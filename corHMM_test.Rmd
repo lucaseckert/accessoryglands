@@ -19,6 +19,7 @@ library(lattice)
 library(ggplot2); theme_set(theme_bw())
 library(colorspace)
 library(GGally)
+library(ggthemes)
 ```
 
 I made a *small* change in `corHMM` that has it return a list of the auxiliary variables it sets up
@@ -183,11 +184,13 @@ all.ci <- data.frame(rate=rep(factor(1:4),3),
                      all.ci)
 all.ci$upr[is.na(all.ci$upr)] <- Inf ## extend NA confidence interval to limit of graph
 
-ggplot(all.ci,
-       aes(rate,est,ymin=lwr,ymax=upr,colour=method)) +
-  geom_pointrange(position=position_dodge(width=0.5)) +
-  scale_colour_discrete_qualitative() +
-  coord_flip()
+print(ggplot(all.ci,
+       aes(rate,est,ymin=lwr,ymax=upr,colour=method))
+      + geom_pointrange(position=position_dodge(width=0.5))
+      + scale_colour_colorblind(guide=guide_legend(reverse=TRUE))
+      + coord_flip()
+      + labs(y="estimated evolutionary rate (hazard)")
+      )
 ```                     
 
 The point estimates for Bayes are a bit lower, due to some combination of priors
@@ -210,5 +213,20 @@ of (ancestrally reconstructed/imputed) traits that are observable in the extant 
 - ??? implement `dev.corhmm` in [Template Model Builder](https://kaskr.github.io/adcomp/Introduction.html) ??? (This would enable much faster estimation and Bayesian analyses)
 - Think more about priors. What is actually a reasonable range? The current values are guessed at from the range set in `corHMM`. Too broad a range breaks `MCMCmetrop1R`, when we go to too extreme a rate value and get numeric errors.  How would we evaluate prior predictive simulations to figure out whether parameters give rise to evolutionary rates/scenarios we would consider unrealistic??
 
+---
+
+Table 1 from Pagel & Meade: $q_{12}$ = gain of multimale system in absence of estrus advertisement; $q_{13}$ = gain of EA in absence of MM system; $q_{24}$=gain of EA in presence of MM; $q_{34}$=gain of MM in presence of EA. $q_{ji}$= loss corresponding to $q_{ij}$.
+
+Phylogeny based on cytochrome B, etc. etc..
+
+Gamma prior on rate coefficients; shape and rate (?) parameters drawn from uniform (0,10)
+
+Obscure statement about branch lengths and rates:
+
+> A factor in choosing the range of the hyperprior is that branch lengths are fixed in most comparative analyses, being given by the trees. This means that the values of the rate parameters can be known only to a constant of proportionality; increasing the branch lengths by a constant multiplier c scales the rate parameters by 1/c so that the product of the rate and branch length remains constant. The mean of the gamma distribution is the product of its two parameters. We drew both at random from the hyperprior, meaning that values up to 100 for the mean could be obtained. If the posterior distributions bunch up at the top end of the 0–100 scale, then the hyperprior’s limits can be shifted or the branches can be scaled to move the rate coefficients to an intermediate value. We updated the gamma prior by drawing new values of a and b from the hyperprior.
+
+Compare results about with Pagel and Meade fig 6?
+
+![posterior distributions of rate parameters](pix/PagelMeade_fig6.png)
 
 ## References
