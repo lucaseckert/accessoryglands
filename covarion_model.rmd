@@ -1,0 +1,28 @@
+---
+title: "covarion model"
+---
+
+As explained in the [corHMM vignette](https://cran.r-project.org/web/packages/corHMM/vignettes/corHMMv2.1-vignette.pdf), the "covarion model" is a model that considers possible transitions among discrete states. The `corHMM` package provides a general framework for fitting these models.
+
+In our case we have three binary characters we are interested in: male parental care (i.e., parental care is either paternal or biparental); opportunity for sperm competition (i.e., mating is either by group spawning or involves alternative reproductive tactics); and presence/absence of accessory glands. That means there are eight possible states that a given evolutionary lineage could be in at any point in time (e.g. 0/0/0 = no male parental care, no sperm competition, no accessory glands; 1/0/1 = male parental care, no sperm competition, accessory glands present). The covarion model is a *continuous-time* evolutionary model, so only one transition can happen at a time; therefore there are 24 possible transitions (including gains and losses as distinct transitions, which might have different evolutionary rates). Ideally we might want to estimate *all* of the rates, but this is almost certainly impossible given (a) the amount of data we have available and (b) a fundamental unidentifiability/ambiguity between gains and losses.
+
+![](trans_pic.png)
+
+In the end, we're going to be particularly interested in contrasts of specific rates. For example, we might want to compare the difference between the rates `*00 → *01` (gain of accessory glands by lineages without sperm competition) and `*10 → *11` (gain of accessory glands by lineages with sperm competition). In the picture above, comparing $\alpha_1$ with $\alpha_8$ (`000 → 001` vs. `010 → 011`) and $\alpha_{14}$ vs. $\alpha_{21}$ (`100 → 101` vs `110 → 111`) for gain, and $\alpha_4$ vs. $\alpha_{11}$, $\alpha_{17}$ vs. $\alpha_{24}$ for the corresponding losses, will allow us to test hypotheses.
+(**better to label states by pairs, e.g. $\theta_{ij}$, to make gain/lo`ss pairs more obvious? Or even $\gamma_{ijk,lmn}$ to be completely explicit?**)
+
+Our first step in simplification will probably be to assume that transitions in parental care and sperm competition state are *exogenous*, i.e. the rates are unaffected by each other and by the presence or absence of accessory glands. This reduces the number of independent rates a lot (how much?). We could say for example that all transitions involving gain of  parental care ($\alpha_3$, $\alpha_6$, $\alpha_9$, $\alpha_12$) are the same, similarly with transitions involving loss of parental care ($\alpha_{13}$, $\alpha_{16}$, $\alpha_{19}$, $\alpha_{22}$). Even if we allow gain and loss to occur at different rates (which might be hard to identify from the data), we have collapsed 8 rate parameters to 2. If we do the same for sperm competition, we drop another 6 parameters. 
+
+The parameters we are most interested in are those involving gain or loss of accessory glands: there are 8 of these (gain and loss for each of the 4 possible parental care/sperm competition states). We might be able to simplify this further by assuming the ratio of the gain rate and loss rate is the same for each of these pairs.  That would mean we're down to 9 parameters (4 for gain/loss of background traits; 4 for the rate of gain/loss as a function of background states; 1 for the gain/loss ratio).
+
+The corHMM package is pretty flexible, and I think we can dig into the guts to make it more flexible. It doesn't provide a built-in way to do Bayesian analysis or to estimate confidence intervals on rate parameters, but I think we can figure out how to do that ...
+
+## next steps
+
+- The first thing to do is to figure out how to fit the *simplest model*. Let's assume for now that gain and loss are **identical** (disappointing but simple). Then we have only 6 independent parameters (parental care evolutionary rate, mating system evol rate, 4 different evol rates for accessory glands in different backgrouns).  Can we do that model?
+- The next thing to do after this will be to see  how much we have to hack `corHMM`: we will do the hacking at my fork of the `corHMM` package [here](https://github.com/bbolker/corHMM/) to:
+    - get Wald confidence intervals and/or likelihood profile confidence intervals
+	- set gain/loss ratio as a parameter
+	- do Metropolis-Hastings over parameters ... ?
+    - ??? use TMB etc for the guts ???
+
