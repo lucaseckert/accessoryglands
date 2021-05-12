@@ -1,0 +1,608 @@
+order,family,genus,species,common.name,ag.presence,ag.origin,ag.type,env,fertilization,mating,care,spawning
+Acipenseriformes,Acipenseridae,Acipenser,Acipenser_baerii,siberian sturgeon,0,n/a,n/a,F,E    ,NA,n/a,NA
+Acipenseriformes,Acipenseridae,Acipenser,Acipenser_brevirostrum,shortnose sturgeon,0,n/a,n/a,"F,M",E,C,n/a,S
+Acipenseriformes,Acipenseridae,Acipenser,Acipenser_fulvescens,Lake sturgeon,0,n/a,n/a,"F,M",E,C,n/a,G
+Acipenseriformes,Acipenseridae,Acipenser,Acipenser_gueldenstaedtii,russian sturgeon,0,n/a,n/a,"F,M",E,NA,n/a,NA
+Acipenseriformes,Acipenseridae,Acipenser,Acipenser_medirostris,green sturgeon,0,n/a,n/a,"F,M",E,M,n/a,P  
+Acipenseriformes,Acipenseridae,Acipenser,Acipenser_nudiventris,ship sturgeon,0,n/a,n/a,"F,M",E,A,n/a,P
+Acipenseriformes,Acipenseridae,Acipenser,Acipenser_oxyrinchus,atlantic sturgeon,0,n/a,n/a,"F,M",E,C,n/a,G
+Acipenseriformes,Acipenseridae,Acipenser,Acipenser_persicus,persian sturgeon,0,n/a,n/a,"F,M",E,NA,n/a,NA
+Acipenseriformes,Acipenseridae,Acipenser,Acipenser_ruthenus,sterlet sturgeon,0,n/a,n/a,F,E,NA,n/a,NA
+Acipenseriformes,Acipenseridae,Acipenser,Acipenser_sinensis,chinese sturgeon,0,n/a,n/a,"F,M",E,NA,n/a,NA
+Acipenseriformes,Acipenseridae,Acipenser,Acipenser_stellatus,stellate sturgeon,0,n/a,n/a,"F,M",E,NA,n/a,NA
+Acipenseriformes,Acipenseridae,Acipenser,Acipenser_sturio,baltic sturgeon,0,n/a,n/a,"F,M",E,A,n/a,P
+Acipenseriformes,Acipenseridae,Acipenser,Acipenser_transmontanus,white sturgeon,0,n/a,n/a,"F,M",E,G,n/a,P
+Acipenseriformes,Acipenseridae,Huso,Huso_dauricus,kaluga,0,n/a,n/a,"F,M",E,NA,n/a,NA
+Acipenseriformes,Acipenseridae,Huso,Huso_huso,beluga,0,n/a,n/a,"F,M",E,NA,n/a,NA
+Acipenseriformes,Polyodontidae,Polyodon,Polyodon_spathula,paddlefish,0,n/a,n/a,F,E,C,n/a,G
+Albuliformes,Albulidae,Albula,Albula_vulpes,Bonefish,0,n/a,n/a,M,E,C,n/a,G
+Albuliformes,Albulidae,Nemoossis,Pterothrissus_belloci,Longfin bonefish,0,n/a,n/a,M,E,C,n/a,G
+Albuliformes,Albulidae,Pterothrissus,Pterothrissus_gissu,Japanese gissu,0,n/a,n/a,M,E,C,n/a,G
+Amiiformes,Amiidae,Amia,Amia_calva,Bowfin,0,n/a,n/a,F,E,M,M,P
+Anguilliformes,Anguillidae,Anguilla,Anguilla_anguilla,european eel,0,n/a,n/a,"F,M",E,A,n/a,G
+Anguilliformes,Chlopsidae,Chilorhinus,Chilorhinus_platyrhynchus,flatnose xenocongrid eel,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Chlopsidae,Chilorhinus,Chilorhinus_suensonii,seagrass eel,0,n/a,n/a,M,E,NA,n/a,NA
+Anguilliformes,Chlopsidae,Kaupichthys,Kaupichthys_hyoproroides,false moray,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Colocongridae,Coloconger,Coloconger_cadenati,,0,n/a,n/a,M,E,NA,NA,NA
+Anguilliformes,Congridae,Acromycter,Acromycter_perturbator,,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Congridae,Ariosoma,Ariosoma_anago,silvery conger,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Congridae,Ariosoma,Ariosoma_marginatum,large-eye conger,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Congridae,Ariosoma,Ariosoma_selenops,,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Congridae,Bathycongrus retrotinctus,Bathycongrus retrotinctus_retrotincta,blackedge conger,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Congridae,Coloconger,Coloconger_meadi,,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Congridae,Coloconger,Coloconger_raniceps,froghead eel,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Congridae,Conger,Conger_conger,European conger,0,n/a,n/a,M,E,NA,NA,NA
+Anguilliformes,Congridae,Conger,Conger_myriaster,Whitespotted conger,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Congridae,Conger,Conger_oceanicus,American conger,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Congridae,Congriscus,Congriscus_megastomus,,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Congridae,Gnathophis,Gnathophis_habenatus,little conger eel,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Congridae,Gnathophis,Gnathophis_heterognathos,,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Congridae,Heteroconger,Heteroconger_longissimus,Brown garden eel,0,n/a,n/a,M,NA,NA,NA,P
+Anguilliformes,Congridae,Paraconger,Paraconger_notialis,Guinean conger,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Congridae,Pseudophichthys,Pseudophichthys_splendens,purplemouthed conger,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Congridae,Rhynchoconger,Rhynchoconger_flavus,yellow conger,0,n/a,n/a,M,E,NA,NA,NA
+Anguilliformes,Congridae,Rhynchoconger,Rhynchoconger_gracilior,whiptail conger,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Congridae,Xenomystax,Xenomystax_atrarius,deepwater conger,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Congridae,Xenomystax,Xenomystax_congroides,bristletooth conger,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Derichthyidae,Derichthys,Derichthys_serpentinus,narrownecked oceanic eel,0,n/a,n/a,M,NA,NA,n/a,NA
+Anguilliformes,Derichthyidae,Nessorhamphus,Nessorhamphus_ingolfianus,duckbill oceanic eel,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Derichthyidae,Nessorhamphus ,Nessorhamphus_danae,dana duckbill eel,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Heterenchelyidae,Pythonichthys,Pythonichthys_asodes,Pacific mud eel,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Muraenesocidae,Congresox,Congresox_talabon,yellow pike conger,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Muraenesocidae,Gavialiceps,Gavialiceps_taeniola,,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Muraenesocidae,Muraenesox,Muraenesox_cinereus,daggertooth pike conger,0,n/a,n/a,"F,M",E,NA,n/a,NA
+Anguilliformes,Muraenesocidae,Oxyconger,Oxyconger_leptognathus,shorttail pike conger,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Muraenidae,Echidna,Echidna_nebulosa,starry moray,0,n/a,n/a,M,E,NA,n/a,NA
+Anguilliformes,Muraenidae,Gymnomuraena,Gymnomuraena_zebra,zebra moray,0,n/a,n/a,M,E,NA,n/a,NA
+Anguilliformes,Muraenidae,Gymnothorax,Gymnothorax_buroensis,vagrant moray,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Muraenidae,Gymnothorax,Gymnothorax_hepaticus,liver-colored moray,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Muraenidae,Gymnothorax,Gymnothorax_herrei,Herre's moray,0,n/a,n/a,M,E,A,n/a,G
+Anguilliformes,Muraenidae,Gymnothorax,Gymnothorax_margaritophorus,blotch-necked moray,0,n/a,n/a,M,E,NA,n/a,NA
+Anguilliformes,Muraenidae,Gymnothorax,Gymnothorax_meleagris,turkey moray,0,n/a,n/a,"F,M",NA,NA,NA,NA
+Anguilliformes,Muraenidae,Gymnothorax,Gymnothorax_richardsonii,Richardson's moray,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Muraenidae,Gymnothorax,Gymnothorax_undulatus,undulated moray,0,n/a,n/a,M,E,NA,NA,NA
+Anguilliformes,Muraenidae,Gymnothorax,Gymnothorax_zonipectis,barredfin moray,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Nemichthyidae,Avocettina,Avocettina_bowersii,,0,n/a,n/a,M,E,NA,NA,NA
+Anguilliformes,Nemichthyidae,Avocettina,Avocettina_infans,avocet snipe eel,0,n/a,n/a,M,E,NA,n/a,NA
+Anguilliformes,Nemichthyidae,Nemichthys,Nemichthys_scolopaceus,slender snipe eel,0,n/a,n/a,M,E,NA,n/a,NA
+Anguilliformes,Nettastomatidae,Facciolella,Facciolella_equatorialis,dogface witch eel,0,n/a,n/a,M,E,NA,NA,NA
+Anguilliformes,Nettastomatidae,Hoplunnis,Hoplunnis_macrura,,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Nettastomatidae,Nettastoma,Nettastoma_melanurum,blackfin sorcerer,0,n/a,n/a,M,E,NA,n/a,NA
+Anguilliformes,Nettastomatidae,Saurenchelys,Saurenchelys_fierasfer,,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Serrivomeridae,Serrivomer,Serrivomer_beanii,stout sawpalate,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Serrivomeridae,Serrivomer,Serrivomer_samoensis,samoa sawtooth,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Serrivomeridae,Serrivomer,Serrivomer_sector,sawtooth eel,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Synaphobranchidae,Atractodenchelys,Atractodenchelys_phrix,,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Synaphobranchidae,Dysomma,Dysomma_anguillare,short belly eel,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Synaphobranchidae,Dysommina,Dysommina_rugosa,,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Synaphobranchidae,Ilyophis,Ilyophis_brunneus,muddy arrowtooth,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Synaphobranchidae,Simenchelys,Simenchelys_parasitica,snubnosed eel,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Synaphobranchidae,Synaphobranchus,Synaphobranchus_affinis,grey cutthroat,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Synaphobranchidae,Synaphobranchus,Synaphobranchus_brevidorsalis,Shortdorsal cutthroat eel,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Synaphobranchidae,Synaphobranchus,Synaphobranchus_kaupii,Kaupi's arrowtooth,0,n/a,n/a,M,NA,NA,NA,NA
+Anguilliformes,Synaphobranchidae,Synaphobranchus,Synaphobranchus_oregoni,,0,n/a,n/a,M,NA,NA,NA,NA
+Atheriniformes,Atherinopsidae,Menidia,Menidia_menidia,Atlantic silverside,0,n/a,n/a,M,E,C,n/a,G
+Atheriniformes,Atherinopsidae,Odontesthes,Odontesthes_nigricans,South american silverside,0,n/a,n/a,"F,M",NA,NA,NA,NA
+Atheriniformes,Atherinopsidae,Odontesthes,Odontesthes_smitti,Neotropical silverside,0,n/a,n/a,F,NA,NA,NA,NA
+Atheriniformes,Melanotaeniidae,Glossolepis,Glossolepis_incisus,red raindowfish,0,n/a,n/a,F,E,NA,NA,P
+Atheriniformes,Melanotaeniidae,Melanotaenia,Melanotaenia_nigrans,Black-banded rainbowfish,0,n/a,n/a,F,E,Y,n/a,P
+Atheriniformes,Phallostethidae,Gulaphallus,Gulaphallus_bikolanus,,0,n/a,n/a,F,I,NA,NA,NA
+Atheriniformes,Phallostethidae,Gulaphallus,Gulaphallus_mirabilis,,0,n/a,n/a,NA,I,NA,n/a,P
+Atheriniformes,Phallostethidae,Neostethus,Neostethus_bicornis,,0,n/a,n/a,"F,B",I,NA,n/a,P
+Atheriniformes,Phallostethidae,Neostethus,Neostethus_borneensis,,0,n/a,n/a,F,I,NA,NA,NA
+Atheriniformes,Phallostethidae,Neostethus,Neostethus_lankesteri,,0,n/a,n/a,F,I,NA,n/a,P
+Atheriniformes,Phallostethidae,Phenacostethus ,Phenacostethus_posthon,,0,n/a,n/a,F,I,NA,NA,P
+Atheriniformes,Phallostethidae,Phenacostethus ,Phenacostethus_smithi,Smith's priapium,0,n/a,n/a,F,I,NA,NA,P
+Atheriniformes,Pseudomugilidae,Pseudomugil,Pseudomugil_gertrudae,Spotted blue-eye,0,n/a,n/a,F,E,NA,n/a,P
+Atheriniformes,Pseudomugilidae,Pseudomugil,Pseudomugil_mellis,Honey blue-eye,0,n/a,n/a,F,E,NA,n/a,P
+Atheriniformes,Pseudomugilidae,Pseudomugil,Pseudomugil_signifer,Pacific blue-eye,0,n/a,n/a,F,E,NA,n/a,P
+Atheriniformes,Pseudomugilidae,Pseudomugil,Pseudomugil_tenellus,Delicate blue-eye,0,n/a,n/a,F,E,NA,n/a,P
+Aulopiformes,Alepisauridae,Alepisaurus,Alepisaurus_ferox,long snouted lancetfish,0,n/a,n/a,M,NA,H,NA,NA
+Aulopiformes,Bathysauridae,Bathysaurus,Bathysaurus_ferox,deep-sea lizard fish,0,n/a,n/a,M,NA,H,NA,NA
+Aulopiformes,Bathysauridae,Bathysaurus,Bathysaurus_mollis,highfin lizardfish,0,n/a,n/a,M,NA,H,NA,NA
+Aulopiformes,Chlorophthalmidae,Chlorophthalmus,Chlorophthalmus_agassizi,Shortnose greeneye,0,n/a,n/a,M,E,H,n/a,NA
+Aulopiformes,Chlorophthalmidae,Parasudis,Parasudis_truculenta,Longnose greeneye,0,n/a,n/a,M,E,H,NA,NA
+Aulopiformes,Giganturidae,Gigantura,Gigantura_indica,Telescopefish,0,n/a,n/a,NA,NA,H,NA,NA
+Aulopiformes,Ipnopidae,Bathypterois,Bathypterois_dubius,mediterranean spiderfish,0,n/a,n/a,M,NA,H,NA,NA
+Aulopiformes,Synodontidae,Synodus,Synodus_ulae,Red lizard fish,0,n/a,n/a,M,E,NA,n/a,P
+Batrachoidiformes,Batrachoididae,Halobatrachus,Halobatrachus_didactylus,Lusitanian toadfish,1,S,S,M,E,G,M,S
+Batrachoidiformes,Batrachoididae,Opsanus,Opsanus_tau,Oyster toadfish,1,S,S,M,E,G,M,S
+Batrachoidiformes,Batrachoididae,Porichthys,Porichthys_notatus,Plainfin midshipman,1,S,S,M,E,G,M,S
+Beloniformes,Adrianichthyidae,Oryzias,Oryzias_latipes,Japanese medaka,0,n/a,n/a,"F,M",I,G,n/a,S
+Beloniformes,Belonidae,Tylosurus,Tylosurus_acus melanotus,keel-jawed needlefish,0,n/a,n/a,M,E,NA,NA,NA
+Beloniformes,Belonidae,Xenentodon,Xenentodon_cancila,freshwater garfish,0,n/a,n/a,"F,M",E,A,n/a,P
+Beloniformes,Exocoetidae,Parexocoetus,Parexocoetus_brachypterus,Salinfin flyingfish,0,n/a,n/a,M,E,C,n/a,G
+Beloniformes,Hemiramphidae,Hemiramphus,Hemiramphus_saltator,Longfin halfbeak,0,n/a,n/a,M,E,NA,NA,NA
+Beloniformes,Hemiramphidae,Hyporhamphus,Hyporhamphus_unifasciatus,Common halfbeak,0,n/a,n/a,M,E,NA,NA,NA
+Beloniformes,Zenarchopteridae,Dermogenys,Dermogenys_montana,,0,n/a,n/a,F,I,NA,F,NA
+Beloniformes,Zenarchopteridae,Dermogenys,Dermogenys_orientalis,,0,n/a,n/a,F,I,NA,F,NA
+Beloniformes,Zenarchopteridae,Dermogenys,Dermogenys_pusilla,wrestling halfbeak,0,n/a,n/a,F,I,NA,F,NA
+Beloniformes,Zenarchopteridae,Dermogenys,Nomorhamphus_ebrardtii,,0,n/a,n/a,F,I,NA,F,P
+Beloniformes,Zenarchopteridae,Dermogenys,Nomorhamphus_vivipara,,0,n/a,n/a,F,I,NA,F,NA
+Beloniformes,Zenarchopteridae,Dermogenys,Nomorhamphus_weberi,,0,n/a,n/a,F,I,NA,F,NA
+Beloniformes,Zenarchopteridae,Hemirhamphodon,Hemirhamphodon_chrysopunctatus,,0,n/a,n/a,F,I,NA,F,NA
+Beloniformes,Zenarchopteridae,Hemirhamphodon,Hemirhamphodon_kapuasensis,,0,n/a,n/a,F,I,NA,F,NA
+Beloniformes,Zenarchopteridae,Hemirhamphodon,Hemirhamphodon_kuekenthali,,0,n/a,n/a,F,I,NA,F,NA
+Beloniformes,Zenarchopteridae,Hemirhamphodon,Hemirhamphodon_phaiosoma,,0,n/a,n/a,F,I,NA,F,NA
+Beloniformes,Zenarchopteridae,Hemirhamphodon,Hemirhamphodon_pogonognathus,forest halfbeak,0,n/a,n/a,F,I,NA,F,NA
+Beloniformes,Zenarchopteridae,Hemirhamphodon,Hemirhamphodon_tengah,,0,n/a,n/a,F,I,C,NA,P
+Beloniformes,Zenarchopteridae,Nomorhamphus,Nomorhamphus_celebensis,poso halfbeak,0,n/a,n/a,F,I,NA,F,NA
+Beloniformes,Zenarchopteridae,Nomorhamphus,Nomorhamphus_liemi,celebes halfbeak,0,n/a,n/a,F,I,NA,F,S
+Beloniformes,Zenarchopteridae,Nomorhamphus,Nomorhamphus_ravnaki,,0,n/a,n/a,F,I,NA,F,NA
+Beloniformes,Zenarchopteridae,Nomorhamphus,Nomorhamphus_sanussii,,0,n/a,n/a,F,I,NA,NA,NA
+Beloniformes,Zenarchopteridae,Nomorhamphus,Nomorhamphus_towoetii,,0,n/a,n/a,F,I,NA,F,NA
+Beloniformes,Zenarchopteridae,Zenarchopterus,Zenarchopterus_buffonis,Buffon's river garfish,0,n/a,n/a,M,I,NA,F,"G,P"
+Beloniformes,Zenarchopteridae,Zenarchopterus,Zenarchopterus_gilli,Viviparous halfbeak,0,n/a,n/a,M,I,NA,F,"G,P"
+Beryciformes,Berycidae,Beryx,Beryx_splendens,splendid alfonsino,0,n/a,n/a,M,E,C,n/a,G
+Beryciformes,Trachichthyidae,Hoplostethus,Hoplostethus_atlanticus,orange roughy,0,n/a,n/a,M,E,C,n/a,G
+Cetomimiformes,Cetomimidae,Cetostoma,Cetostoma_regani,,0,n/a,n/a,M,NA,NA,NA,NA
+Characiformes,Acestrorhynchidae,Acestrorhynchus,Acestrorhynchus_lacustris,,0,n/a,n/a,F,E,NA,NA,NA
+Characiformes,Anostomidae,Leporinus,Leporinus_macrocephalus,,0,n/a,n/a,F,E,NA,n/a,P
+Characiformes,Bryconidae,Brycon,Brycon_opalinus,,0,n/a,n/a,F,E,NA,NA,NA
+Characiformes,Bryconidae,Brycon,Brycon_orthotaenia,,0,n/a,n/a,F,E,NA,NA,NA
+Characiformes,Characidae,Argopleura,Argopleura_chocoensis,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Argopleura,Argopleura_magdalenensis,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Brittanichthys,Brittanichthys_axelrodi,,0,n/a,n/a,F,NA,NA,NA,NA
+Characiformes,Characidae,Corynopoma ,Corynopoma_riisei,swordtail characin,0,n/a,n/a,F,I,M,n/a,S
+Characiformes,Characidae,Diapoma,Diapoma_speculiferum,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Diapoma,Diapoma_terofali,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Gephyrocharax,Gephyrocharax_atracaudatus,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Gephyrocharax,Gephyrocharax_chocoensis,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Gephyrocharax,Gephyrocharax_intermedius,,0,n/a,n/a,F,NA,NA,NA,NA
+Characiformes,Characidae,Gephyrocharax,Gephyrocharax_valencia,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Gephyrocharax,Gephyrocharax_venezuelae,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Glandulocauda,Glandulocauda_melanopleura,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Gymnocharacinus,Gymnocharacinus_bergii,Naked characin,0,n/a,n/a,F,E,NA,n/a,P
+Characiformes,Characidae,Hysteronotus,Chrysobrycon_hesperus,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Hysteronotus,Chrysobrycon_myersi,,0,n/a,n/a,F,NA,NA,NA,NA
+Characiformes,Characidae,Hysteronotus,Hysteronotus_megalostomus,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Iotabrycon,Iotabrycon_praecox,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Landonia,Landonia_latidens,,0,n/a,n/a,F,NA,NA,NA,NA
+Characiformes,Characidae,Mimagoniates,Mimagoniates_barberi,,0,n/a,n/a,F,I,NA,n/a,NA
+Characiformes,Characidae,Mimagoniates,Mimagoniates_lateralis,,0,n/a,n/a,F,E,NA,n/a,NA
+Characiformes,Characidae,Mimagoniates,Mimagoniates_microlepis,blue tetra,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Mimagoniates,Mimagoniates_rheocharis,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Mimagoniates,Mimagoniates_sylvicola,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Phenacobrycon,Phenacobrycon_henni,,0,n/a,n/a,F,NA,NA,NA,NA
+Characiformes,Characidae,Planaltina,Planaltina_myersi,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Pseudocorynopoma,Pseudocorynopoma_doriae,dragonfin tetra,0,n/a,n/a,F,E,NA,n/a,P
+Characiformes,Characidae,Pseudocorynopoma,Pseudocorynopoma_heterandria,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Pterobrycon,Pterobrycon_myrnae,,0,n/a,n/a,F,I,C,NA,P
+Characiformes,Characidae,Ptychocharax,Ptychocharax_rhyacophila,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Characidae,Xenurobrycon,Xenurobrycon_polyancistrus,,0,n/a,n/a,F,I,NA,NA,NA
+Characiformes,Chilodontidae,Chilodus,Chilodus_punctatus,Spotted headstander,0,n/a,n/a,F,E,NA,n/a,NA
+Characiformes,Distichondontidae,Distichodus,Distichodus_rostratus,Grass-eater,0,n/a,n/a,F,NA,NA,NA,NA
+Characiformes,Hepsetidae,Hepsetus,Hepsetus_odoe,african pike,0,n/a,n/a,F,E,M,B,P
+Characiformes,Iguanodectidae,Bryconops,Bryconops_affinis,Orangefin tetra,0,n/a,n/a,F,E,NA,n/a,NA
+Characiformes,Iguanodectidae,Bryconops,Bryconops_melanurus,,0,n/a,n/a,F,E,NA,n/a,NA
+Characiformes,Parodontidae,Apareiodon,Apareiodon_affinis,Darter characine,0,n/a,n/a,F,E,NA,n/a,NA
+Characiformes,Parodontidae,Apareiodon,Apareiodon_ibitiensis,,0,n/a,n/a,F,E,C,n/a,G
+Characiformes,Parodontidae,Apareiodon,Apareiodon_piracicabae,,0,n/a,n/a,F,E,C,n/a,G
+Characiformes,Prochilodontidae,Prochilodus,Prochilodus_argenteus,,0,n/a,n/a,F,E,G,NA,G
+Clupeiformes,Chirocentridae,Chirocentrus,Chirocentrus_dorab,Dorab wolf-herring,0,n/a,n/a,M,NA,NA,NA,NA
+Clupeiformes,Clupeidae,Jenkinsia,Jenkinsia_lamprotaenia,Dwarf round herring,0,n/a,n/a,M,E,C,n/a,G
+Clupeiformes,Clupeidae,Sardina,Sardina_pilchardus,European pilchard,0,n/a,n/a,"F,M",E,C,n/a,G
+Clupeiformes,Engraulidae,Engraulis,Engraulis_encrasicolus,European anchovy,0,n/a,n/a,M,E,C,n/a,G
+Clupeiformes,Engraulidae,Stolephorus,Stolephorus_commersonnii,Commerson's anchovy,0,n/a,n/a,M,E,C,NA,NA
+Cypriniformes,Botiidae,Leptobotia,Leptobotia_elongata,,0,n/a,n/a,F,E,NA,NA,NA
+Cypriniformes,Catostomidae,Erimyzon,Erimyzon_oblongus,Eastern creek chubsucker,0,n/a,n/a,F,E,C,M,S
+Cypriniformes,Cobitidae,Cobitis,Cobitis_striata,Striated spined loach,0,n/a,n/a,F,E,C,NA,P
+Cypriniformes,Cyprinidae,Danio,Danio_rerio,zebrafish,0,n/a,n/a,F,E,C,n/a,S
+Cypriniformes,Cyprinidae,Puntius,Puntius_denisonii,denison barb,0,n/a,n/a,F,NA,NA,n/a,NA
+Cypriniformes,Cyprinidae,Rhodeus,Rhodeus_ocellatus,Rosy bitterling,0,n/a,n/a,F,E,C,n/a,S 
+Cypriniformes,Cyprinidae,Rhodeus,Rhodeus_sericeus,Bitterling,0,n/a,n/a,F,E,G,n/a,S
+Cypriniformes,Cyprinidae,Rutilus,Rutilus_rutilus,Roach,0,n/a,n/a,F,E,G,n/a,S
+Cyprinodontiformes,Anablepidae,Anableps,Anableps_anableps,Largescale foureyes,0,n/a,n/a,F,I,NA,F,NA
+Cyprinodontiformes,Anablepidae,Anableps,Anableps_dowei,pacific foureyed fish,0,n/a,n/a,"F,M",I,NA,NA,NA
+Cyprinodontiformes,Anablepidae,Jenynsia,Jenynsia_lineata,onesided livebearer,0,n/a,n/a,F,I,NA,F,P
+Cyprinodontiformes,Anablepidae,Jenynsia,Jenynsia_multidentata,Rio de la Plata one-sided livebearer,0,n/a,n/a,F,I,A,F,P
+Cyprinodontiformes,Cyprinodontidae,Cyprinodon,Cyprinodon_variegatus_variegatus,Sheepshead minnow,0,n/a,n/a,"F,M",E,G,M,S
+Cyprinodontiformes,Fundulidae,Fundulus,Fundulus_heteroclitus_heteroclitus,mummichog,0,n/a,n/a,"F,M",E,G,n/a,S
+Cyprinodontiformes,Goodeidae,Girardinichthys,Girardinichthys_multiradiatus,Darkedged splitfin,0,n/a,n/a,F,I,NA,F,S
+Cyprinodontiformes,Poeciliidae,Poecilia,Poecilia_reticulata,Guppy,0,n/a,n/a,F,I,C,F,S 
+Cyprinodontiformes,Poeciliidae,Xiphophorus,Xiphophorus_variatus,Variable platyfish,0,n/a,n/a,F,I,NA,F,S
+Cyprinodontiformes,Rivulidae,Austrolebias,Austrolebias_charrua,,0,n/a,n/a,F,E,M,NA,P
+Cyprinodontiformes,Rivulidae,Kryptolebias,Kryptolebias_marmoratus,mangrove rivulus,0,n/a,n/a,F,I,H,n/a,NA
+Elopiformes,Elopidae,Elops,Elops_saurus,Ladyfish,0,n/a,n/a,M,E,C,n/a,G
+Elopiformes,Megalopidae,Megalops,Megalops_atlanticus,Tarpon,0,n/a,n/a,"F,M",E,C,n/a,G
+Elopiformes,Megalopidae,Megalops,Megalops_cyprinoides,Indo-Pacific tarpon,0,n/a,n/a,"F,M",E,C,n/a,G
+Esociformes,Esocidae,Esox,Esox_lucius,Northern pike,0,n/a,n/a,"F,M",E,C,n/a,"G,P"
+Gadiformes,Gadidae,Gadus,Gadus_morhua,Atlantic cod,0,n/a,n/a,M,E,C,n/a,G
+Gadiformes,Gadidae,Melanogrammus,Melanogrammus_aeglefinus,Haddock,0,n/a,n/a,M,E,C,n/a,P
+Gadiformes,Gadidae,Theragra,Theragra_chalcogramma,Alaska pollock,0,n/a,n/a,M,E,C,n/a,G
+Gadiformes,Macrouridae,Coryphaenoides,Coryphaenoides_rupestris,roundnose grenadier,0,n/a,n/a,F,E,C,n/a,G
+Gadiformes,Merlucciidae,Macruronus,Macruronus_novaezelandiae,blue grenadier,0,n/a,n/a,M,E,NA,n/a,NA
+Gadiformes,Moridae,Pseudophycis,Pseudophycis_bachus,red codling,0,n/a,n/a,M,E,NA,n/a,NA
+Gadiformes,Phycidae,Phycis,Phycis_phycis,forkbeard,0,n/a,n/a,M,E,NA,n/a,NA
+Gadiformes,Phycidae,Urophycis,Urophycis_brasiliensis,Brazilian codling,0,n/a,n/a,M,NA,NA,NA,G
+Gasterosteiformes,Gasterosteidae,Gasterosteus,Gasterosteus_aculeatus,Three-spined stickleback,0,n/a,n/a,"F,M",E,C,M,S
+Gasterosteiformes,Gasterosteidae,Spinachia,Spinachia_spinachia,Sea stickleback,0,n/a,n/a,M,E,G,M,S
+Gasterosteiformes,Hypoptychidae,Hypoptychus,Hypoptychus_dybowskii,Korean sandlance,0,n/a,n/a,M,E,G,n/a,S
+Gasterosteiformes,Indostomidae,Indostomus,Indostomus_paradoxus,Pipe fish,0,n/a,n/a,F,NA,NA,NA,NA
+Gasterosteiformes,Pegasidae,Eurypegasus,Eurypegasus_draconis,Short dragonfish,0,n/a,n/a,F,E,M,n/a,P
+Gobiesociformes,Gobiesocidae,Gobiesox,Gobiesox_maeandricus,Northern clingfish,0,n/a,n/a,M,E,NA,M,NA
+Gobiesociformes,Gobiesocidae,Lepadogaster,Lepadogaster_lepadogaster,Shore clingfish,0,n/a,n/a,M,E,NA,B,NA
+Gonornchiformes,Chanidae,Chanos,Chanos_chanos,Milkfish,0,n/a,n/a,"F,M",E,C,n/a,G
+Gymnotiformes,Apteronotidae,Apteronotus,Apteronotus_leptorhynchus,Brown ghost knifefish,0,n/a,n/a,F,E,NA,n/a,P
+Gymnotiformes,Gymnotidae,Gymnotus,Gymnotus_carapo,Banded knifefish,0,n/a,n/a,F,E,NA,M,NA
+Gymnotiformes,Hypopomidae,Brachyhypopomus,Brachyhypopomus_pinnicaudatus,,0,n/a,n/a,F,E,G,n/a,P
+Gymnotiformes,Sternopygidae,Eigenmannia,Eigenmannia_trilineata,,0,n/a,n/a,F,E,NA,M,NA
+Gymnotiformes,Sternopygidae,Eigenmannia,Eigenmannia_virescens,Glass knifefish,0,n/a,n/a,F,E,NA,n/a,P
+Lampriformes,Regalecidae,Regalecus,Regalecus_russelii,oarfish,0,n/a,n/a,M,E,NA,n/a,NA
+Lampriformes,Trachipteridae,Trachipterus,Trachipterus_ishikawae,slender ribbonfish,0,n/a,n/a,M,NA,NA,NA,NA
+Lepisosteiformes,Lepisosteidae,Atractosteus,Atractosteus_spatula,alligator gar,0,n/a,n/a,F,E,G,n/a,P
+Lepisosteiformes,Lepisosteidae,Atractosteus,Atractosteus_tropicus,tropical gar,0,n/a,n/a,F,E,A,n/a,P
+Lepisosteiformes,Lepisosteidae,Lepisosteus,Lepisosteus_oculatus,spotted gar,0,n/a,n/a,F,E,C,n/a,G
+Lepisosteiformes,Lepisosteidae,Lepisosteus,Lepisosteus_osseus,longnose gar,0,n/a,n/a,F,E,C,n/a,G
+Lophiiformes,Caulophrynidae,Caulophryne,Caulophryne_jordani,Fanfin angler,0,n/a,n/a,M,E,NA,NA,NA
+Lophiiformes,Caulophrynidae,Robia,Robia_legula,,0,n/a,n/a,M,E,NA,NA,NA
+Lophiiformes,Ceratiidae,Ceratias,Ceratias_holboelli,Kroyer's deep-sea angler fish,0,n/a,n/a,M,E,A,NA,NA
+Lophiiformes,Linophrynidae,Borophryne,Borophryne_apogon,,0,n/a,n/a,M,NA,NA,NA,NA
+Lophiiformes,Linophrynidae,Haplophryne,Haplophryne_mollis,soft leafvent angler,0,n/a,n/a,M,I,NA,NA,NA
+Lophiiformes,Lophiidae,Lophius,Lophius_budegassa,blackbellied angler,0,n/a,n/a,M,E,NA,n/a,NA
+Lophiiformes,Melanocetidae,Melanocetus,Melanocetus_johnsonii,humpback anglerfish,0,n/a,n/a,M,NA,NA,n/a,P
+Lophiiformes,Melanocetidae,Melanocetus,Melanocetus_murrayi,murray's abyssal anglerfish,0,n/a,n/a,M,NA,NA,NA,P
+Lophiiformes,Neoceratiidae,Neoceratias,Neoceratias_spinifer,,0,n/a,n/a,M,NA,NA,NA,P
+Lophiiformes,Oneirodidae,Bertella,Bertella_idiomorpha,,0,n/a,n/a,M,NA,NA,NA,P
+Lophiiformes,Oneirodidae,Leptacanthichthys,Leptacanthichthys_gracilispinis,plainchin dreamarm,0,n/a,n/a,M,NA,NA,NA,P
+Mugiliformes,Mugilidae,Chelon,Chelon_labrosus,Thicklip grey mullet,0,n/a,n/a,"F,M",E,C,n/a,NA
+Mugiliformes,Mugilidae,Liza,Liza_dumerili,grooved mullet,0,n/a,n/a,"F,M",E,NA,n/a,NA
+Mugiliformes,Mugilidae,Mugil,Mugil_cephalus,Flathead grey mullet,0,n/a,n/a,"F,M",E,C,n/a,G
+Mugiliformes,Mugilidae,Mugil,Mugil_liza,Lebranche mullet,0,n/a,n/a,"F,M",E,NA,n/a,NA
+Myctophiformes,Myctophidae,Benthosema,Benthosema_pterotum,Skinnycheek lanternfish,0,n/a,n/a,M,E,C,n/a,G
+Myctophiformes,Myctophidae,Lampanyctodes,Lampanyctodes_hectoris,Hector's lanternish,0,n/a,n/a,M,E,NA,n/a,NA
+Notacanthiformes,Notacanthidae,Polyacanthonotus,Polyacanthonotus_challengeri,longnose tapirfish,0,n/a,n/a,M,NA,NA,NA,NA
+Notacanthiformes,Notacanthidae ,Polyacanthonotus,Polyacanthonotus_rissoanus,Smallmouth spiny eel,0,n/a,n/a,M,NA,NA,NA,NA
+Ophidiiformes,Aphyonidae,Barathronus,Barathronus_multidens,,0,n/a,n/a,M,I,NA,F,NA
+Ophidiiformes,Aphyonidae,Barathronus,Barathronus_unicolor,,0,n/a,n/a,M,I,NA,F,NA
+Ophidiiformes,Bythitidae,Cataetyx ,Cataetyx_alleni,,0,n/a,n/a,M,I,NA,F,NA
+Ophidiiformes,Bythitidae,Ogilbia,Ogilbia_cayorum,Key brotula,0,n/a,n/a,M,I,NA,F,NA
+Ophidiiformes,Carapidae,Carapus,Carapus_bermudensis,pearlfish,0,n/a,n/a,M,E,NA,NA,NA
+Ophidiiformes,Ophidiidae,Ophidion,Ophidion_barbatum,snake blenny,0,n/a,n/a,M,E,NA,n/a,NA
+Osmeriformes,Alepocephalidae,Alepocephalus,Alepocephalus_bairdii,Baird's slickhead,0,n/a,n/a,M,E,C,n/a,G
+Osmeriformes,Alepocephalidae,Bathytroctes,Bathytroctes_microlepis,Smallscale smooth-head,0,n/a,n/a,M,E,C,n/a,G
+Osmeriformes,Galaxiidae,Galaxias,Galaxias_fasciatus,Banded kokopu,0,n/a,n/a,"F,M",E,NA,n/a,P
+Osmeriformes,Lepidogalaxiidae,Lepidogalaxias ,Lepidogalaxias_salamandroides,Salamanderfish,1,S,S,F,I,NA,n/a,P
+Osmeriformes,Osmeridae,Hypomesus,Hypomesus_japonicus,Japanese surf smelt,0,n/a,n/a,"F,M",E,C,n/a,G
+Osmeriformes,Retropinnidae,Prototroctes,Prototroctes_maraena,Australian grayling,0,n/a,n/a,"F,M",NA,NA,n/a,NA
+Osteoglossiformes,Arapaimidae,Arapaima,Arapaima_gigas,Arapaima,0,n/a,n/a,F,NA,NA,M,P
+Osteoglossiformes,Gymnarchidae,Gymnarchus,Gymnarchus_niloticus,Aba,0,n/a,n/a,F,E,NA,M,NA
+Osteoglossiformes,Hiodontidae,Hiodon,Hiodon_alosoides,Goldeye,0,n/a,n/a,F,E,C,n/a,G
+Osteoglossiformes,Hiodontidae,Hiodon,Hiodon_tergisus,Mooneye,0,n/a,n/a,F,E,C,n/a,NA
+Osteoglossiformes,Mormyridae,Pollimyrus,Pollimyrus_isidori_isidori,Elephant fish,0,n/a,n/a,F,E,G,M,P
+Osteoglossiformes,Notopteridae,Chitala,Chitala_chitala,Clown knifefish,0,n/a,n/a,F,E,NA,M,P
+Osteoglossiformes,Osteoglossidae,Osteoglossum,Osteoglossum_bicirrhosum,Arawana,0,n/a,n/a,F,E,M,M,P
+Osteoglossiformes,Osteoglossidae,Scleropages,Scleropages_leichardti,Spotted bonytongue,0,n/a,n/a,F,E,NA,F,P
+Osteoglossiformes,Pantodontidae,Pantodon,Pantodon_buchholzi,freshwater butterflyfish,0,n/a,n/a,F,I,NA,n/a,P
+Perciformes,Acanthuridae,Acanthurus,Acanthurus_nigrofuscus,Brown surgeonfish,0,n/a,n/a,M,E,C,n/a,G
+Perciformes,Ambassidae,Ambassis,Ambassis_agassizii,Agassiz's glassfish,0,n/a,n/a,F,NA,NA,n/a,NA
+Perciformes,Ambassidae,Parambassis,Parambassis_siamensis,,0,n/a,n/a,F,NA,NA,n/a,NA
+Perciformes,Anabantidae,Anabas,Anabas_testudineus,climbing perch,0,n/a,n/a,F,E,C,n/a,"G,P"
+Perciformes,Anarhichadidae,Anarhichas,Anarhichas_lupus,atlantic wolffish,0,n/a,n/a,M,I,NA,M,P
+Perciformes,Apogonidae,Apogon,Apogon_crassiceps,Transparent cardinalfish,1,S,S,M,E,M,M,P
+Perciformes,Apogonidae,Apogon,Ostorhinchus_apogonoides,short-tooth cardinal,0,n/a,n/a,M,E,M,M,P
+Perciformes,Apogonidae,Apogon,Zapogon_evermanni,Evermann's cardinalfish,1,S,S,M,E,M,M,P
+Perciformes,Arripidae,Arripis,Arripis_trutta,Australian salmon,0,n/a,n/a,M,NA,NA,n/a,NA
+Perciformes,Artedidraconidae,Artedidraco,Artedidraco_skottsbergi,,0,n/a,n/a,M,E,NA,NA,NA
+Perciformes,Artedidraconidae,Dolloidraco,Dolloidraco_longedorsalis,,0,n/a,n/a,M,E,NA,NA,NA
+Perciformes,Artedidraconidae,Pogonophryne,Pogonophryne_scotti,Saddleback plunderfish,0,n/a,n/a,M,E,NA,M,NA
+Perciformes,Bathydraconidae,Akarotaxis,Akarotaxis_nudiceps,,0,n/a,n/a,M,E,NA,n/a,NA
+Perciformes,Bathydraconidae,Bathydraco,Bathydraco_marri,Deep-water dragon,0,n/a,n/a,M,E,NA,n/a,NA
+Perciformes,Bathydraconidae,Gymnodraco,Gymnodraco_acuticeps,Ploughfish,0,n/a,n/a,M,E,NA,B,P
+Perciformes,Bathydraconidae,Parachaenichthys,Parachaenichthys_charcoti,,0,n/a,n/a,M,E,NA,NA,NA
+Perciformes,Blenniidae,Aidablennius,Aidablennius_sphynx,Sphinx blenny,1,"S,T","S,T",M,E,G,M,P
+Perciformes,Blenniidae,Blennius,Blennius_ocellaris,Butterfly blenny,1,"S,T","S,T",M,E,G,M,P
+Perciformes,Blenniidae,Coryphoblennius,Coryphoblennius_galerita,Montagu's blenny,1,"S,T","S,T",M,E,G,M,P
+Perciformes,Blenniidae,Ecsenius,Ecsenius_bicolor,bicolor blenny,0,n/a,n/a,M,E,NA,M,P
+Perciformes,Blenniidae,Lipophrys,Microlipophrys_adriaticus,Adriatic blenny,1,"S,T","S,T",M,E,G,M,P
+Perciformes,Blenniidae,Lipophrys,Microlipophrys_canevae,,1,"S,T","S,T",M,E,G,M,P
+Perciformes,Blenniidae,Lipophrys,Microlipophrys_dalmatinus,,1,"S,T","S,T",M,E,G,M,P
+Perciformes,Blenniidae,Lipophrys,Microlipophrys_nigriceps,Black-headed blenny,1,"S,T","S,T",M,E,G,M,P
+Perciformes,Blenniidae,Parablennius,Parablennius_gattorugine,Tompot blenny,1,"S,T","S,T",M,E,G,M,P
+Perciformes,Blenniidae,Parablennius,Parablennius_incognitus,Mystery blenny,1,"S,T","S,T",M,E,G,M,P
+Perciformes,Blenniidae,Parablennius,Parablennius_parvicornis,Rock-pool blenny,1,T,T,M,E,G,M,S
+Perciformes,Blenniidae,Parablennius,Parablennius_rouxi,Longstriped blenny,1,"S,T","S,T",M,E,G,M,P
+Perciformes,Blenniidae,Parablennius,Parablennius_sanguinolentus,Rusty blenny,1,"S,T","S,T",M,E,G,M,S
+Perciformes,Blenniidae,Parablennius,Parablennius_tentacularis,Tentacled blenny,1,"S,T","S,T",M,E,G,M,P
+Perciformes,Blenniidae,Parablennius,Parablennius_zvonimiri,Zvonimir's blenny,1,"S,T","S,T",M,E,G,M,P
+Perciformes,Blenniidae,Paralipophyrs,Lipophrys_trigloides,,1,"S,T","S,T",M,E,G,M,P
+Perciformes,Blenniidae,Salaria,Salaria_pavo,Peacock blenny,1,"S,T","S,T",M,E,G,M,S
+Perciformes,Blenniidae,Salarias,Salarias_fasciatus,jewelled blenny,1,T,T,M,E,G,M,P
+Perciformes,Blenniidae,Scartella,Scartella_cristata,Molly Miller,1,"S,T","S,T",M,E,G,M,S
+Perciformes,Callionymidae,Callionymus,Callionymus_maculatus,,0,n/a,n/a,M,E,NA,n/a,NA
+Perciformes,Caproidae,Capros,Capros_aper,Boarfish,0,n/a,n/a,M,E,C,n/a,G
+Perciformes,Carangidae,Trachinotus,Trachinotus_carolinus,Florida pompano,0,n/a,n/a,M,E,C,n/a,G
+Perciformes,Centrarchidae,Lepomis,Lepomis_macrochirus,Bluegill sunfish,0,n/a,n/a,F,E,G,M,S
+Perciformes,Centropomidae,Centropomus,Centropomus_medius,blackfin snook,0,n/a,n/a,"F,M",NA,NA,n/a,NA
+Perciformes,Cepolidae,Cepola,Cepola_macrophthalma,red bandfish,0,n/a,n/a,M,NA,NA,n/a,S
+Perciformes,Chaenopsidae,Acanthemblemaria,Acanthemblemaria_spinosa,Spinyhead blenny,1,S,S,M,E,G,M,P
+Perciformes,Chaenopsidae,Coralliozetus,Coralliozetus_angelicus,Angel blenny,1,S,S,M,E,G,M,P
+Perciformes,Chaetodontidae,Chaetodon,Chaetodon_multicinctus,pebbled butterflyfish,0,n/a,n/a,M,E,M,n/a,P
+Perciformes,Chaetodontidae,Chaetodon,Chaetodon_plebeius,blueblotch butterflyfish,0,n/a,n/a,M,E,M,n/a,P
+Perciformes,Chaetodontidae,Chaetodon,Chaetodon_rainfordi,Rainford's butterflyfish,0,n/a,n/a,M,E,M,n/a,P
+Perciformes,Channichthyidae,Chaenocephalus,Chaenocephalus_aceratus,Blackfin icefish,0,n/a,n/a,M,E,NA,M,NA
+Perciformes,Channichthyidae,Chionodraco,Chionodraco_rastrospinosus,Ocellated icefish,0,n/a,n/a,M,E,NA,NA,NA
+Perciformes,Channichthyidae,Pseudochaenichthys,Pseudochaenichthys_georgianus,South Georgian icefish,0,n/a,n/a,M,E,NA,n/a,NA
+Perciformes,Channidae,Channa,Channa_punctata,spotted snakehead,0,n/a,n/a,F,E,M,B,P
+Perciformes,Cichlidae,Alcolapia,Alcolapia_grahami,lake magadi tilapia,0,n/a,n/a,F,D,A,F,P
+Perciformes,Cichlidae,Lamprologus,Lamprologus_callipterus,,0,n/a,n/a,F,E,G,F,S
+Perciformes,Cichlidae,Mchenga,Mchenga_cyclicos,,0,n/a,n/a,M,E,G,NA,S
+Perciformes,Cichlidae,Sarotherodon,Sarotherodon_galilaeus,Mango tilapia,0,n/a,n/a,"F,M",E,G,"M,F,B",S
+Perciformes,Cirrhitidae,Amblycirrhitus,Amblycirrhitus_pinos,red-spotted hawkfish,0,n/a,n/a,M,E,G,n/a,P
+Perciformes,Cirrhitidae,Cirrhitus ,Cirrhitus_pinnulatus,stocky hawkfish,0,n/a,n/a,M,E,NA,n/a,P
+Perciformes,Cirrhitidae,Neocirrhites,Neocirrhites_armatus,flame hawkfish,0,n/a,n/a,M,E,M,n/a,P
+Perciformes,Cirrhitidae,Paracirrhites,Paracirrhites_arcatus,arc-eye hawkfish,0,n/a,n/a,M,E,G,n/a,P
+Perciformes,Cirrhitidae,Paracirrhites,Paracirrhites_forsteri,blackside hawkfish,0,n/a,n/a,M,E,M,n/a,P
+Perciformes,Clinidae,Clinitrachus,Clinitrachus_argentatus,,1,T,T,M,E,NA,M,NA
+Perciformes,Clinidae,Heterostichus,Heterostichus_rostratus,Giant kelpfish,0,n/a,n/a,M,E,NA,M,P
+Perciformes,Coryphaenidae,Coryphaena ,Coryphaena_hippurus,common dolphinfish,0,n/a,n/a,M,E,NA,n/a,P
+Perciformes,Creediidae,Limnichthys,Limnichthys_fasciatus,Barred sand burrower,0,n/a,n/a,M,NA,H,NA,NA
+Perciformes,Dactyloscopidae,Gillellus,Platygillellus_rubrocinctus,Saddle stargazer,1,T,T,M,E,NA,NA,NA
+Perciformes,Echeneidae,Remora,Remora_brachyptera,spearfish remora,0,n/a,n/a,M,E,NA,n/a,NA
+Perciformes,Eleginopidae,Eleginops,Eleginops_maclovinus,Patagonian blennie,0,n/a,n/a,M,E,H,n/a,NA
+Perciformes,Eleotridae,Bostrychus,Bostrychus_sinensis,Four-eyed sleeper,1,NA,NA,"F,M",E,M,NA,P
+Perciformes,Eleotridae,Gobiomorphus,Gobiomorphus_breviceps,Upland bully,0,n/a,n/a,F,E,NA,M,P
+Perciformes,Eleotridae,Gobiomorus,Gobiomorus_dormitor,Bigmouth sleeper,1,NA,NA,"F,M",E,NA,NA,P
+Perciformes,Embiotocidae,Cymatogaster,Cymatogaster_aggregata,Shiner perch,0,n/a,n/a,M,I,A,F,P
+Perciformes,Embiotocidae,Embiotoca,Embiotoca_jacksoni,Black perch,0,n/a,n/a,M,I,A,F,P
+Perciformes,Gempylidae,Ruvettus,Ruvettus_pretiosus,oilfish,0,n/a,n/a,M,NA,NA,n/a,NA
+Perciformes,Gerreidae,Gerres,Gerres_filamentosus,Whipfin silver-biddy,0,n/a,n/a,"F,M",E,NA,n/a,NA
+Perciformes,Gerreidae,Gerres,Gerres_longirostris,Strongspine silver-biddy,0,n/a,n/a,"F,M",E,NA,NA,NA
+Perciformes,Gerreidae,Gerres,Gerres_methueni,Striped silver biddy,0,n/a,n/a,"F,M",E,NA,NA,NA
+Perciformes,Girellidae,Girella,Girella_leonina,,0,n/a,n/a,M,NA,NA,NA,NA
+Perciformes,Girellidae,Girella,Girella_punctata,,0,n/a,n/a,M,NA,NA,NA,NA
+Perciformes,Gobiidae,Amblygobius,Amblygobius_nocturnus,Pyjama goby,0,n/a,n/a,M,E,M,M,P
+Perciformes,Gobiidae,Amblygobius,Koumansetta_rainfordi,Rainford's goby,1,S,S,M,E,G,M,P
+Perciformes,Gobiidae,Bathygobius,Bathygobius_fuscus,dusky frillgoby,1,S,S,"F,M",E,G,M,S
+Perciformes,Gobiidae,Buenia,Buenia_jeffreysii,Jeffrey's goby,1,"S,T","S,M",M,NA,NA,M,NA
+Perciformes,Gobiidae,Cryptocentrus,Cryptocentrus_lutheri,Luther's prawn goby,0,n/a,n/a,M,E,M,M,P
+Perciformes,Gobiidae,Gillichthys,Gillichthys_mirabilis,Longjaw mudsucker,1,S,S,"F,M",E,NA,M,P
+Perciformes,Gobiidae,Glossogobius,Glossogobius_giuris,Tank goby,1,S,S,"F,M",E,G,M,P
+Perciformes,Gobiidae,Glossogobius,Glossogobius_olivaceus,Urohaze goby,1,"S,T","S,M","F,M",E,M,M,P
+Perciformes,Gobiidae,Gobiodon,Gobiodon_oculolineatus,eyeline coralgoby,1,"H,S",S,M,E,M,M,P
+Perciformes,Gobiidae,Gobiodon,Gobiodon_okinawae,Yellow clown goby,1,"H,S",S,M,E,M,NA,P
+Perciformes,Gobiidae,Gobiodon,Gobiodon_quinquestrigatus,Five-lined coral goby,1,H,S,M,E,M,M,P
+Perciformes,Gobiidae,Gobiodon,Gobiodon_rivulatus,rippled goby,1,H,NA,M,E,M,M,P
+Perciformes,Gobiidae,Gobius,Gobius_cobitis,giant goby,1,S,S,M,E,G,M,P
+Perciformes,Gobiidae,Gobius,Gobius_niger,Black goby,1,"S,T","S,M",M,E,G,M,S
+Perciformes,Gobiidae,Gobius,Gobius_paganellus,Rock goby,1,"S,T","S,M",M,E,G,M,P
+Perciformes,Gobiidae,Knipowitschia,Knipowitschia_panizzae,Adriatic dwarf goby,1,S,S,M,E,G,M,P
+Perciformes,Gobiidae,Lythrypnus,Lythrypnus_dalli,Blue-banded goby,1,H,S,M,E,G,M,S
+Perciformes,Gobiidae,Neogobius,Neogobius_melanostomus,Round goby,1,"S,T","S,M",F,E,G,M,S
+Perciformes,Gobiidae,Padogobius,Padogobius_bonelli,Padanian goby,1,S,S,F,E,G,M,P
+Perciformes,Gobiidae,Paragobiodon,Paragobiodon_echinocephalus,Redhead goby,1,H,S,M,E,M,M,P
+Perciformes,Gobiidae,Pomatoschistus,Pomatoschistus_marmoratus,Mural goby,1,S,S,M,E,G,M,P
+Perciformes,Gobiidae,Pomatoschistus,Pomatoschistus_microps,common goby,1,S,S,"F,M",E,M,M,S
+Perciformes,Gobiidae,Pomatoschistus,Pomatoschistus_minutus,Sand goby,1,S,S,M,E,G,M,S
+Perciformes,Gobiidae,Valenciennea,Valenciennea_muralis,Painted grudgeon,0,n/a,n/a,M,E,M,M,P
+Perciformes,Gobiidae,Valenciennea,Valenciennea_sexguttata,Sixspot goby,0,n/a,n/a,M,E,M,M,P
+Perciformes,Gobiidae,Valenciennea,Valenciennea_strigata,Blueband goby,0,n/a,n/a,M,E,M,M,P
+Perciformes,Gobiidae,Zosterisessor,Zosterisessor_ophiocephalus,Grass goby,1,S,S,M,E,G,M,S
+Perciformes,Grammatidae,Gramma,Gramma_brasiliensis,Brazilian basslet,0,n/a,n/a,M,NA,H,M,NA
+Perciformes,Grammatidae,Gramma,Gramma_loreto,Royal gramma,0,n/a,n/a,M,E,NA,M,P
+Perciformes,Haemulidae,Haemulon,Haemulon_flavolineatum,french grunt,0,n/a,n/a,M,E,M,n/a,P
+Perciformes,Haemulidae,Haemulon,Haemulon_plumierii,white grunt,0,n/a,n/a,M,E,M,n/a,P
+Perciformes,Hapalogenyidae,Hapalogenys,Hapalogenys_nigripinnis,Short barbeled velvetchin,0,n/a,n/a,"F,M",NA,NA,NA,NA
+Perciformes,Icosteidae,Icosteus,Icosteus_aenigmaticus,ragfish,0,n/a,n/a,M,E,NA,NA,NA
+Perciformes,Istiophoridae,Makaira,Makaira_nigricans,blue marlin,0,n/a,n/a,M,E,A,n/a,P
+Perciformes,Istiophoridae,Tetrapturus,Kajikia_albida,atlantic white marlin,0,n/a,n/a,M,E,NA,n/a,NA
+Perciformes,Istiophoridae,Tetrapturus,Kajikia_audax,striped marlin,0,n/a,n/a,M,E,NA,n/a,NA
+Perciformes,Istiophoridae,Tetrapturus,Tetrapturus_angustirostris,shortbill spearfish,0,n/a,n/a,M,E,NA,n/a,NA
+Perciformes,Kraemeriidae,Kraemeria,Kraemeria_bryani,Bryan's sand dart,0,n/a,n/a,M,NA,NA,NA,NA
+Perciformes,Kurtidae,Kurtus,Kurtus_gulliveri,nurseryfish,0,n/a,n/a,F,E,G,M,P
+Perciformes,Kyphosidae,Kyphosus,Kyphosus_bigibbus,brown chub,0,n/a,n/a,NA,NA,NA,NA,NA
+Perciformes,Labridae,Cheilinus,Cheilinus_undulatus,Humphead wrasse,1,S,S,M,E,G,n/a,P
+Perciformes,Labridae,Halichoeres,Halichoeres_bivittatus,Slippery dick,0,n/a,n/a,M,E,C,n/a,S
+Perciformes,Labridae,Halichoeres,Halichoeres_garnoti,Yellowhead wrasse,0,n/a,n/a,M,E,M,n/a,NA
+Perciformes,Labridae,Halichoeres,Halichoeres_maculipinna,Clown wrasse,0,n/a,n/a,M,E,C,NA,S
+Perciformes,Labridae,Halichoeres,Halichoeres_melanurus,Tail-spot wrasse,0,n/a,n/a,M,E,M,n/a,P
+Perciformes,Labridae,Halichoeres,Halichoeres_pictus,Rainbow wrasse,0,n/a,n/a,M,E,NA,NA,S
+Perciformes,Labridae,Halichoeres,Halichoeres_poeyi,Blackear wrasse,0,n/a,n/a,M,E,G,NA,S
+Perciformes,Labridae,Thalassoma,Thalassoma_bifasciatum,Bluehead,0,n/a,n/a,M,E,G,M,S
+Perciformes,Labrisomidae,Labrisomus,Labrisomus_bucciferus,Puffcheek blenny,1,T,T,M,E,NA,NA,NA
+Perciformes,Labrisomidae,Labrisomus,Labrisomus_haitiensis,Longfin blenny,1,T,T,M,E,NA,NA,NA
+Perciformes,Labrisomidae,Labrisomus,Labrisomus_nuchipinnis,Hairy blenny,1,T,T,M,E,G,M,P
+Perciformes,Labrisomidae,Malacoctenus,Malacoctenus_macropus,Rosy blenny,1,T,T,M,E,G,M,P
+Perciformes,Labrisomidae,Malacoctenus,Malacoctenus_triangulatus,Saddled blenny,1,T,T,M,E,NA,M,P
+Perciformes,Labrisomidae,Malacoctenus,Malacoctenus_versicolor,Barfin blenny,1,T,T,M,E,NA,NA,NA
+Perciformes,Labrisomidae,Paraclinus,Paraclinus_nigripinnis,Blackfin blenny,1,T,T,M,E,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_atlantica,Smooth-eye blenny,1,T,T,M,E,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_elongata,Elongate blenny,1,T,T,M,I,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_fasciata,Blackbar blenny,1,T,T,M,I,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_fulva,Yellow blenny,1,T,T,M,I,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_galapagensis,Galapagos blenny,1,T,T,M,I,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_greenfieldi,,1,T,T,M,I,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_guadalupae,Guadalupe blenny,1,T,T,M,I,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_guttata,Spotted blenny,1,T,T,M,I,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_hoesei,Hose blenny,1,T,T,M,I,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_lepicoelia,Blackcheek blenny,1,T,T,M,E,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_nanodes,Dwarf blenny,1,T,T,M,I,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_occidentalis,Occidental blenny,1,T,T,M,I,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_sangreyae,Sangrey's blenny,1,T,T,M,E,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_sluiteri,Chessboard blenny,1,T,T,M,I,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_smithvanizi,Brokenbar blenny,1,T,T,M,I,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_spinipenis,Phallic blenny,1,T,T,M,I,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_weigti,Weigt's blenny,1,T,T,M,E,NA,NA,NA
+Perciformes,Labrisomidae,Starksia,Starksia_williamsi,,1,T,T,M,E,NA,NA,NA
+Perciformes,Labrisomidae,Xenomedea,Xenomedea_rhodopyga,,1,T,T,M,I,NA,NA,NA
+Perciformes,Lateolabracidae,Lateolabrax,Lateolabrax_japonicus,Japanese seabass,0,n/a,n/a,"F,M",E,NA,n/a,NA
+Perciformes,Latidae,Lates,Lates_niloticus,nile perch,0,n/a,n/a,F,E,C,n/a,G
+Perciformes,Leiognathidae,Leiognathus,Leiognathus_equulus,common ponyfish,0,n/a,n/a,"F,M",E,NA,n/a,NA
+Perciformes,Lethrinidae,Lethrinus,Lethrinus_atkinsoni,pacific yellowtail emperor,0,n/a,n/a,M,E,G,n/a,P
+Perciformes,Lutjanidae,Lutjanus,Lutjanus_argentiventris,Yellow snapper,0,n/a,n/a,M,E,C,n/a,G
+Perciformes,Lutjanidae,Lutjanus,Lutjanus_kasmira,Common bluestripe snapper,0,n/a,n/a,M,E,C,n/a,G
+Perciformes,Luvaridae,Luvarus,Luvarus_imperialis,Luvar,0,n/a,n/a,M,NA,NA,NA,NA
+Perciformes,Malacanthidae,Caulolatilus,Caulolatilus_microps,grey tilefish,0,n/a,n/a,M,E,NA,NA,NA
+Perciformes,Microdesmidae,Cerdale,Cerdale_floridana,Pugjaw wormfish,1,S,S,M,NA,NA,NA,NA
+Perciformes,Microdesmidae,Microdesmus,Microdesmus_bahianus,,1,S,S,M,NA,NA,NA,NA
+Perciformes,Moronidae,Morone,Morone_saxatilis,striped bass,0,n/a,n/a,"F,M",E,A,n/a,P
+Perciformes,Mullidae,Upeneus,Upeneus_tragula,freckled goatfish,0,n/a,n/a,M,E,NA,NA,NA
+Perciformes,Nandidae,Nandus,Nandus_nandus,gangetic leaffish,0,n/a,n/a,F,E,M,n/a,P
+Perciformes,Nemipteridae,Nemipterus,Nemipterus_japonicus,Japanese threadfin bream,1,T,D,M,E,G,n/a,P
+Perciformes,Nemipteridae,Nemipterus,Nemipterus_virgatus,Golden threadfin bream,1,T,D,M,E,NA,n/a,NA
+Perciformes,Nototheniidae,Dissostichus,Dissostichus_mawsoni,antarctic toothfish,0,n/a,n/a,M,E,NA,NA,NA
+Perciformes,Nototheniidae,Patagonotothen,Patagonotothen_tessellata,black southern cod,0,n/a,n/a,M,E,G,M,P
+Perciformes,Nototheniidae,Pleuragramma,Pleuragramma_antarctica,antarctic silverfish,0,n/a,n/a,M,E,NA,n/a,NA
+Perciformes,Odacidae,Odax,Odax_pullus,butterfish,0,n/a,n/a,M,NA,NA,NA,NA
+Perciformes,Percichthyidae,Macquaria,Macquaria_novemaculeata,Australian bass,0,n/a,n/a,F,NA,NA,NA,NA
+Perciformes,Percidae,Etheostoma,Etheostoma_caeruleum,Rainbow darter,0,n/a,n/a,F,E,M,n/a,S
+Perciformes,Percidae,Percina,Percina_caprodes,Logperch,0,n/a,n/a,F,E,C,n/a,S
+Perciformes,Percidae,Zingel,Zingel_asper,rhone streber,0,n/a,n/a,F,E,A,NA,S
+Perciformes,Pholidae,Pholis,Pholis_nebulosa,Tidepool gunnel,0,n/a,n/a,M,E,NA,B,P
+Perciformes,Pinguipedidae,Parapercis,Parapercis_snyderi,U-mark sandperch,0,n/a,n/a,M,E,G,NA,P
+Perciformes,Pinguipedidae,Pinguipes,Pinguipes_brasilianus,brazilian sandperch,0,n/a,n/a,M,E,M,n/a,P
+Perciformes,Polynemidae,Eleutheronema,Eleutheronema_tetradactylum,fourfinger threadfin,0,n/a,n/a,"F,M",E,NA,n/a,NA
+Perciformes,Polyprionidae,Polyprion,Polyprion_americanus,wreckfish,0,n/a,n/a,M,E,C,n/a,G
+Perciformes,Pomacanthidae,Holacanthus,Holacanthus_tricolor,rock beauty,0,n/a,n/a,M,E,G,n/a,P
+Perciformes,Pomacentridae,Dascyllus ,Dascyllus_aruanus,whitetail dascyllus,0,n/a,n/a,M,E,G,M,P
+Perciformes,Priacanthidae,Priacanthus,Priacanthus_hamrur,moontail bullseye,0,n/a,n/a,M,NA,NA,NA,NA
+Perciformes,Rachycentridae,Rachycentron,Rachycentron_canadum,cobia,0,n/a,n/a,M,E,NA,n/a,NA
+Perciformes,Rhyacichthyidae,Rhyacichthys,Rhyacichthys_aspro,Loach goby,1,S,S,"F,M",NA,NA,NA,NA
+Perciformes,Scaridae,Chlorurus,Chlorurus_gibbus,Heavybeak parrotfish,0,n/a,n/a,M,E,M,n/a,P
+Perciformes,Scaridae,Scarus,Scarus_psittacus,Common parrotfish,0,n/a,n/a,M,E,M,n/a,P
+Perciformes,Scatophagidae,Scatophagus,Scatophagus_argus,spotted scat,0,n/a,n/a,"F,M",E,NA,n/a,P
+Perciformes,Schindleriidae,Schindleria,Schindleria_praematura,Schindler's fish,1,S,S,M,E,NA,NA,NA
+Perciformes,Sciaenidae,Otolithes,Otolithes_ruber,tigertooth croaker,0,n/a,n/a,M,E,NA,n/a,NA
+Perciformes,Scombridae,Thunnus,Thunnus_alalunga,albacore,0,n/a,n/a,M,E,NA,n/a,NA
+Perciformes,Scombrolabracidae,Scombrolabrax,Scombrolabrax_heterolepis,longfin escolar,0,n/a,n/a,M,NA,NA,NA,NA
+Perciformes,Serranidae,Bullisichthys,Bullisichthys_caribbaeus,pugnose bass,0,n/a,n/a,M,NA,H,NA,NA
+Perciformes,Serranidae,Epinephelus,Epinephelus_tauvina,greasy grouper,0,n/a,n/a,M,E,H,n/a,P
+Perciformes,Serranidae,Serranus,Serranus_cabrilla,comber,0,n/a,n/a,M,E,H,n/a,NA
+Perciformes,Serranidae,Serranus,Serranus_scriba,painted comber,0,n/a,n/a,M,E,H,n/a,S
+Perciformes,Siganidae,Siganus,Siganus_luridus,dusky spinefoot,0,n/a,n/a,M,E,NA,n/a,NA
+Perciformes,Sillaginidae,Sillago,Sillago_robusta,Stout whiting,0,n/a,n/a,M,NA,NA,NA,NA
+Perciformes,Sparidae,Cheimerius,Cheimerius_nufar,Santer seabream,0,n/a,n/a,M,E,H,n/a,S
+Perciformes,Sparidae,Pagrus,Chrysophrys_auratus,Silver seabream,0,n/a,n/a,M,E,NA,n/a,S
+Perciformes,Sphyraenidae,Sphyraena,Sphyraena_barracuda,great barracuda,0,n/a,n/a,M,E,NA,n/a,NA
+Perciformes,Stichaeidae,Ulvaria,Ulvaria_subbifurcata,radiated shanny,0,n/a,n/a,M,E,G,M,P
+Perciformes,Stromateidae,Peprilus,Peprilus_medius,pacific harvestfish,0,n/a,n/a,M,NA,NA,NA,NA
+Perciformes,Trichiuridae,Lepidopus,Lepidopus_caudatus,silver scabbardfish,0,n/a,n/a,M,E,NA,n/a,NA
+Perciformes,Tripterygiidae,Enneapterygius,Enneapterygius_atriceps,Hawaiian blackhead triplefin,1,T,T,M,E,NA,M,P
+Perciformes,Trypterygiidae,Axoclinus,Axoclinus_nigricaudus,Cortez triplefin,1,T,T,M,E,G,NA,S
+Perciformes,Trypterygiidae,Enneanectes,Enneanectes_boehlkei,Roughhead triplefin,1,T,T,M,E,NA,NA,NA
+Perciformes,Trypterygiidae,Enneanectes,Enneanectes_carminalis,Delicate triplefin,1,T,T,M,E,G,NA,S
+Perciformes,Trypterygiidae,Enneanectes,Enneanectes_pectoralis,Redeye triplefin,1,T,T,M,E,NA,NA,NA
+Perciformes,Trypterygiidae,Tripterygion,Tripterygion_delaisi,,1,T,T,M,E,G,M,S
+Perciformes,Trypterygiidae,Tripterygion,Tripterygion_tripteronotum,Red-black triplefin,1,T,T,M,E,G,M,S
+Perciformes,Xiphiidae,Xiphias,Xiphias_gladius,swordfish,0,n/a,n/a,M,E,NA,n/a,P
+Perciformes,Zoarcidae,Zoarces,Zoarces_americanus,Ocean pout,0,n/a,n/a,M,I,M,F,P
+Percopsiformes,Aphredoderidae,Aphredoderus,Aphredoderus_sayanus,Pirate perch,0,n/a,n/a,F,E,NA,n/a,P
+Pleuronectiformes,Achiridae,Achirus,Achirus_lineatus,Lined sole,0,n/a,n/a,M,E,NA,n/a,NA
+Pleuronectiformes,Achiridae,Gymnachirus,Gymnachirus_texae,Mexican fringed sole,0,n/a,n/a,M,NA,NA,NA,NA
+Pleuronectiformes,Achiridae,Trinectes,Trinectes_maculatus,Hogchoker,0,n/a,n/a,"F,M",E,G,NA,P
+Pleuronectiformes,Bothidae,Bothus,Bothus_ellipticus,,0,n/a,n/a,M,E,G,n/a,P
+Pleuronectiformes,Bothidae,Bothus,Bothus_ocellatus,Eyed flounder,0,n/a,n/a,M,E,G,n/a,P
+Pleuronectiformes,Bothidae,Engyprosopon,Engyprosopon_grandisquama,Largescale flounder,0,n/a,n/a,M,E,G,n/a,P
+Pleuronectiformes,Cynoglossidae,Cynoglossus,Cynoglossus_arel,largescale tonguesole,0,n/a,n/a,M,NA,NA,NA,NA
+Pleuronectiformes,Osphronemidae,Betta,Betta_splendens,siamese fighting fish,0,n/a,n/a,F,E,NA,M,P
+Pleuronectiformes,Osphronemidae,Colisa,Trichogaster_lalius,dwarf gourami,0,n/a,n/a,F,E,NA,M,S
+Pleuronectiformes,Pleuronectidae,Kareius,Kareius_bicoloratus,stone flounder,0,n/a,n/a,"F,M",E,NA,n/a,NA
+Pleuronectiformes,Pleuronectidae,Pseudopleuronectes,Pseudopleuronectes_americanus,Winter flounder,0,n/a,n/a,M,E,C,n/a,G
+Pleuronectiformes,Psettodidae,Psettodes,Psettodes_erumei,indian halibut,0,n/a,n/a,M,E,NA,NA,NA
+Pleuronectiformes,Scophthalmidae,Psetta,Scophthalmus_maximus,turbot,0,n/a,n/a,M,E,NA,n/a,NA
+Pleuronectiformes,Scophthalmidae,Scophthalmus,Scophthalmus_rhombus,brill,0,n/a,n/a,M,NA,NA,NA,NA
+Pleuronectiformes,Soleidae,Solea,Solea_senegalensis,senegalese sole,0,n/a,n/a,M,E,M,n/a,P
+Polypteriformes,Polypteridae,Erpetoichthys,Erpetoichthys_calabaricus,Reedfish,0,n/a,n/a,"F,M",E,NA,n/a,NA
+Saccopharyngiformes,Cyematidae,Cyema,Cyema_atrum,bobtail eel,0,n/a,n/a,NA,NA,NA,NA,NA
+Saccopharyngiformes,Eurypharyngidae,Eurypharynx,Eurypharynx_pelecanoides,pelican eel,0,n/a,n/a,M,NA,NA,NA,NA
+Salmoniformes,Salmonidae,Salmo,Salmo_salar,Atlantic salmon,0,n/a,n/a,"F,M",E,G,n/a,S
+Salmoniformes,Salmonidae,Salvelinus,Salvelinus_malma,Dolly varden,0,n/a,n/a,"F,M",E,G,n/a,S
+Scorpaeniformes,Agonidae,Aspidophoroides ,Aspidophoroides_monopterygius,alligatorfish,0,n/a,n/a,M,I,NA,NA,P
+Scorpaeniformes,Anoplopomatidae,Anoplopoma,Anoplopoma_fimbria,sablefish,0,n/a,n/a,M,E,C,n/a,NA
+Scorpaeniformes,Cottidae,Cottus,Cottus_bairdii,Mottled sculpin,0,n/a,n/a,F,E,G,M,P
+Scorpaeniformes,Cottidae,Cottus,Cottus_nozawae,Fluvial sculpin,0,n/a,n/a,F,E,G,M,P
+Scorpaeniformes,Cottidae,Radulinopsis,Radulinopsis_taranetzi,,1,S,S,M,E,NA,F,P
+Scorpaeniformes,Hexagrammidae,Hexagrammos,Hexagrammos_agrammus,spotty-bellied greenling,0,n/a,n/a,M,E,A,M,S
+Scorpaeniformes,Jordaniidae,Jordania,Jordania_zonope,Longfin sculpin,0,n/a,n/a,M,NA,NA,NA,P
+Scorpaeniformes,Platycephalidae,Platycephalus,Platycephalus_bassensis,Southern sand flathead,0,n/a,n/a,M,NA,NA,n/a,NA
+Scorpaeniformes,Scorpaenidae,Caracanthus,Caracanthus_typicus,hawaiian orbicular velvetfish,0,n/a,n/a,M,NA,NA,NA,NA
+Scorpaeniformes,Scorpaenidae,Caracanthus,Caracanthus_unipinna,pygmy coral croucher,0,n/a,n/a,M,E,C,n/a,G
+Scorpaeniformes,Scorpaenidae,Dendrochirus,Dendrochirus_zebra,Zebra turkeyfish,0,n/a,n/a,M,E,C,F,P
+Scorpaeniformes,Scorpaenidae,Scorpaena,Scorpaena_notata,Small red scorpionfish,0,n/a,n/a,M,E,NA,NA,NA
+Scorpaeniformes,Scorpaenidae,Scorpaena,Scorpaena_porcus,black scorpionfish,0,n/a,n/a,M,NA,NA,n/a,NA
+Scorpaeniformes,Scorpaenidae,Scorpaena,Scorpaena_scrofa,red scorpionfish,0,n/a,n/a,M,E,NA,n/a,NA
+Scorpaeniformes,Sebastidae,Helicolenus,Helicolenus_dactylopterus,blackbelly rosefish,0,n/a,n/a,M,I,NA,n/a,P
+Scorpaeniformes,Triglidae,Chelidonichthys,Chelidonichthys_obscurus,longfin gurnard,0,n/a,n/a,M,NA,NA,n/a,NA
+Scorpaeniformes,Triglidae,Trigla,Trigla_lyra,Piper gurnard,0,n/a,n/a,M,NA,NA,n/a,NA
+Siluriformes,Amphiliidae,Amphilus,Amphilius_natalensis,natal mountain catfish,0,n/a,n/a,F,E,NA,NA,NA
+Siluriformes,Ariidae ,Sciades,Sciades_couma,Couma catfish,0,n/a,n/a,"F,M",E,NA,M,P
+Siluriformes,Ariidae ,Sciades,Sciades_parkeri,Gillbacker catfish,0,n/a,n/a,M,E,NA,NA,P
+Siluriformes,Ariidae ,Sciades,Sciades_proops,Crucifix catfish,0,n/a,n/a,"F,M",E,NA,M,NA
+Siluriformes,Astroblepidae,Astroblepus,Astroblepus_chotae,,1,S,S,F,I,NA,NA,NA
+Siluriformes,Astroblepidae,Astroblepus,Astroblepus_sabalo,,1,S,S,F,I,NA,NA,P
+Siluriformes,Astroblepidae,Astroblepus,Astroblepus_trifasciatus,,1,S,S,F,I,NA,NA,P
+Siluriformes,Auchenipteridae,Ageneiosus,Ageneiosus_inermis,Manduba,0,n/a,n/a,F,I,NA,n/a,P
+Siluriformes,Auchenipteridae,Auchenipterus,Auchenipterus_nuchalis,Moustache cat,1,S,S,F,I,NA,NA,P
+Siluriformes,Auchenipteridae,Tatia,Tatia_intermedia,Driftwood cat,0,n/a,n/a,F,E,NA,NA,NA
+Siluriformes,Auchenipteridae,Trachelyopterus,Trachelyopterus_galeatus,Common woodcat,1,S,S,F,I,NA,n/a,P
+Siluriformes,Auchenipteridae,Trachelyopterus,Trachelyopterus_lucenai,,1,S,S,F,I,NA,NA,P
+Siluriformes,Auchenipteridae,Trachelyopterus,Trachelyopterus_striatulus,Singing catfish,1,S,S,F,I,NA,NA,P
+Siluriformes,Bagridae,Mystus,Mystus_tengara,Indian catfish,1,NA,NA,F,E,NA,NA,P
+Siluriformes,Bagridae,Mystus,Mystus_vittatus,striped dwarf catfish,1,S,S,F,E,A,M,NA
+Siluriformes,Bagridae,Rita,Rita_rita,n/a - search,1,S,S,NA,NA,NA,NA,NA
+Siluriformes,Callichthyidae,Callichthys,Callichthys_callichthys,Armoured catfish,0,n/a,n/a,F,E,G,NA,P
+Siluriformes,Callichthyidae,Corydoras,Corydoras_aeneus,Bronze cory,1,"S,T","S,T",F,D,C,n/a,P 
+Siluriformes,Callichthyidae,Corydoras,Corydoras_bondi,Blackstripe cory,1,"S,T","S,T",F,D,NA,n/a,P
+Siluriformes,Callichthyidae,Corydoras,Corydoras_ehrhardti,,1,"S,T","S,T",F,D,NA,n/a,NA
+Siluriformes,Callichthyidae,Corydoras,Corydoras_potaroensis,,1,"S,T","S,T",F,D,NA,NA,NA
+Siluriformes,Callichthyidae,Hoplosternum,Hoplosternum_littorale,Fork tailed hoplo,1,"S,T","S,T",F,D,G,"M,F",P
+Siluriformes,Cetopsidae,Helogenes,Helogenes_marmoratus,,0,n/a,n/a,F,E,NA,NA,NA
+Siluriformes,Clariidae,Clarias,Clarias_batrachus,Walking catfish,1,S,S,F,E,G,M,P
+Siluriformes,Clariidae,Clarias,Clarias_gariepinus,African catfish,1,S,S,F,E,C,n/a,P
+Siluriformes,Clariidae,Heterobranchus,Heterobranchus_longifilis,Sampa,1,T,T,F,E,NA,NA,P
+Siluriformes,Claroteidae,Auchenoglanis,Auchenoglanis_occidentalis,bubu,0,n/a,n/a,F,E,NA,NA,P
+Siluriformes,Claroteidae,Clarotes,Clarotes_laticeps,widehead catfish,0,n/a,n/a,F,NA,NA,NA,NA
+Siluriformes,Doradidae,Hassar,Hassar_affinis,,0,n/a,n/a,F,NA,NA,NA,NA
+Siluriformes,Heptapteridae,Pimelodella,Pimelodella_vittata,,0,n/a,n/a,F,NA,NA,NA,NA
+Siluriformes,Heptapteridae,Rhamdia ,Rhamdia_quelen,south american catfish,0,n/a,n/a,F,E,NA,n/a,NA
+Siluriformes,Heteropneustidae,Heteropneustes,Heteropneustes_fossilis,Asian stinging catfish,1,S,S,F,E,M,B,P
+Siluriformes,Horabagridae ,Horabagrus,Horabagrus_brachysoma,Günther's catfish,0,n/a,n/a,F,E,G,n/a,P
+Siluriformes,Ictaluridae,Ictalurus,Ictalurus_furcatus,blue catfish,1,S,S,F,E,NA,NA,NA
+Siluriformes,Ictaluridae,Ictalurus,Ictalurus_punctatus,channel catfish,1,S,S,F,E,M,M,P
+Siluriformes,Ictaluridae,Noturus,Noturus_gyrinus,tadpole madtom,0,n/a,n/a,F,E,NA,NA,NA
+Siluriformes,Loricariidae,Fonchiiichthys,Fonchiiichthys_uracanthus,,0,n/a,n/a,F,E,G,NA,P
+Siluriformes,Loricariidae,Rhinelepis,Rhinelepis_aspera,,0,n/a,n/a,F,E,NA,NA,NA
+Siluriformes,Malapteruridae,Malapterurus,Malapterurus_electricus,electric catfish,0,n/a,n/a,F,E,NA,M,P
+Siluriformes,Mochokidae,Synodontis,Synodontis_multipunctatus,,0,n/a,n/a,F,E,NA,n/a,S
+Siluriformes,Pangasiidae,Pangassius,Pangasius_pangasius,pangas catfish,1,S,S,F,NA,NA,NA,NA
+Siluriformes,Pimelodidae,Conorhynchos,Conorhynchos_conirostris,pira catfish,0,n/a,n/a,F,NA,C,NA,G
+Siluriformes,Pimelodidae,Iheringichtys,Iheringichthys_labrosus,,0,n/a,n/a,F,NA,NA,NA,NA
+Siluriformes,Pimelodidae,Pimelodus,Pimelodus_maculatus,,0,n/a,n/a,F,E,NA,NA,NA
+Siluriformes,Pimelodidae,Pseudoplatystoma ,Pseudoplatystoma_corruscans,Spotted sorubim,0,n/a,n/a,F,E,C,NA,G
+Siluriformes,Plotosidae,Neosilurus,Neosilurus_ater,Narrowfront tandan,0,n/a,n/a,F,E,NA,M,P
+Siluriformes,Plotosidae,Neosilurus,Neosilurus_hyrtlii,Glencoe tandan,0,n/a,n/a,F,E,NA,M,P
+Siluriformes,Pseudopimelodidae,Lophiosilurus,Lophiosilurus_alexandri,,0,n/a,n/a,F,NA,NA,M,P
+Siluriformes,Schilbeidae,Eutropiichthys,Eutropiichthys_vacha,Batchwa vacha,0,n/a,n/a,"F,M",E,NA,n/a,P
+Siluriformes,Schilbeidae,Schilbe,Schilbe_mystus,African butter catfish,0,n/a,n/a,F,E,NA,n/a,P
+Siluriformes,Scoloplacidae,Scoloplax,Scoloplax_distolothrix,,0,n/a,n/a,F,I,NA,NA,P
+Siluriformes,Siluridae,Ompok ,Ompok_siluroides,,1,S,S,F,NA,NA,NA,NA
+Siluriformes,Siluridae,Silurus,Silurus_aristotelis,Aristotle's catfish,0,n/a,n/a,F,E,NA,M,P
+Siluriformes,Siluridae,Silurus,Silurus_asotus,Amur catfish,0,n/a,n/a,F,E,M,n/a,P
+Siluriformes,Siluridae,Silurus,Silurus_lithophilus,Rock catfish,0,n/a,n/a,F,E,NA,n/a,P
+Siluriformes,Sisoridae,Glyptothorax,Glyptothorax_brevipinnis,river cat,0,n/a,n/a,F,NA,NA,NA,NA
+Siluriformes,Trichomycteridae,Hatcheria,Hatcheria_macraei,,0,n/a,n/a,F,NA,NA,NA,NA
+Stomiiformes,Gonostomatidae,Gonostoma,Gonostoma_elongatum,elongated bristlemouth,0,n/a,n/a,M,E,H,n/a,NA
+Stomiiformes,Gonostomatidae,Sigmops,Sigmops_bathyphilus,spark anglemouth,0,n/a,n/a,M,E,H,NA,P
+Stomiiformes,Sternoptychidae,Maurolicus,Maurolicus_muelleri,silvery lightfish,0,n/a,n/a,M,NA,NA,NA,NA
+Synbranchiformes,Mastacembelidae,Mastacembelus,Mastacembelus_platysoma,,0,n/a,n/a,F,E,NA,M,P
+Synbranchiformes,Synbranchidae,Monopterus,Monopterus_cuchia,Cuchia,0,n/a,n/a,F,E,NA,M,P
+Synbranchiformes,Synbranchidae,Synbranchus,Synbranchus_marmoratus,,0,n/a,n/a,F,E,H,NA,NA
+Syngnathiformes,Aulostomidae,Aulostomus,Aulostomus_chinensis,Chinese trumpetfish,0,n/a,n/a,M,E,NA,n/a,P
+Syngnathiformes,Aulostomidae,Aulostomus,Aulostomus_maculatus,Trumpetfish,0,n/a,n/a,M,E,NA,n/a,P
+Syngnathiformes,Centriscidae,Macroramphosus,Macroramphosus_scolopax,Longspine snipefish,0,n/a,n/a,M,E,NA,NA,S
+Syngnathiformes,Fistulariidae,Fistularia,Fistularia_commersonii,bluespotted cornetfish,0,n/a,n/a,M,E,NA,n/a,S
+Syngnathiformes,Syngnathidae,Phyllopteryx,Phyllopteryx_taeniolatus,Common seadragon,0,n/a,n/a,M,E,A,M,P
+Syngnathiformes,Syngnathidae,Syngnathus,Syngnathus_acus,Greater pipefish,0,n/a,n/a,M,E,A,M,P
+Tetraodontiformes,Balistidae,Pseudobalistes,Pseudobalistes_flavimarginatus,Yellowmargin triggerfish,0,n/a,n/a,M,E,G,B,P
+Tetraodontiformes,Balistidae,Xanthichthys,Xanthichthys_mento,Redtail triggerfish,0,n/a,n/a,M,E,G,B,P
+Tetraodontiformes,Diodontidae,Chilomycterus,Chilomycterus_reticulatus,Spotfin burrfish,0,n/a,n/a,M,E,C,n/a,G
+Tetraodontiformes,Diodontidae,Diodon,Diodon_hystrix,Spot-fin porcupinefish,0,n/a,n/a,M,E,C,n/a,G
+Tetraodontiformes,Molidae,Ranzania,Ranzania_laevis,slender sunfish,0,n/a,n/a,M,E,NA,n/a,NA
+Tetraodontiformes,Monacanthidae,Oxymonacanthus,Oxymonacanthus_longirostris,Longnose filefish,0,n/a,n/a,M,E,M,n/a,P
+Tetraodontiformes,Monacanthidae,Rudarius,Rudarius_ercodes,Whitespotted pygmy filefish,0,n/a,n/a,M,E,C,F,G
+Tetraodontiformes,Monacanthidae,Stephanolepis ,Stephanolepis_hispidus,planehead filefish,0,n/a,n/a,M,E,NA,NA,P
+Tetraodontiformes,Ostraciidae,Lactoria,Lactoria_diaphana,Roundbelly cowfish,0,n/a,n/a,M,E,C,n/a,S
+Tetraodontiformes,Tetraodontidae,Canthigaster,Canthigaster_valentini,Sharpnose puffer,0,n/a,n/a,M,E,G,M,S
+Zeiformes,Oreosomatidae,Allocyttus,Allocyttus_verrucosus,Warty oreo,0,n/a,n/a,M,I,NA,n/a,NA
+Zeiformes,Oreosomatidae,Neocyttus,Neocyttus_rhomboidalis,spiky oreo,0,n/a,n/a,M,I,NA,n/a,P
+Zeiformes,Zeidae,Zenopsis,Zenopsis_conchifer,Silvery John dory,0,n/a,n/a,M,NA,NA,NA,NA
