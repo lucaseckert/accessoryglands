@@ -30,6 +30,8 @@ data<-trimmedData$data
 
 #getting state matrix and legend
 getStateMat4Dat(data)
+LegendAndRateMat <- getStateMat4Dat(data)
+RateMat <- LegendAndRateMat$rate.mat
 
 #making the gain and loss of care and sperm comp exogenous, down to 12 pars
 pars2equal<-list(c(7,10,20,23), c(4,11,17,24), c(2,5,15,18), c(1,8,14,21))
@@ -56,13 +58,13 @@ H <- numDeriv::hessian(nllfun, p)
 sds <- sqrt(diag(solve(H)))
 wald.ci <- sweep(qnorm(0.975)*outer(sds,c(-1,1)),1,FUN="+",STATS=p)
 
-names(p) <- parnames(nllfun) <- paste("p",1:4)
+names(p) <- parnames(nllfun) <- paste("p",1:12)
 nllfun(p)
 
-# fit an mle2 model, ERROR AT THIS LINE
+# fit an mle2 model
 m0 <- mle2(minuslogl=nllfun, start=p, vecpar=TRUE, lower=log(1e-9), upper=log(100), method="L-BFGS-B")
 
-print(system.time(pp <- profile(m0,std.err=0.2)))
+print(system.time(pp <- profile(m0,std.err=0.2,trace=TRUE)))
 
 plot(pp,show.points=TRUE)
 
@@ -77,7 +79,7 @@ logpostfun <- function(p,lb=log(1e-9),ub=log(1e2),range=3) {
   return(loglik+log.prior) ## product of likelihood and prior -> sum of LL and log-prior
 }
 
-fn <- "MK_3state_mcmc.rds"
+fn <- "MK_3state_simple_mcmc.rds"
 if (!file.exists(fn)) {
   m1 <- MCMCmetrop1R(logpostfun,p,verbose=1000, mcmc=100000)
   saveRDS(m1, file=fn)
