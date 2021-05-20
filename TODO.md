@@ -15,7 +15,7 @@ missing data, mostly for parental care/mating system traits (AG info is known)
 - consensus tree from tree block?
 - use complete tree?
 
-## 
+## miscellaneous/inference
 
 - think about multimodal likelihood surface
    - MCMC algorithms
@@ -32,3 +32,15 @@ missing data, mostly for parental care/mating system traits (AG info is known)
 - compare monkey/Pagel & Meade?
 - power differences?
 - biologically
+
+## machinery
+
+- figure out a good workflow that handles slow bits?
+- for now: Rmarkdown with caching, plus explicit caching
+- install `styler` add-in, use it to clean up formatting as you go: https://styler.r-lib.org/
+- BMB: implement multi-chain/multi-start/parallel M-H (with tuning??)
+
+## Qs for corHMM authors
+
+- what about identifiability of gain/loss?
+- are they interested in the philosophical/CI-vs-hypothesis-comparison stuff?
