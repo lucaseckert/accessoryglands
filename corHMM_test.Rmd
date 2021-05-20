@@ -146,25 +146,9 @@ pairs(as.matrix(m1),gap=0,pch=".")
 ```
 
 ```{r ggpairs, echo=FALSE}
-
-my_mcmc <- function(data, mapping, lb=log(1e-9), ub=log(1e2), range=3, ...) {
-  prior.mean <- (lb+ub)/2
-  prior.sd <- (ub-lb)/(2*range)
-  ggplot(data = data, mapping=mapping) +
-    ## geom_point(..., alpha = 0.2)
-    geom_hex() + scale_fill_viridis_c() +
-    geom_vline(xintercept=c(prior.mean+c(-2,0,2)*prior.sd),
-               lty=c(2,1,2),
-               colour="red",
-               alpha=0.3) +
-    geom_hline(yintercept=c(prior.mean+c(-2,0,2)*prior.sd),
-               lty=c(2,1,2),
-               colour="red",
-               alpha=0.3)
-
-}
+source("utils.R")
 ggpairs(as.data.frame(m1), progress=FALSE,
-        lower=list(continuous=my_mcmc)) +
+        lower=list(continuous=function(...) my_mcmc(..., show_prior=TRUE))) +
   theme(panel.spacing=grid::unit(0,"lines"))
 ```
 

@@ -37,8 +37,8 @@ missing data, mostly for parental care/mating system traits (AG info is known)
 
 - figure out a good workflow that handles slow bits?
 - for now: Rmarkdown with caching, plus explicit caching
-- install `styler` add-in, use it to clean up formatting as you go: https://styler.r-lib.org/
-- BMB: implement multi-chain/multi-start/parallel M-H (with tuning??)
+- LE: install `styler` add-in, use it to clean up formatting as you go: https://styler.r-lib.org/
+- BMB: implement multi-chain/multi-start/parallel M-H (with tuning??) e.g. start with the code [here](https://cran.microsoft.com/web/packages/glmmTMB/vignettes/mcmc.html) (+ pick random starting values from the priors, use Hessian for scale; adapt scale??)  (NIMBLE package is suggested; or the Metropolis function from [BayesianTools](https://github.com/florianhartig/BayesianTools/blob/master/BayesianTools/man/Metropolis.Rd)
 
 ## Qs for corHMM authors
 

@@ -2,7 +2,7 @@
 title: "first pass at transition model"
 ---
 
-```{r get_corHMM}
+```{r get_corHMM, message=FALSE}
 while (require("corHMM") && packageVersion("corHMM") < "2.7.1") {
   if (!interactive()) {
     stop("need hacked version of corHMM. Try 'remotes::install_github(\"bbolker/corHMM\", build_vignettes=TRUE)'")
@@ -26,6 +26,7 @@ library(colorspace)
 library(GGally)
 library(fishtree)
 library(caper)
+source("utils.R")
 ```
 
 # loading data and tree and trimming
@@ -81,12 +82,13 @@ nllfun <- function(p) {
   a$p <- p
   do.call(corHMM:::dev.corhmm, a)
 }
+p <- MK_3state_simple$args.list$p
+num_pars <- length(MK_3state_simple$args.list$p)
 ```
 
 # Compute Wald confidence intervals (standard-error based)
 
 ```{r wald, cache=TRUE}
-p <- MK_3state_simple$args.list$p
 H <- numDeriv::hessian(nllfun, p)
 sds <- sqrt(diag(solve(H)))
 wald.ci <- sweep(qnorm(0.975) * outer(sds, c(-1, 1)), 1, FUN = "+", STATS = p)
@@ -94,9 +96,16 @@ wald.ci <- sweep(qnorm(0.975) * outer(sds, c(-1, 1)), 1, FUN = "+", STATS = p)
 
 ```{r adapt, cache=TRUE}
 ## adapt nllfun for mle2
-names(p) <- parnames(nllfun) <- paste0("p",seq_along(MK_3state_simple$args.list$p))
+names(p) <- parnames(nllfun) <- paste0("p",seq(num_pars))
 m0 <- mle2(minuslogl=nllfun, start=p, vecpar=TRUE, lower=log(1e-9), upper=log(100), method="L-BFGS-B")
 ```
+
+```{r save_info}
+## for future
+save("MK_3state_simple","nllfun","num_pars","p", "sds", "m0",
+     "H", file="cache/MK_3state_simple.rda")
+```
+
 
 ```{r profile, cache=TRUE}
 fn <- "cache/MK_3state_constr1_profile.rds"
@@ -119,11 +128,12 @@ plot(pp, show.points = TRUE)
 
 ```{r prof_CI}
 prof.ci <- confint(pp)
+```
 
 ## Bayesian
 
 ```{r bayes1}
-logpostfun <- function(p, lb = log(1e-9), ub = log(1e2), range = 31) {
+logpostfun <- function(p, lb = log(1e-9), ub = log(1e2), range = 3) {
   prior.mean <- (lb + ub) / 2
   prior.sd <- (ub - lb) / (2 * range)
   loglik <- -1 * nllfun(p)
@@ -139,24 +149,37 @@ if (!file.exists(fn)) {
 }
 ```
 
-```{r bayes_plots}
-xyplot(m1)
+```{r bayes_traceplot}
+xyplot(m1, aspect="fill", layout=c(2,6))
+```
+
+```{r bayes_sum}
 summary(m1)
 raftery.diag(m1)
+```
+
+BMB: not seeing bimodality that Lucas saw?
+
+```{r bayes_pairs}
 pairs(as.matrix(m1), gap = 0, pch = ".")
 bayes.ci <- t(apply(m1, 2, quantile, c(0.025, 0.975)))
 ```
 
+Improved pairs plot
+
 Graphing all CIs
 
 ```{r ci_plot}
+modList <- list(Wald=wald.ci, profile=prof.ci, Bayes=bayes.ci)
+nmod <- length(modList)
 all.ci <- setNames(
-  as.data.frame(rbind(wald.ci, prof.ci, bayes.ci)),
+  as.data.frame(do.call("rbind", modList)),
   c("lwr", "upr")
 )
 all.ci <- data.frame(
-  rate = rep(factor(1:4), 3),
-  method = rep(c("Wald", "profile", "Bayes"), each = 4),
+  rate = rep(factor(1:num_pars), nmod),
+  method = rep(names(modList), each = num_pars),
+  ## estimates are the same for Wald & profile; 
   est = c(rep(p, 2), colMeans(m1)),
   all.ci
 )
@@ -168,5 +191,7 @@ ggplot(
 ) +
   geom_pointrange(position = position_dodge(width = 0.5)) +
   scale_colour_discrete_qualitative() +
+  scale_y_continuous(limits=c(-20,0), oob=scales::squish) +
   coord_flip()
+## FIXME: indicate which values are truncated?
 ```
