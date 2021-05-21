@@ -21,6 +21,7 @@ library(MCMCpack) ## for Bayes (Metropolis-Hastings) run
 library(coda)
 library(lattice)
 library(ggplot2); theme_set(theme_bw())
+zmargin <- theme(panel.spacing=grid::unit(0,"lines"))
 library(ggthemes)
 library(colorspace)
 library(GGally)
@@ -160,12 +161,22 @@ raftery.diag(m1)
 
 BMB: not seeing bimodality that Lucas saw?
 
-```{r bayes_pairs}
+```{r bayes_pairs, fig.width=10, fig.height=10}
 pairs(as.matrix(m1), gap = 0, pch = ".")
-bayes.ci <- t(apply(m1, 2, quantile, c(0.025, 0.975)))
 ```
 
-Improved pairs plot
+Not sure about the best way(s) to represent density: contour lines, filled contours ... change scale? Show highest posterior density contours?
+
+```{r bayes_pairs2, fig.width=10, fig.height=10, cache=TRUE}
+ggpairs(as.data.frame(m1), progress=FALSE,
+        lower=list(continuous=function(...) my_mcmc(..., show_prior=FALSE)),
+        upper=list(continuous=function(...) my_mcmc(..., geom="density", show_prior=FALSE))) +
+  zmargin
+```
+
+```{r bayes.ci}
+bayes.ci <- t(apply(m1, 2, quantile, c(0.025, 0.975)))
+```
 
 Graphing all CIs
 
@@ -184,6 +195,7 @@ all.ci <- data.frame(
   all.ci
 )
 all.ci$upr[is.na(all.ci$upr)] <- Inf ## extend NA confidence interval to limit of graph
+all.ci$lwr[is.na(all.ci$lwr)] <- -Inf ## extend NA confidence interval to limit of graph
 
 ggplot(
   all.ci,
