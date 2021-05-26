@@ -1,5 +1,12 @@
 #
 
+## LE for 2021-06-02
+
+- make net rate
+- compute interactions
+- compute CIs
+- compare primate results
+
 ## BMB for 2021-06-02
 
 - get multi-chain MCMC working
