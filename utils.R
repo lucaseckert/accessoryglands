@@ -31,3 +31,40 @@ my_mcmc <- function(data, mapping, lb=log(1e-9), ub=log(1e2), range=2,
   }
   return(gg1)
 }
+
+
+#' adaptive Metropolis from ramcmc package
+#' @param postfun log-posterior  probability function
+#' @param theta0 starting value
+#' @param S initial Cholesky factor for MVN candidate distribution
+#' @param n_iter number of iterations
+#' @param n_burnin length of burnin/adapt phase
+#' @param adapt (logical) adapt?
+metropolis <- function(postfun, theta0, S, n_iter, n_burnin, adapt = FALSE) {
+
+  ## FIXME: test/check; implement thinning; wrap in parallel version?
+  p <- length(theta0)
+  theta <- matrix(NA, n_iter, p)
+  accept <- numeric(n_iter)
+  posterior <- postfun(theta0)
+  theta[1, ] <- theta0
+
+  for (i in 2:n_iter){
+    u <- rnorm(p)
+    theta_prop <- theta[i - 1, ] + S %*% u
+    posterior_prop <- postfun(theta_prob)
+    acceptance_prob <- min(1, exp(posterior_prop - posterior))
+    if (runif(1) < acceptance_prob) {
+      accept[i] <- 1
+      theta[i, ] <- theta_prop
+      posterior <- posterior_prop
+    } else{
+      theta[i, ] <- theta[i - 1, ]
+    }
+    if(adapt && i <= n_burnin) {
+      S <- ramcmc::adapt_S(S, u, acceptance_prob, i - 1)
+    }
+  }
+  list(theta = theta[(n_burnin + 1):n_iter, ], S = S,
+       acceptance_rate = sum(accept[(n_burnin + 1):n_iter]) / (n_iter - n_burnin))
+}
