@@ -178,6 +178,18 @@ ggpairs(as.data.frame(m1), progress=FALSE,
 bayes.ci <- t(apply(m1, 2, quantile, c(0.025, 0.975)))
 ```
 
+effect of care on the rate of gaining accessory glands
+```{r}
+careToAG<-((m1[,11]+m1[,12])/2)-((m1[,9]+m1[,10])/2)
+hist(careToAG)
+```
+
+effect of sperm comp on the rate of gaining accessory glands
+```{r}
+spermCompToAG<-((m1[,10]+m1[,12])/2)-((m1[,11]+m1[,9])/2)
+hist(spermCompToAG)
+```
+
 Graphing all CIs
 
 ```{r ci_plot}
