@@ -1,5 +1,9 @@
 #
 
+## BMB for 2021-06-02
+
+- get multi-chain MCMC working
+
 ## missing data
 
 missing data, mostly for parental care/mating system traits (AG info is known)
@@ -32,6 +36,7 @@ missing data, mostly for parental care/mating system traits (AG info is known)
 - compare monkey/Pagel & Meade?
 - power differences?
 - biologically
+- weighting when averaging across states?
 
 ## machinery
 
