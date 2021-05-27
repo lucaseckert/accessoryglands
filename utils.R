@@ -41,23 +41,38 @@ my_mcmc <- function(data, mapping, lb=log(1e-9), ub=log(1e2), range=2,
 #' @param n_burnin length of burnin/adapt phase
 #' @param thin thinning frequency
 #' @param adapt (logical) adapt?
-#' @param ... additional arguments to pass to postfun
+#' @param trace_level verbosity (0=none; 1=log-posterior + accept rate; 2 includes parameter values)
+#' @param trace_steps frequency of reports
+#' @param seed random number seed
+#' @param p_args list of additional arguments to pass to postfun
 ## FIXME: add trace/verbose; auto-optim? return as mcmc object + attributes? multi-chain version?
-metropolis <- function(postfun, theta0, S, n_iter=1000,
-                       n_burnin=100, thin = 1, adapt = FALSE, p_args=list()) {
+metropolis <- function(postfun,
+                       theta0,
+                       S,
+                       n_iter=1000,
+                       n_burnin=100,
+                       thin = 1,
+                       adapt = FALSE,
+                       p_args = list(),
+                       trace_level = 1,
+                       trace_steps = 100,
+                       seed = NULL) {
   if (adapt && !require("ramcmc")) {
     stop("need ramcmc package for adaptive MCMC")
   }
-  ## FIXME: test/check; implement thinning; wrap in parallel version?
+
+  ## FIXME: seed for parallel versions?
   p <- length(theta0)
   theta <- matrix(NA, nrow = ceiling((n_iter - n_burnin) / thin), ncol = p)
   accept <- numeric(n_iter)
+  bad_steps <- 0
 
   pwrap <- function(x) {
     do.call("postfun",c(list(x), p_args))
   }
 
   ## initialize
+  S0 <- S   ## store initial cholesky factor (for comparison later if we need)
   posterior <- pwrap(theta0)
   theta_current <- theta0
   j <- 0  ## storage counter
@@ -67,6 +82,10 @@ metropolis <- function(postfun, theta0, S, n_iter=1000,
     theta_prop <- theta_current + S %*% u
     posterior_prop <- pwrap(theta_prop)
     acceptance_prob <- min(1, exp(posterior_prop - posterior))
+    if (!is.finite(acceptance_prob)) {
+      bad_steps <- bad_steps + 1
+      acceptance_prob <- 0
+    }
     if (runif(1) < acceptance_prob) {
       accept[i] <- 1
       theta_current <- theta_prop
@@ -79,16 +98,38 @@ metropolis <- function(postfun, theta0, S, n_iter=1000,
     if (adapt && i <= n_burnin) {
       S <- ramcmc::adapt_S(S, u, acceptance_prob, i - 1)
     }
+    if (trace_level > 0 && i %% trace_steps == 0) {
+      cat(sprintf("** %d: log_post = %1.2f accept_rate=%1.2f\n",
+                  i, posterior, mean(accept[1:i])))
+      if (trace_level > 1) {
+        cat(theta_current,"\n")
+      }
+    }
   }
   list(theta = theta, S = S,
        acceptance_rate = sum(accept[(n_burnin + 1):n_iter]) / (n_iter - n_burnin))
 }
 
 
-metrop_mult <- function(postfun, start, S, nchains, nclust = getOption("mc.cores", 1), ...) {
+#' @param postfun log-posterior
+#' @param start randomized starting function, or list of starting values
+#' @param S initial Cholesky factor for candidate distribution
+#' @param nchains number of chains
+#' @param nclust number of cores
+#' @param clust_extras additional objects needed in clust environments
+#' @param ... additional arguments to \code{metropolis}
+metrop_mult <- function(postfun, start, S, nchains,
+                        nclust = min(nchains,getOption("mc.cores", 1)),
+                        clust_extras = list(),
+                        ...) {
+
+  ## FIXME: better/less clunky way to parallelize?
+  ## (1) handling environments/objects; (2) progress bar?
+  ## (3) random-number-seed handling
   if (is.function(start)) {
     start <- replicate(nchains, start(), simplify=FALSE)
   }
+  if (length(start) != nchains) stop("need as many start values as chains")
   require("parallel")
   mfun <- function(s) {
     metropolis(postfun, theta0 = s, S = S, ...)
@@ -96,12 +137,14 @@ metrop_mult <- function(postfun, start, S, nchains, nclust = getOption("mc.cores
   if (nclust == 1) {
     res <- lapply(start, mfun)
   } else {
-    L <- list(...)
-    attach(L) ## yes, we really want/need to do this
-    on.exit(detach(L))
+    clust_stuff <- c(list(...), clust_extras)
+    suppressMessages(
+        attach(clust_stuff) ## yes, we really want/need to do this
+    )
+    on.exit(detach(clust_stuff))
     cl <- makeCluster(nclust)
     clusterExport(cl, varlist = c("mfun", "metropolis", "postfun", "S",
-                                  names(L)),
+                                  names(clust_stuff)),
                   envir = environment(mfun))
     res <- parLapply(cl, start, mfun)
     stopCluster(cl)

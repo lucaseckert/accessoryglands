@@ -9,7 +9,9 @@
 
 ## BMB for 2021-06-02
 
-- get multi-chain MCMC working
+- multi-chain MCMC (done)
+- helper function for variable names?
+- look into missing-value computations ...
 
 ## missing data
 

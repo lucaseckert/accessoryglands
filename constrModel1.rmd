@@ -18,15 +18,18 @@ while (require("corHMM") && packageVersion("corHMM") < "2.7.1") {
 library(bbmle) ## for likelihood profiles/CIs
 library(numDeriv) ## for Hessian/Wald CIs
 library(MCMCpack) ## for Bayes (Metropolis-Hastings) run
-library(coda)
+library(coda)     ## Bayesian diagnostics
 library(lattice)
-library(ggplot2); theme_set(theme_bw())
+library(ggplot2)
+theme_set(theme_bw())
 zmargin <- theme(panel.spacing=grid::unit(0,"lines"))
 library(ggthemes)
 library(colorspace)
 library(GGally)
 library(fishtree)
 library(caper)
+library(broom.mixed) ## tidy() for mcmc.list
+library(emdbook)     ## lump.mcmc.list()
 source("utils.R")
 ```
 
@@ -92,7 +95,9 @@ num_pars <- length(MK_3state_simple$args.list$p)
 ```{r wald, cache=TRUE}
 H <- numDeriv::hessian(nllfun, p)
 sds <- sqrt(diag(solve(H)))
-wald.ci <- sweep(qnorm(0.975) * outer(sds, c(-1, 1)), 1, FUN = "+", STATS = p)
+wald.ci <- as.data.frame(
+    sweep(qnorm(0.975) * outer(sds, c(-1, 1)), 1, FUN = "+", STATS = p)
+)
 ```
 
 ```{r adapt, cache=TRUE}
@@ -128,7 +133,7 @@ plot(pp, show.points = TRUE)
 ```
 
 ```{r prof_CI}
-prof.ci <- confint(pp)
+prof.ci <- as.data.frame(confint(pp))
 ```
 
 ## Bayesian
@@ -141,25 +146,21 @@ logpostfun <- function(p, lb = log(1e-9), ub = log(1e2), range = 3) {
   log.prior <- sum(dnorm(p, mean = prior.mean, sd = prior.sd, log = TRUE))
   return(loglik + log.prior) ## product of likelihood and prior -> sum of LL and log-prior
 }
-fn <- "cache/MK_3state_constr1_mcmc.rds"
-if (!file.exists(fn)) {
-  m1 <- MCMCmetrop1R(logpostfun, p, verbose = 1000, thin=100, mcmc = 500000)
-  saveRDS(m1, file = fn)
-} else {
-  m1 <- readRDS(fn)
-}
+## see MK_3state_mcmc.rds
+m1 <- readRDS("cache/MK_3state_constr1_mcmc_adapt.rds")
 ```
 
-```{r bayes_traceplot}
+```{r bayes_traceplot, fig.width=8, fig.height=8}
 xyplot(m1, aspect="fill", layout=c(2,6))
 ```
 
 ```{r bayes_sum}
-summary(m1)
-raftery.diag(m1)
+summary(emdbook::lump.mcmc.list(m1))
+sort(effectiveSize(m1))
+coda::gelman.diag(m1)
 ```
 
-BMB: not seeing bimodality that Lucas saw?
+These diagnostics are OK but not great (ideally we would effective sample size up to 1000 and Gelman-Rubin ($\hat R$) statistic as low as 1.01 --- although older studies have used a higher cutoff). Probably fixable by "just" running the chain longer.
 
 ```{r bayes_pairs, fig.width=10, fig.height=10}
 pairs(as.matrix(m1), gap = 0, pch = ".")
@@ -175,19 +176,20 @@ ggpairs(as.data.frame(m1), progress=FALSE,
 ```
 
 ```{r bayes.ci}
-bayes.ci <- t(apply(m1, 2, quantile, c(0.025, 0.975)))
+bayes.ci <- broom.mixed::tidy(m1, conf.int=TRUE)[,c("conf.low", "conf.high")]
 ```
 
 effect of care on the rate of gaining accessory glands
 ```{r}
-careToAG<-((m1[,11]+m1[,12])/2)-((m1[,9]+m1[,10])/2)
-hist(careToAG)
+m1L <- emdbook::lump.mcmc.list(m1)
+careToAG <- ((m1L[,11]+m1L[,12])/2)-((m1L[,9]+m1L[,10])/2)
+hist(careToAG, breaks=100)
 ```
 
 effect of sperm comp on the rate of gaining accessory glands
 ```{r}
-spermCompToAG<-((m1[,10]+m1[,12])/2)-((m1[,11]+m1[,9])/2)
-hist(spermCompToAG)
+spermCompToAG<-((m1L[,10]+m1L[,12])/2)-((m1L[,11]+m1L[,9])/2)
+hist(spermCompToAG, breaks=100)
 ```
 
 Graphing all CIs
@@ -195,15 +197,15 @@ Graphing all CIs
 ```{r ci_plot}
 modList <- list(Wald=wald.ci, profile=prof.ci, Bayes=bayes.ci)
 nmod <- length(modList)
-all.ci <- setNames(
-  as.data.frame(do.call("rbind", modList)),
-  c("lwr", "upr")
+all.ci <- do.call(
+    "rbind",
+    lapply(modList, setNames, c("lwr", "upr"))
 )
 all.ci <- data.frame(
   rate = rep(factor(1:num_pars), nmod),
   method = rep(names(modList), each = num_pars),
   ## estimates are the same for Wald & profile; 
-  est = c(rep(p, 2), colMeans(m1)),
+  est = c(rep(p, 2), colMeans(m1L)),
   all.ci
 )
 all.ci$upr[is.na(all.ci$upr)] <- Inf ## extend NA confidence interval to limit of graph
