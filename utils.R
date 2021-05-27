@@ -33,38 +33,82 @@ my_mcmc <- function(data, mapping, lb=log(1e-9), ub=log(1e2), range=2,
 }
 
 
-#' adaptive Metropolis from ramcmc package
+#' adaptive Metropolis, modified from ramcmc package example
 #' @param postfun log-posterior  probability function
 #' @param theta0 starting value
 #' @param S initial Cholesky factor for MVN candidate distribution
 #' @param n_iter number of iterations
 #' @param n_burnin length of burnin/adapt phase
+#' @param thin thinning frequency
 #' @param adapt (logical) adapt?
-metropolis <- function(postfun, theta0, S, n_iter, n_burnin, adapt = FALSE) {
-
+#' @param ... additional arguments to pass to postfun
+## FIXME: add trace/verbose; auto-optim? return as mcmc object + attributes? multi-chain version?
+metropolis <- function(postfun, theta0, S, n_iter=1000,
+                       n_burnin=100, thin = 1, adapt = FALSE, p_args=list()) {
+  if (adapt && !require("ramcmc")) {
+    stop("need ramcmc package for adaptive MCMC")
+  }
   ## FIXME: test/check; implement thinning; wrap in parallel version?
   p <- length(theta0)
-  theta <- matrix(NA, n_iter, p)
+  theta <- matrix(NA, nrow = ceiling((n_iter - n_burnin) / thin), ncol = p)
   accept <- numeric(n_iter)
-  posterior <- postfun(theta0)
-  theta[1, ] <- theta0
 
-  for (i in 2:n_iter){
+  pwrap <- function(x) {
+    do.call("postfun",c(list(x), p_args))
+  }
+
+  ## initialize
+  posterior <- pwrap(theta0)
+  theta_current <- theta0
+  j <- 0  ## storage counter
+
+  for (i in 2:n_iter) {
     u <- rnorm(p)
-    theta_prop <- theta[i - 1, ] + S %*% u
-    posterior_prop <- postfun(theta_prob)
+    theta_prop <- theta_current + S %*% u
+    posterior_prop <- pwrap(theta_prop)
     acceptance_prob <- min(1, exp(posterior_prop - posterior))
     if (runif(1) < acceptance_prob) {
       accept[i] <- 1
-      theta[i, ] <- theta_prop
+      theta_current <- theta_prop
       posterior <- posterior_prop
-    } else{
-      theta[i, ] <- theta[i - 1, ]
     }
-    if(adapt && i <= n_burnin) {
+    if (i > n_burnin && i %% thin == 0) {
+      j <- j + 1
+      theta[j, ] <- theta_current
+    }
+    if (adapt && i <= n_burnin) {
       S <- ramcmc::adapt_S(S, u, acceptance_prob, i - 1)
     }
   }
-  list(theta = theta[(n_burnin + 1):n_iter, ], S = S,
+  list(theta = theta, S = S,
        acceptance_rate = sum(accept[(n_burnin + 1):n_iter]) / (n_iter - n_burnin))
+}
+
+
+metrop_mult <- function(postfun, start, S, nchains, nclust = getOption("mc.cores", 1), ...) {
+  if (is.function(start)) {
+    start <- replicate(nchains, start(), simplify=FALSE)
+  }
+  require("parallel")
+  mfun <- function(s) {
+    metropolis(postfun, theta0 = s, S = S, ...)
+  }
+  if (nclust == 1) {
+    res <- lapply(start, mfun)
+  } else {
+    L <- list(...)
+    attach(L) ## yes, we really want/need to do this
+    on.exit(detach(L))
+    cl <- makeCluster(nclust)
+    clusterExport(cl, varlist = c("mfun", "metropolis", "postfun", "S",
+                                  names(L)),
+                  envir = environment(mfun))
+    res <- parLapply(cl, start, mfun)
+    stopCluster(cl)
+  }
+  mval <- coda::as.mcmc.list(lapply(res,
+                                    function(x) coda::as.mcmc(x$theta)))
+  attr(mval, "acceptance_rate") <- vapply(res, "[[", FUN.VALUE=numeric(1),
+                                          "acceptance_rate")
+  return(mval)
 }
