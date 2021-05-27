@@ -182,13 +182,13 @@ bayes.ci <- broom.mixed::tidy(m1, conf.int=TRUE)[,c("conf.low", "conf.high")]
 effect of care on the rate of gaining accessory glands
 ```{r}
 m1L <- emdbook::lump.mcmc.list(m1)
-careToAG <- ((m1L[,11]+m1L[,12])/2)-((m1L[,9]+m1L[,10])/2)
+careToAG <- ((m1L[,11]-m1L[,7]+m1L[,12]-m1L[,8])/2)-((m1L[,9]-m1L[,3]+m1L[,10]-m1L[,5])/2)
 hist(careToAG, breaks=100)
 ```
 
 effect of sperm comp on the rate of gaining accessory glands
 ```{r}
-spermCompToAG<-((m1L[,10]+m1L[,12])/2)-((m1L[,11]+m1L[,9])/2)
+spermCompToAG<-((m1L[,10]-m1L[,5]+m1L[,12]-m1L[,8])/2)-((m1L[,11]-m1L[,7]+m1L[,9]-m1L[,3])/2)
 hist(spermCompToAG, breaks=100)
 ```
 
