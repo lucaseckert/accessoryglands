@@ -212,5 +212,19 @@ Obscure statement about branch lengths and rates:
 Compare results about with Pagel and Meade fig 6?
 
 ![posterior distributions of rate parameters](pix/PagelMeade_fig6.png)
+I'm not sure what units their rates are in (clearly not log hazard) so hard to compare, but they find q42 to be mostly zero whereas in ours q42 is pretty similar to q12... might also be hard to compare since they have more parameters that our model doesn't allow
+```{r}
+hist(m1[,1], breaks = 100) #compare to q21
+hist(m1[,2], breaks = 100) #compare to q12
+hist(m1[,3], breaks = 100) #compare to q42
+hist(m1[,4], breaks = 100) #compare to q24
+```
+testing their hypotheses... they propose that once multimale mating is gained, estrus advertisement should quickly follow. To test this the compare the rate gaining mutlimale mating to the rate from multimale mating to estrus ad (hyp1). They find limited evidence for this as the rates are most often pretty similar (which might be consistent with our results?). They also hypothesize that estrus ads should be lost more quickly than gained (hyp2) but find mostly the opposite (which we find too). So we seem to reach similar conclusions...
+```{r}
+hyp1<-m1[,4]-m1[,2] 
+hist(hyp1, breaks = 100)
+hyp2<-m1[,3]-m1[,4]
+hist(hyp2, breaks = 100)
+```
 
 ## References
