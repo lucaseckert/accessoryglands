@@ -9,7 +9,7 @@
 
 ## BMB for 2021-06-02
 
-- multi-chain MCMC (done)
+- multi-chain MCMC, HPD regions on pairs plots (done)
 - helper function for variable names?
 - look into missing-value computations ...
 

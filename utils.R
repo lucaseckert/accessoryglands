@@ -7,12 +7,24 @@
 #' @param show_prior include representation of prior (red lines)
 my_mcmc <- function(data, mapping, lb=log(1e-9), ub=log(1e2), range=2,
                     show_prior=FALSE, geom=c("hexbin","density"),
-                    density_alpha=0.5,...) {
+                    density_alpha=0.5,
+                    hpd_levels = c(0.5, 0.8, 0.9, 0.95),
+                    ...) {
+  require("emdbook")
   geom <- match.arg(geom)
   gg1 <- ggplot(data = data, mapping=mapping)
   gg1 <- switch(geom,
                 hexbin = gg1 + geom_hex()  + scale_fill_viridis_c(),
-                density = gg1 + geom_density_2d_filled(alpha=density_alpha) + scale_fill_grey(start=0.9, end=0.02)
+                ## inefficient because we are computing
+                density = {
+                  dd <- ggplot_build(gg1)$data[[1]]
+                  levels <- get_hpd2d_levels(dd$x, dd$y, prob= hpd_levels)
+                  (gg1
+                    + geom_density_2d_filled(alpha=density_alpha)
+                    + geom_density_2d(breaks = levels, colour="red")
+                    + scale_fill_grey(start=0.9, end=0.02)
+                  )
+                }
                 )
     ## geom_point(..., alpha = 0.2)
   if (show_prior) {
@@ -32,6 +44,33 @@ my_mcmc <- function(data, mapping, lb=log(1e-9), ub=log(1e2), range=2,
   return(gg1)
 }
 
+##' Get 2D highest posterior density levels corresponding to probability regions
+##' @param x x-coordinate of samples
+##' @param y y-coordinate
+##' @param probs vector of probability levels
+##' @param ... arguments for MASS::kde2d
+##' @examples
+##' dd <- data.frame(x=rnorm(1000), y=rnorm(1000))
+##' get_hpd2d_levels(dd$x,dd$y)
+##' gg2 <- ggplot(dd, aes(x,y)) + geom_density_2d(breaks=get_hpd2d_levels(dd$x,dd$y), colour="red")
+##' print(gg2)
+get_hpd2d_levels <- function(x, y, prob=c(0.9,0.95), ...) {
+  post1 <- MASS::kde2d(x, y)
+  dx <- diff(post1$x[1:2])
+  dy <- diff(post1$y[1:2])
+  sz <- sort(post1$z)
+  c1 <- cumsum(sz) * dx * dy
+  ## remove duplicates
+  ## dups <- duplicated(sz)
+  ## sz <- sz[!dups]
+  ## c1 <- c1[!dups]
+  levels <- sapply(prob, function(x) {
+    approx(c1, sz, xout = 1 - x, ties = mean)$y
+  })
+  return(levels)
+}
+
+##
 
 #' adaptive Metropolis, modified from ramcmc package example
 #' @param postfun log-posterior  probability function

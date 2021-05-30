@@ -37,7 +37,7 @@ source("utils.R")
 
 ```{r get_data}
 allData <- read.csv("data/binaryTraitData.csv", header = TRUE)
-fullPhy <- fishtree_phylogeny(allData$species)
+fullPhy <- suppressWarnings(fishtree_phylogeny(allData$species)) ## request 607, only find 478 spp
 traitData <- with(allData,
                   data.frame(species, ag, care, mating, names=species))
 ## BMB: why do we need 'species' column _and_ 'names' column?
@@ -133,7 +133,8 @@ plot(pp, show.points = TRUE)
 ```
 
 ```{r prof_CI}
-prof.ci <- as.data.frame(confint(pp))
+prof.ci <- suppressWarnings(as.data.frame(confint(pp)))
+## lots of warnings: non-monotonic profile etc. etc.
 ```
 
 ## Bayesian
@@ -169,38 +170,45 @@ pairs(as.matrix(m1), gap = 0, pch = ".")
 Not sure about the best way(s) to represent density: contour lines, filled contours ... change scale? Show highest posterior density contours?
 
 ```{r bayes_pairs2, fig.width=10, fig.height=10, cache=TRUE}
-ggpairs(as.data.frame(m1), progress=FALSE,
+bp2 <- ggpairs(as.data.frame(lump.mcmc.list(m1)), progress=FALSE,
         lower=list(continuous=function(...) my_mcmc(..., show_prior=FALSE)),
         upper=list(continuous=function(...) my_mcmc(..., geom="density", show_prior=FALSE))) +
   zmargin
+bp2_time <- system.time(print(bp2))
 ```
+
+Contour levels are: 50%, 80% 90%, 95% (largest) highest posterior density regions.
 
 ```{r bayes.ci}
 bayes.ci <- broom.mixed::tidy(m1, conf.int=TRUE)[,c("conf.low", "conf.high")]
 ```
 
-effect of care on the rate of accessory gland evolution
-```{r}
+### effect of care on the rate of accessory gland evolution
+
+```{r care_hist}
 m1L <- emdbook::lump.mcmc.list(m1)
 careToAG <- ((m1L[,11]-m1L[,7]+m1L[,12]-m1L[,8])/2)-((m1L[,9]-m1L[,3]+m1L[,10]-m1L[,5])/2)
-careCI<-quantile(careToAG, c(0.025,0.975))
+(careCI <- quantile(careToAG, c(0.025,0.975)))
 hist(careToAG, breaks=100)
 ```
 
-effect of sperm comp on the rate of accessory gland evolution
-```{r}
-spermCompToAG<-((m1L[,10]-m1L[,5]+m1L[,12]-m1L[,8])/2)-((m1L[,11]-m1L[,7]+m1L[,9]-m1L[,3])/2)
-spermCompCI<-quantile(spermCompToAG, c(0.025,0.975))
+### effect of sperm comp on the rate of accessory gland evolution
+
+```{r spermcomp_hist}
+spermCompToAG <- ((m1L[,10]-m1L[,5]+m1L[,12]-m1L[,8])/2)-((m1L[,11]-m1L[,7]+m1L[,9]-m1L[,3])/2)
+(spermCompCI <- quantile(spermCompToAG, c(0.025,0.975)))
 hist(spermCompToAG, breaks=100)
 ```
+
 interactions?
-```{r}
+
+```{r int_hists}
 int1<-((m1L[,12]-m1L[,8])-(m1L[,10]-m1L[,5]))-((m1L[,11]-m1L[,7])-(m1L[,9]-m1L[,3]))
-int1CI<-quantile(int1,c(0.025,0.975))
+(int1CI<-quantile(int1,c(0.025,0.975)))
 hist(int1, breaks = 100)
 
 int2<-((m1L[,12]-m1L[,8])-(m1L[,9]-m1L[,3]))-((m1L[,10]-m1L[,5])-(m1L[,11]-m1L[,7]))
-int2CI<-quantile(int2, c(0.025,0.975))
+(int2CI<-quantile(int2, c(0.025,0.975)))
 hist(int2, breaks = 100)
 ```
 
