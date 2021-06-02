@@ -1,6 +1,48 @@
 #
 
+## LE for 2021-06-09
+
+- build up contrasts by computing intermediate values, e.g.
+
+To identify a parameter we need to know the
+both the row ('from') and column ('to')
+name variables as 'gain' and loss'
+```
+{ag0_pc0_sc0, ag0_pc0_sc1} -> "gain.sc_ag0_pc0"
+{ag0_pc0_sc1, ag0_pc0_sc0} -> "loss.sc_ag0_pc0"
+
+## difference in gain rates for sc1 vs sc0 given pc0
+sc.gain.pc0 <- gain.ag_sc1_pc0 - gain.ag_sc0_pc0
+sc.gain <- (sc.gain.pc1 + sc.gain.pc0)/2
+sc.netgain <- sc.gain - sc.loss
+```
+
+- bivariate plot of `sc.gain` vs `sc.loss`
+- histograms or violin plots of `sc.gain`, `sc.loss`, `sc.netgain`
+
+```r
+var     sample   value
+sc.gain 1        ...
+sc.gain 2        ...
+...
+sc.loss 1        ...
+```
+
+```r
+ggplot(df, aes(x=var, y=value)) + geom_violin()
+```
+
+- is there a parameter contrast for combined effects of PC and SC?
+- loss of power due to missing data? (either in phylog or in traits)
+
+```r
+## after introducing "?" for missing values and reading ?corHMM
+corHMM:::corProcessData(data) ## then figure out what all the bits are
+```
+
 ## LE for 2021-06-02
+
+
 
 - make net rate
 - compute interactions
