@@ -196,7 +196,7 @@ metrop_mult <- function(postfun, start, S, nchains,
 }
 
 
-CorData <- corHMM:::corProcessData(data, collapse = TRUE)
+
 
 traitNames <- function(dd, sep1 = "", sep2 = "_") {
     uu <- lapply(dd, function(x) sort(unique(x)))
@@ -206,8 +206,10 @@ traitNames <- function(dd, sep1 = "", sep2 = "_") {
     uu3 <- rev(do.call("expand.grid", rev(uu2)))
     return(apply(uu3, 1, paste, collapse = sep2))
 }
-traitNames(data[,-1])
-CorData$PossibleTraits
+
+## CorData <- corHMM:::corProcessData(data, collapse = TRUE)
+## traitNames(data[,-1])
+## CorData$PossibleTraits
 
 image.corhmm <- function(x, dd,
                          aspect="iso",
