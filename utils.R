@@ -207,7 +207,7 @@ traitNames <- function(dd, sep1 = "", sep2 = "_") {
     return(apply(uu3, 1, paste, collapse = sep2))
 }
 traitNames(data[,-1])
-CorData$PossibleTraits    
+CorData$PossibleTraits
 
 image.corhmm <- function(x, dd,
                          aspect="iso",
@@ -227,5 +227,3 @@ image.corhmm <- function(x, dd,
     return(p)
 }
 
-image(Mk
-    
