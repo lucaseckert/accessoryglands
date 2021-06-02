@@ -194,3 +194,38 @@ metrop_mult <- function(postfun, start, S, nchains,
                                           "acceptance_rate")
   return(mval)
 }
+
+
+CorData <- corHMM:::corProcessData(data, collapse = TRUE)
+
+traitNames <- function(dd, sep1 = "", sep2 = "_") {
+    uu <- lapply(dd, function(x) sort(unique(x)))
+    uu2 <- mapply(paste, names(uu), uu, MoreArgs = list(sep = sep1),
+                  SIMPLIFY = FALSE)
+    ## expand in slowest - to -fastest order
+    uu3 <- rev(do.call("expand.grid", rev(uu2)))
+    return(apply(uu3, 1, paste, collapse = sep2))
+}
+traitNames(data[,-1])
+CorData$PossibleTraits    
+
+image.corhmm <- function(x, dd,
+                         aspect="iso",
+                         ...) {
+    require("Matrix")
+    nm <- traitNames(dd)
+    M <- x$solution
+    rlabs <- clabs <- nm
+    p <- Matrix::image(Matrix(M),
+                       scales=list(x=list(at=seq(nrow(M)),labels=rlabs,
+                                          rot=90),
+                                   y=list(at=seq(ncol(M)),labels=clabs)),
+                       xlab="to",
+                       ylab="from",
+                       sub="",
+                       aspect=aspect, ...)
+    return(p)
+}
+
+image(Mk
+    

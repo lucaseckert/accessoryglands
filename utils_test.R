@@ -46,3 +46,6 @@ m2 <- metrop_mult(logitfun, sfun, S = S,
                   n_iter=10000, n_burnin=500, adapt=TRUE)
 
 xyplot(m2)
+
+##
+L <- load("cache/MK_3state_simple.rda")
