@@ -2,6 +2,7 @@
 
 ## LE for 2021-06-09
 
+- figure out ?s for missing data
 - build up contrasts by computing intermediate values, e.g.
 
 To identify a parameter we need to know the
@@ -39,15 +40,6 @@ ggplot(df, aes(x=var, y=value)) + geom_violin()
 ## after introducing "?" for missing values and reading ?corHMM
 corHMM:::corProcessData(data) ## then figure out what all the bits are
 ```
-
-## LE for 2021-06-02
-
-
-
-- make net rate
-- compute interactions
-- compute CIs
-- compare primate results
 
 ## BMB for 2021-06-02
 
