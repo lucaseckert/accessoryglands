@@ -1,0 +1,40 @@
+---
+title: "pagelComparison"
+output: html_document
+---
+
+```{r pkgs,message=FALSE}
+if (packageVersion("corHMM")<"2.6.1") {
+  stop("need hacked version of corHMM. Try 'remotes::install_github(\"bbolker/corHMM\", build_vignettes=TRUE)'")
+}
+## if installation fails when building vignettes drop build_vignettes=TRUE (default is FALSE)
+library(corHMM)
+library(bbmle)     ## for likelihood profiles/CIs
+library(numDeriv)  ## for Hessian/Wald CIs
+library(MCMCpack)  ## for Bayes (Metropolis-Hastings) run
+library(coda)
+library(lattice)
+library(ggplot2); theme_set(theme_bw())
+library(colorspace)
+library(GGally)
+library(ggthemes)
+```
+
+```{r}
+data(primates)
+phy <- multi2di(primates[[1]])
+data <- primates[[2]]
+```
+
+```{r statemat}
+LegendAndRateMat <- getStateMat4Dat(data)
+LegendAndRateMat$legend<-c("0_0","0_1","1_0","1_1")
+names(LegendAndRateMat$legend)<-c(1,2,3,4)
+LegendAndRateMat$rate.mat<- matrix(c(0,1,2,0,3,0,0,4,5,0,0,6,0,7,8,0), nrow = 4, dimnames = list(c("(1)","(2)","(3)","(4)"), c("(1)","(2)","(3)","(4)")))
+RateMat <- LegendAndRateMat$rate.mat
+```
+
+```{r ex1,cache=TRUE}
+(MK_primate_full <- corHMM(phy = phy, data = data, rate.cat = 1, collapse = FALSE, rate.mat = RateMat))
+print(MK_primate_full)
+```
