@@ -34,7 +34,7 @@ library(emdbook)     ## lump.mcmc.list()
 source("utils.R")
 ```
 
-# loading data and tree and trimming
+# loading data and tree and trimming, adding ?'s and checking
 
 ```{r get_data}
 allData <- read.csv("data/binaryTraitData.csv", header = TRUE)
@@ -45,6 +45,7 @@ fullPhy <- suppressWarnings(fishtree_phylogeny(traitData$species)) ## request 60
 trimmedData <- comparative.data(fullPhy, traitData, names.col = names)
 phy <- trimmedData$phy
 data <- trimmedData$data
+corHMM:::corProcessData(data)
 ```
 
 # getting state matrix and legend
