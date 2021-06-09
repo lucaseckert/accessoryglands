@@ -2,9 +2,10 @@ load("cache/MK_3state_simple.rda")
 source("utils.R")
 
 CorData <- corHMM:::corProcessData(data, collapse = TRUE)
-tt <- traitNames(data[,-1])
+## pull machinery from corProcessData ?
+tt <- traitNames(data[,-1])   ## exclude first column (species names)
 CorData$PossibleTraits
-image(MK_3state_simple, data[,-1])
+image(MK_3state_simple, data[,-1])  ## add numbers ?
 m1 <- MK_3state_simple$index.mat
 dimnames(m1) <- list(tt,tt)
 
@@ -27,5 +28,5 @@ for (i in parnums) {
     stopifnot(nrow(labs)==1) ## should be unique
     cat(i, paste(labs[nzchar(labs)], collapse="_"),"\n")
     ## still need to work out which trait is 'focal' changing (if more than one)
-    ## 
+    ##
 }

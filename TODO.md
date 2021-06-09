@@ -1,4 +1,45 @@
-#
+
+## LE for 2021-06-16
+
+- discrete vs continuous comparison (Pagel/Meade/etc vs parameter estimation)
+    - Pagel & Meade
+	- Beaulieu O'Meara
+	- your thesis
+- list of stuff to do/intentions, classified by importance and difficulty
+- figure out where the tree block data comes from ... ?
+- interactions
+- https://www.embarcadero.com/starthere/xe5/mobdevsetup/ios/en/installing_the_commandline_tools.html
+
+### expanded histograms
+
+```r
+d <- as.data.frame(matrix(rnorm(6000), ncol=6))
+library(tidyr)
+d_long <- pivot_longer(d, cols=everything(), names_to="var")
+library(ggplot2)
+ggplot(d_long, aes(x=value)) + facet_wrap(~var) +
+  geom_histogram(binwidth=0.1)
+```
+
+## Sigal and Jess
+
+- timing and venue
+- gain/loss priors
+
+## BMB 
+
+- finish naming stuff
+- fix missing data printing bug
+- set up makefile
+- tree blocks?
+- gain/loss ratio?
+   - have a parameter set and you've identified gain/loss pairs: R1, R2, ... Rn
+   - right now we're passing a full parameter set and sticking parameterwise priors on top
+   - but we can fairly easily add priors for (R1[1] - R1[2]), etc. : in limit we could say
+       R1[gain] - R1[loss] ~ dnorm(0, sd=0.0001) -> enforcing symmetry (Sigal??)
+	   differences in log-hazard rates are ("just") logs of proportional differences in gain vs loss
+	   for example, we could specify (lower bound, middle, upper bound) [loss rate is 50% higher than gain,
+	           middle = loss 10% higher than gain, upper = gain 20% higher than loss] - range +/- 2 or 3 SD
 
 ## LE for 2021-06-09
 
@@ -47,7 +88,7 @@ corHMM:::corProcessData(data) ## then figure out what all the bits are
 - helper function for variable names?
 - look into missing-value computations ...
 
-## missing data
+## missing data (solved!)
 
 missing data, mostly for parental care/mating system traits (AG info is known)
 

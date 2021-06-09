@@ -145,6 +145,7 @@ logpostfun <- function(p, lb = log(1e-9), ub = log(1e2), range = 3) {
   prior.sd <- (ub - lb) / (2 * range)
   loglik <- -1 * nllfun(p)
   log.prior <- sum(dnorm(p, mean = prior.mean, sd = prior.sd, log = TRUE))
+  ## say something about gain/loss rates, identify gain/loss pairs
   return(loglik + log.prior) ## product of likelihood and prior -> sum of LL and log-prior
 }
 ## see MK_3state_mcmc.rds

@@ -1,8 +1,9 @@
 load("cache/MK_3state_simple.rda")
+library(corHMM)
 ## will be a benchmark of corHMM(..., p = ...)  vs running with arg list
-nllfun(p)
-fun2 <- function(p) {
-  capture.output(cc <- corHMM(p = exp(p), phy = phy, data = data, rate.cat = 1, rate.mat = StateMatA_constrained))
+nllfun(p)  ## BMB version
+fun2 <- function(log_p) {
+  capture.output(cc <- corHMM(p = exp(log_p), phy = phy, data = data, rate.cat = 1, rate.mat = StateMatA_constrained))
   -(cc$loglik)
 }
 fun2(p)
