@@ -39,7 +39,7 @@ source("utils.R")
 ```{r get_data}
 allData <- read.csv("data/binaryTraitData.csv", header = TRUE)
 traitData <- with(allData,
-                  data.frame(species, ag, care, mating, names=species))
+                  data.frame(species, ag, care, spawning, names=species))
 traitData[is.na(traitData)] <- "?"
 fullPhy <- suppressWarnings(fishtree_phylogeny(traitData$species)) ## request 607, only find 478 spp
 trimmedData <- comparative.data(fullPhy, traitData, names.col = names)
