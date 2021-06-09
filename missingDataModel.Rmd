@@ -1,0 +1,73 @@
+---
+title: "missingDataModel"
+output: html_document
+---
+
+```{r get_corHMM, message=FALSE}
+while (require("corHMM") && packageVersion("corHMM") < "2.7.1") {
+  if (!interactive()) {
+    stop("need hacked version of corHMM. Try 'remotes::install_github(\"bbolker/corHMM\", build_vignettes=TRUE)'")
+  }
+  ## if installation fails when building vignettes drop build_vignettes=TRUE (default is FALSE)
+  if (toupper(trimws(readline("Install newest version of corHMM?")))=="Y") {
+    remotes::install_github("bbolker/corHMM", build_vignettes=TRUE)
+  }
+}
+```
+
+```{r pkgs, message=FALSE, warning=FALSE}
+library(bbmle) ## for likelihood profiles/CIs
+library(numDeriv) ## for Hessian/Wald CIs
+library(MCMCpack) ## for Bayes (Metropolis-Hastings) run
+library(coda)     ## Bayesian diagnostics
+library(lattice)
+library(ggplot2)
+theme_set(theme_bw())
+zmargin <- theme(panel.spacing=grid::unit(0,"lines"))
+library(ggthemes)
+library(colorspace)
+library(GGally)
+library(fishtree)
+library(caper)
+library(broom.mixed) ## tidy() for mcmc.list
+library(emdbook)     ## lump.mcmc.list()
+source("utils.R")
+```
+
+# loading data and tree and trimming
+
+```{r get_data}
+allData <- read.csv("data/binaryTraitData.csv", header = TRUE)
+traitData <- with(allData,
+                  data.frame(species, ag, care, mating, names=species))
+traitData[is.na(traitData)] <- "?"
+fullPhy <- suppressWarnings(fishtree_phylogeny(traitData$species)) ## request 607, only find 478 spp
+trimmedData <- comparative.data(fullPhy, traitData, names.col = names)
+phy <- trimmedData$phy
+data <- trimmedData$data
+```
+
+# getting state matrix and legend
+
+```{r statemat}
+LegendAndRateMat <- getStateMat4Dat(data)
+RateMat <- LegendAndRateMat$rate.mat
+getStateMat4Dat(data)
+LegendAndRateMat <- getStateMat4Dat(data)
+RateMat <- LegendAndRateMat$rate.mat
+```
+
+
+Make the gain and loss of care and sperm comp exogenous, down to 12 pars:
+
+```{r simplify}
+pars2equal <- list(c(7, 10, 20, 23), c(4, 11, 17, 24), c(2, 5, 15, 18), c(1, 8, 14, 21))
+print(StateMatA_constrained <- equateStateMatPars(RateMat, pars2equal))
+```
+
+Run constrained/simplified model:
+
+```{r simple, cache=TRUE}
+MK_3state_missing <- corHMM(phy = phy, data = data, rate.cat = 1, rate.mat = StateMatA_constrained)
+MK_3state_missing$solution
+```
