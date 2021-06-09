@@ -183,33 +183,64 @@ Contour levels are: 50%, 80% 90%, 95% (largest) highest posterior density region
 bayes.ci <- broom.mixed::tidy(m1, conf.int=TRUE)[,c("conf.low", "conf.high")]
 ```
 
-### effect of care on the rate of accessory gland evolution
+### naming parameters
 
-```{r care_hist}
+```{r}
 m1L <- emdbook::lump.mcmc.list(m1)
-careToAG <- ((m1L[,11]-m1L[,7]+m1L[,12]-m1L[,8])/2)-((m1L[,9]-m1L[,3]+m1L[,10]-m1L[,5])/2)
-(careCI <- quantile(careToAG, c(0.025,0.975)))
-hist(careToAG, breaks=100)
+m1L[,1] -> loss.sc
+m1L[,2] -> loss.pc
+m1L[,3] -> loss.ag_pc0_sc0
+m1L[,4] -> gain.sc
+m1L[,5] -> loss.ag_pc0_sc1
+m1L[,6] -> gain.pc
+m1L[,7] -> loss.ag_pc1_sc0
+m1L[,8] -> loss.ag_pc1_sc1
+m1L[,9] -> gain.ag_pc0_sc0
+m1L[,10] -> gain.ag_pc0_sc1
+m1L[,11] -> gain.ag_pc1_sc0
+m1L[,12] -> gain.ag_pc1_sc1
 ```
 
-### effect of sperm comp on the rate of accessory gland evolution
+### intermediate values
 
-```{r spermcomp_hist}
-spermCompToAG <- ((m1L[,10]-m1L[,5]+m1L[,12]-m1L[,8])/2)-((m1L[,11]-m1L[,7]+m1L[,9]-m1L[,3])/2)
-(spermCompCI <- quantile(spermCompToAG, c(0.025,0.975)))
-hist(spermCompToAG, breaks=100)
+```{r}
+#effect of pc on gaining ag
+pc.gain.sc0 <- gain.ag_pc1_sc0 - gain.ag_pc0_sc0
+pc.gain.sc1 <- gain.ag_pc1_sc1 - gain.ag_pc0_sc1
+pc.gain <- (pc.gain.sc0+pc.gain.sc1)/2
+
+#effect of pc on losing ag
+pc.loss.sc0 <- loss.ag_pc1_sc0 - loss.ag_pc0_sc0
+pc.loss.sc1 <- loss.ag_pc1_sc1 - loss.ag_pc0_sc1
+pc.loss <- (pc.loss.sc0+pc.loss.sc1)/2
+
+#effect of sc on gaining ag
+sc.gain.pc0 <- gain.ag_pc0_sc1 - gain.ag_pc0_sc0
+sc.gain.pc1 <- gain.ag_pc1_sc1 - gain.ag_pc1_sc0
+sc.gain <- (sc.gain.pc0+sc.gain.pc1)/2
+
+#effect of pc on losing ag
+sc.loss.pc0 <- loss.ag_pc0_sc1 - loss.ag_pc0_sc0
+sc.loss.pc1 <- loss.ag_pc1_sc1 - loss.ag_pc1_sc0
+sc.loss <- (sc.loss.pc0+sc.loss.pc1)/2
+
+#net effects on ag
+pc.net <- pc.gain - pc.loss
+sc.net <- sc.gain - sc.loss
+
+df1<-data.frame(var="pc.gain",value=pc.gain)
+df2<-data.frame(var="pc.loss",value=pc.loss)
+df3<-data.frame(var="sc.gain",value=sc.gain)
+df4<-data.frame(var="sc.loss",value=sc.loss)
+df<-rbind(df1,df2,df3,df4)
+
+ggplot(df, aes(x=var, y=var1)) + geom_violin()
 ```
 
 interactions?
 
 ```{r int_hists}
-int1<-((m1L[,12]-m1L[,8])-(m1L[,10]-m1L[,5]))-((m1L[,11]-m1L[,7])-(m1L[,9]-m1L[,3]))
-(int1CI<-quantile(int1,c(0.025,0.975)))
-hist(int1, breaks = 100)
-
-int2<-((m1L[,12]-m1L[,8])-(m1L[,9]-m1L[,3]))-((m1L[,10]-m1L[,5])-(m1L[,11]-m1L[,7]))
-(int2CI<-quantile(int2, c(0.025,0.975)))
-hist(int2, breaks = 100)
+#redo this part
 ```
 
 Graphing all CIs
