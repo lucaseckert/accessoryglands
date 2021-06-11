@@ -39,7 +39,7 @@ source("utils.R")
 allData <- read.csv("data/binaryTraitData.csv", header = TRUE)
 fullPhy <- suppressWarnings(fishtree_phylogeny(allData$species)) ## request 607, only find 478 spp
 traitData <- with(allData,
-                  data.frame(species, ag, care, mating, names=species))
+                  data.frame(species, ag, care, spawning, names=species))
 ## BMB: why do we need 'species' column _and_ 'names' column?
 trimmedData <- comparative.data(fullPhy, traitData, names.col = names)
 phy <- trimmedData$phy
