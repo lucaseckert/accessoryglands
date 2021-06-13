@@ -1,3 +1,5 @@
+library(optigrab)
+
 do_MCMCpack <- FALSE
 source("utils.R")
 

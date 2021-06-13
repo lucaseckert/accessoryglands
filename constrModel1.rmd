@@ -30,7 +30,7 @@ library(fishtree)
 library(caper)
 library(broom.mixed) ## tidy() for mcmc.list
 library(emdbook)     ## lump.mcmc.list()
-source("utils.R")
+source("R/utils.R")
 ```
 
 # loading data and tree and trimming

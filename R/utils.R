@@ -1,3 +1,16 @@
+pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
+             "ggthemes", "fishtree", "caper", "broom.mixed",
+             "emdbook", "ramcmc", "corHMM")
+
+
+install_pkgs <- function() {
+  stop("stub!")
+  ## install uninstalled pkgs from pkgList
+  ## check corHMM version, install from bb repo if necessary
+}
+
+
+
 #' utility function for hexbin panels for MCMC pairs plot
 #' @param data ...
 #' @param mapping ...
@@ -199,26 +212,44 @@ metrop_mult <- function(postfun, start, S, nchains,
 
 
 traitNames <- function(dd, sep1 = "", sep2 = "_") {
-    uu <- lapply(dd, function(x) sort(unique(x)))
-    uu2 <- mapply(paste, names(uu), uu, MoreArgs = list(sep = sep1),
-                  SIMPLIFY = FALSE)
-    ## expand in slowest - to -fastest order
-    uu3 <- rev(do.call("expand.grid", rev(uu2)))
-    return(apply(uu3, 1, paste, collapse = sep2))
+  get_u <- function(x) {
+    s <- sort(unique(x))
+    s[s != "?"]
+  }
+  uu <- lapply(dd, get_u)
+  uu2 <- mapply(paste, names(uu), uu, MoreArgs = list(sep = sep1),
+                SIMPLIFY = FALSE)
+  ## expand in slowest - to -fastest order
+  uu3 <- rev(do.call("expand.grid", rev(uu2)))
+  return(apply(uu3, 1, paste, collapse = sep2))
 }
 
 ## CorData <- corHMM:::corProcessData(data, collapse = TRUE)
 ## traitNames(data[,-1])
 ## CorData$PossibleTraits
 
+mk_idf <- function(index.mat) {
+  df <- data.frame(which(!is.na(index.mat), arr.ind=TRUE),
+                   index=c(na.omit(c(index.mat))))
+  return(df)
+}
+
+
+
 image.corhmm <- function(x, dd,
                          aspect="iso",
+                         log = TRUE,
+                         include_nums = TRUE,
+                         pnum_col = "red",
+                         pnum_cex = 1.5,
                          ...) {
-    require("Matrix")
-    nm <- traitNames(dd)
-    M <- x$solution
-    rlabs <- clabs <- nm
-    p <- Matrix::image(Matrix(M),
+  require("Matrix")
+  require("latticeExtra")
+  nm <- traitNames(dd)
+  M <- x$solution
+  if (log) M <- log10(M)
+  rlabs <- clabs <- nm
+  p <- Matrix::image(Matrix(M),
                        scales=list(x=list(at=seq(nrow(M)),labels=rlabs,
                                           rot=90),
                                    y=list(at=seq(ncol(M)),labels=clabs)),
@@ -226,6 +257,38 @@ image.corhmm <- function(x, dd,
                        ylab="from",
                        sub="",
                        aspect=aspect, ...)
-    return(p)
+  if (include_nums) {
+    dd <- c(mk_idf(x$index.mat), pnum_col=pnum_col, pnum_cex=pnum_cex)
+    p <- p + latticeExtra::layer(lattice::panel.text(row, col, index, col=pnum_col, cex=pnum_cex), data=dd)
+  }
+  return(p)
 }
 
+
+## wrap corhmm results to create a negative log-likelihood function
+## (faster than calling corHMM(p = exp(log_p))
+make_nllfun <- function(corhmm_fit) {
+  require("bbmle")
+  f <- function(log_p) {
+    a <- corhmm_fit$args.list
+    a$p <- log_p
+    return(do.call(corHMM:::dev.corhmm, a))
+  }
+  parnames(f) <- paste0("p",seq_along(corhmm_fit$p))
+  return(f)
+}
+
+corhmm_logpostfun <- function(p,
+                              lb = log(1e-9),
+                              ub = log(1e2),
+                              range = 3,
+                              l_gainloss = log(1e-3)
+                              ) {
+  ## identify gain/loss (symmetric) pairs
+  prior.mean <- (lb + ub) / 2
+  prior.sd <- (ub - lb) / (2 * range)
+  loglik <- -1 * nllfun(p)
+  log.prior <- sum(dnorm(p, mean = prior.mean, sd = prior.sd, log = TRUE))
+  ## say something about gain/loss rates, identify gain/loss pairs
+  return(loglik + log.prior) ## product of likelihood and prior -> sum of LL and log-prior
+}

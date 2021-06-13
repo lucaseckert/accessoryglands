@@ -10,7 +10,12 @@ get_ag_data <- function(file) {
   phylo <-  suppressWarnings(
       fishtree_phylogeny(full_data$species))
   ## request 607, only find 478 spp
-  caper::comparative.data(phy = phylo,
+  cc <- caper::comparative.data(phy = phylo,
                           data = as.data.frame(full_data), ## f'n works REALLY BADLY with tibbles!
                           names.col = "species")
+  ## construct new version of data including species name (corHMM format)
+  cc$data0 <- cc$data
+  cc$data <- data.frame(species = rownames(cc$data0), cc$data0)
+  rownames(cc) <- NULL
+  return(cc)
 }

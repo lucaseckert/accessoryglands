@@ -25,12 +25,15 @@ list(
     tar_target(
         ## state matrix for AG problem (12 compartments)
         ag_statemat1, {
+          ## debugging
+          ## data <- ag_compdata$data
+          ## with(data, table(ag, care, spawning))
           with(ag_compdata, {
             ag_smdat <- corHMM::getStateMat4Dat(data)
-                 pars2equal <- list(c(7, 10, 20, 23), c(4, 11, 17, 24), c(2, 5, 15, 18), c(1, 8, 14, 21))
-                 StateMatA_constrained <- equateStateMatPars(ag_smdat$rate.mat, pars2equal)
-               }
-               )
+            pars2equal <- list(c(7, 10, 20, 23), c(4, 11, 17, 24), c(2, 5, 15, 18), c(1, 8, 14, 21))
+            StateMatA_constrained <- equateStateMatPars(ag_smdat$rate.mat, pars2equal)
+          }
+          )
         }),
     tar_target(
         ag_model0, {
@@ -38,5 +41,14 @@ list(
                  data = ag_compdata$data,
                  rate.cat = 1,
                  rate.mat = ag_statemat1)
-        })
+        }),
+    tar_target(
+      ag_exp_outfile,
+      format = "file",
+      {
+        fn <-  "cache/ag_fit.rda"
+        save(ag_compdata, ag_model0, file = fn)
+        fn ## must return fn
+      }
+    )
 )
