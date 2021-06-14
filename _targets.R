@@ -29,15 +29,18 @@ list(
           ## data <- ag_compdata$data
           ## with(data, table(ag, care, spawning))
           with(ag_compdata, {
-            ag_smdat <- corHMM::getStateMat4Dat(data)
-            pars2equal <- list(c(7, 10, 20, 23), c(4, 11, 17, 24), c(2, 5, 15, 18), c(1, 8, 14, 21))
-            StateMatA_constrained <- equateStateMatPars(ag_smdat$rate.mat, pars2equal)
+              ag_smdat <- corHMM::getStateMat4Dat(data)
+              ## FIXME: name/number match here?
+              pars2equal <- list(c(7, 10, 20, 23), c(4, 11, 17, 24), c(2, 5, 15, 18), c(1, 8, 14, 21))
+              StateMatA_constrained <- equateStateMatPars(ag_smdat$rate.mat, pars2equal)
           }
           )
         }),
     tar_target(
         ag_model0, {
             augment_model(
+                ## FIXME: quietly?
+                ## (drop node labels for one part)
                 corHMM(phy = ag_compdata$phy,
                        data = ag_compdata$data,
                        rate.cat = 1,

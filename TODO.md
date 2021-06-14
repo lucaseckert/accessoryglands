@@ -28,9 +28,12 @@ ggplot(d_long, aes(x=value)) + facet_wrap(~var) +
 
 ## BMB 
 
-- finish naming stuff
-- fix missing data printing bug
-- set up makefile
+- finish naming stuff (done)
+- fix missing data printing bug: partially done (no longer breaks, but also doesn't match number of states? collapse vs non-collapse?)
+- set up makefile (working): using "targets" instead
+   - how do we make targets depend on _functions_? (= files containing functions?) Seems geared toward data.
+   - revamp `constrModel` 
+   - target documentation?
 - tree blocks?
 - gain/loss ratio?
    - have a parameter set and you've identified gain/loss pairs: R1, R2, ... Rn

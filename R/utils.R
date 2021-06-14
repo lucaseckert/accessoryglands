@@ -5,12 +5,13 @@ pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
 
 ## install uninstalled pkgs from pkgList
 ## check corHMM version, install from bb repo if necessary
+## FIXME: save required version elsewhere/externally?
 install_pkgs <- function() {
     ip <- installed.packages()
     to_install <- setdiff(pkgList, c(rownames(ip), "corHMM"))
     install.packages(to_install)
-    if (!require("corHMM") || packageVersion("corHMM") < "2.7.1") {
-        remotes::install_packages("bbolker/corHMM")
+    if (!require("corHMM") || packageVersion("corHMM") < "2.7.1.1") {
+        remotes::install_github("bbolker/corHMM")
     }
     return(NULL)
 }
@@ -338,8 +339,10 @@ par_names <- function(model) {
 }
 
 
+#' give parameters and states more meaningful names
+#' @param model corHMM model
 augment_model <- function(model) {
-    sn <- state_names(model)
+    sn <- state_names(model$data[, -1])
     dimnames(model$solution) <- dimnames(model$index.mat) <- list(sn, sn)
     names(model$args.list$p) <- par_names(model)
     return(model)
