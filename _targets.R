@@ -37,10 +37,12 @@ list(
         }),
     tar_target(
         ag_model0, {
-          corHMM(phy = ag_compdata$phy,
-                 data = ag_compdata$data,
-                 rate.cat = 1,
-                 rate.mat = ag_statemat1)
+            augment_model(
+                corHMM(phy = ag_compdata$phy,
+                       data = ag_compdata$data,
+                       rate.cat = 1,
+                       rate.mat = ag_statemat1)
+                )
         }),
     tar_target(
       ag_exp_outfile,

@@ -3,10 +3,16 @@ pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "emdbook", "ramcmc", "corHMM")
 
 
+## install uninstalled pkgs from pkgList
+## check corHMM version, install from bb repo if necessary
 install_pkgs <- function() {
-  stop("stub!")
-  ## install uninstalled pkgs from pkgList
-  ## check corHMM version, install from bb repo if necessary
+    ip <- installed.packages()
+    to_install <- setdiff(pkgList, c(rownames(ip), "corHMM"))
+    install.packages(to_install)
+    if (!require("corHMM") || packageVersion("corHMM") < "2.7.1") {
+        remotes::install_packages("bbolker/corHMM")
+    }
+    return(NULL)
 }
 
 
@@ -209,9 +215,8 @@ metrop_mult <- function(postfun, start, S, nchains,
 }
 
 
-
-
-trait_names <- function(dd, sep1 = "", sep2 = "_") {
+#' @param dd trait data (no species names)
+state_names <- function(dd, sep1 = "", sep2 = "_") {
   get_u <- function(x) {
     s <- sort(unique(x))
     s[s != "?"]
@@ -224,10 +229,6 @@ trait_names <- function(dd, sep1 = "", sep2 = "_") {
   return(apply(uu3, 1, paste, collapse = sep2))
 }
 
-## CorData <- corHMM:::corProcessData(data, collapse = TRUE)
-## traitNames(data[,-1])
-## CorData$PossibleTraits
-
 mk_idf <- function(index.mat) {
   df <- data.frame(which(!is.na(index.mat), arr.ind=TRUE),
                    index=c(na.omit(c(index.mat))))
@@ -236,7 +237,7 @@ mk_idf <- function(index.mat) {
 
 
 
-image.corhmm <- function(x, dd,
+image.corhmm <- function(x, 
                          aspect="iso",
                          log = TRUE,
                          include_nums = TRUE,
@@ -245,7 +246,8 @@ image.corhmm <- function(x, dd,
                          ...) {
   require("Matrix")
   require("latticeExtra")
-  nm <- traitNames(dd)
+  dd <- x$data[, -1] ## no species names
+  nm <- state_names(dd)
   M <- x$solution
   if (log) M <- log10(M)
   rlabs <- clabs <- nm
@@ -299,9 +301,10 @@ corhmm_logpostfun <- function(p,
 #' @examples
 #' load("cache/ag_fit.rda")
 #' par_names(ag_model0, ag_compdata$data0)
-par_names <- function(model, data) {
+par_names <- function(model) {
+    data <- model$data[, -1]
     m1 <- model$index.mat
-    tt <- trait_names(data)
+    tt <- state_names(data)
     dimnames(m1) <- list(to = tt, from = tt)
     parnums <- c(na.omit(unique(c(m1))))
     nm <- character(length(parnums))
@@ -335,3 +338,9 @@ par_names <- function(model, data) {
 }
 
 
+augment_model <- function(model) {
+    sn <- state_names(model)
+    dimnames(model$solution) <- dimnames(model$index.mat) <- list(sn, sn)
+    names(model$args.list$p) <- par_names(model)
+    return(model)
+}
