@@ -211,7 +211,7 @@ metrop_mult <- function(postfun, start, S, nchains,
 
 
 
-traitNames <- function(dd, sep1 = "", sep2 = "_") {
+trait_names <- function(dd, sep1 = "", sep2 = "_") {
   get_u <- function(x) {
     s <- sort(unique(x))
     s[s != "?"]
@@ -253,13 +253,14 @@ image.corhmm <- function(x, dd,
                        scales=list(x=list(at=seq(nrow(M)),labels=rlabs,
                                           rot=90),
                                    y=list(at=seq(ncol(M)),labels=clabs)),
-                       xlab="to",
-                       ylab="from",
+                       xlab="from",
+                       ylab="to",
                        sub="",
                        aspect=aspect, ...)
   if (include_nums) {
-    dd <- c(mk_idf(x$index.mat), pnum_col=pnum_col, pnum_cex=pnum_cex)
-    p <- p + latticeExtra::layer(lattice::panel.text(row, col, index, col=pnum_col, cex=pnum_cex), data=dd)
+      dd <- c(mk_idf(x$index.mat), pnum_col=pnum_col, pnum_cex=pnum_cex)
+      ## n.b. col = from = x, row = to = y
+      p <- p + latticeExtra::layer(lattice::panel.text(col, row, index, col=pnum_col, cex=pnum_cex), data=dd)
   }
   return(p)
 }
@@ -292,3 +293,45 @@ corhmm_logpostfun <- function(p,
   ## say something about gain/loss rates, identify gain/loss pairs
   return(loglik + log.prior) ## product of likelihood and prior -> sum of LL and log-prior
 }
+
+#' @param model a \code{corHMM} model
+#' @param data trait data associated with the model (matrix of traits only)
+#' @examples
+#' load("cache/ag_fit.rda")
+#' par_names(ag_model0, ag_compdata$data0)
+par_names <- function(model, data) {
+    m1 <- model$index.mat
+    tt <- trait_names(data)
+    dimnames(m1) <- list(to = tt, from = tt)
+    parnums <- c(na.omit(unique(c(m1))))
+    nm <- character(length(parnums))
+    for (i in parnums) {
+        w <- which(m1==i, arr.ind=TRUE, useNames=TRUE)
+        w_to <- rownames(w)
+        w_from <- colnames(m1)[w[, "from"]]
+        ss_to <- strsplit(w_to, "_")
+        ss_from <-strsplit(w_from, "_")
+        focal <- ss_to[[1]][ss_to[[1]] != ss_from[[1]]]
+        ssdf <- do.call(rbind,ss_to)
+        labs <- apply(ssdf,2,
+                      function(x) {
+                          ## FIXME: > binary traits?
+                          const <- (length(u <- unique(x)) ==1)
+                          if (const) return(u)
+                          return("")
+                          ## return(gsub("[0-9]+$","",x))
+                      })
+        stopifnot(nrow(labs)==1) ## should be unique
+        lab <- paste(labs[nzchar(labs)], collapse="_")
+        lastnum <- as.numeric(substr(focal, nchar(focal), nchar(focal)))
+        focal_lab <- paste(substr(focal, 1, nchar(focal) - 1),
+                           c("loss", "gain")[lastnum + 1],
+                           sep=".")
+        
+        lab <- gsub(focal, focal_lab, lab)
+        nm[i] <- lab
+    }
+    return(nm)
+}
+
+
