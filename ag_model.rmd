@@ -7,14 +7,16 @@ source("R/utils.R")
 source("R/mcmc.R")
 source("R/functions.R")
 load_pkgs()
+zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
+theme_set(theme_bw())
 library(targets)
 ## tar_load(names=c(ag_compdata, ag_model0))
-tar_load(everything())
+tar_load(everything())  ## incorporate all computed values
 ```
 
 Approximate workflow:
 
-```{r eval=FALSE}
+```{r workflow, eval=FALSE}
 get_ag_data("data/binaryTraitData.csv")
 ag_statemat1 <- with(ag_compdata, {
   ag_smdat <- corHMM::getStateMat4Dat(data)
@@ -29,16 +31,17 @@ ag_model0 <- augment_model(
 )
 ```
 
-```{r cifun, cache=TRUE, }
+```{r cifun, cache=TRUE}
 t_list <- list(
     wald = tidy(ag_model0, conf.int = TRUE),
     profile = tidy(ag_model0, conf.int = TRUE,
                    conf.method = "profile", profile = ag_profile0),
     mcmc = tidy(ag_mcmc0, conf.int = TRUE)
+) 
+all_ci <- (bind_rows(t_list, .id = "method")
+  %>% rename(lwr = "conf.low", upr = "conf.high")
 )
-tt <- bind_rows(t_list, .id = "method")
 ```
-
 
 ## Bayesian
 
@@ -54,7 +57,7 @@ coda::gelman.diag(ag_mcmc0)
 
 These diagnostics are OK but not great (ideally we would effective sample size up to 1000 and Gelman-Rubin ($\hat R$) statistic as low as 1.01 --- although older studies have used a higher cutoff). Probably fixable by "just" running the chain longer.
 
-```{r bayes_pairs, fig.width=10, fig.height=10}
+```{r bayes_pairs, fig.width=10, fig.height=10, echo=FALSE, eval=FALSE}
 pairs(as.matrix(ag_mcmc0), gap = 0, pch = ".")
 ```
 
@@ -72,8 +75,9 @@ Contour levels are: 50%, 80% 90%, 95% (largest) highest posterior density region
 
 ### naming parameters
 
-```{r}
-m1L <- emdbook::lump.mcmc.list(m1)
+```{r parnames}
+## FIXME: still necessary?
+m1L <- as.mcmc(ag_mcmc0)
 m1L[,1] -> loss.sc
 m1L[,2] -> loss.pc
 m1L[,3] -> loss.ag_pc0_sc0
@@ -89,6 +93,8 @@ m1L[,12] -> gain.ag_pc1_sc1
 ```
 
 ### intermediate values
+
+**FIXME**: do this via contrast matrix?
 
 ```{r}
 #effect of pc on gaining ag
@@ -121,7 +127,10 @@ df3<-data.frame(var="sc.gain",value=sc.gain)
 df4<-data.frame(var="sc.loss",value=sc.loss)
 df<-rbind(df1,df2,df3,df4)
 
-ggplot(df, aes(x=var, y=var1)) + geom_violin()
+print(ggplot(df, aes(x=var, y=var1))
+      + geom_violin(fill="gray")
+      + geom_hline(yintercept = 0, lty = 2)
+      )
 ```
 
 interactions?
@@ -133,29 +142,27 @@ interactions?
 Graphing all CIs
 
 ```{r ci_plot}
-modList <- list(Wald=wald.ci, profile=prof.ci, Bayes=bayes.ci)
-nmod <- length(modList)
-all.ci <- do.call(
-    "rbind",
-    lapply(modList, setNames, c("lwr", "upr"))
-)
-all.ci <- data.frame(
-  rate = rep(factor(1:num_pars), nmod),
-  method = rep(names(modList), each = num_pars),
-  ## estimates are the same for Wald & profile; 
-  est = c(rep(p, 2), colMeans(m1L)),
-  all.ci
-)
-all.ci$upr[is.na(all.ci$upr)] <- Inf ## extend NA confidence interval to limit of graph
-all.ci$lwr[is.na(all.ci$lwr)] <- -Inf ## extend NA confidence interval to limit of graph
-
+all_ci <- all_ci %>% replace_na(list(upr = Inf, lwr = -Inf))
+## extend NA confidence interval to limit of graph
 ggplot(
-  all.ci,
-  aes(rate, est, ymin = lwr, ymax = upr, colour = method)
+  all_ci,
+  aes(term, estimate, ymin = lwr, ymax = upr, colour = method)
 ) +
   geom_pointrange(position = position_dodge(width = 0.5)) +
   scale_colour_discrete_qualitative() +
   scale_y_continuous(limits=c(-20,0), oob=scales::squish) +
   coord_flip()
 ## FIXME: indicate which values are truncated?
+```
+
+```{r bayes_violin}
+mcmc_long <- (ag_mcmc0
+  %>% as.mcmc()
+  %>% as_tibble()
+  %>% pivot_longer(everything(), names_to = "term")
+)
+
+ggplot(mcmc_long, aes(x = value, y = term)) +
+  geom_violin(fill="gray") +
+  coord_cartesian(xlim=c(-20,10))
 ```

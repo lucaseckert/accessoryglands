@@ -1,6 +1,7 @@
 pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "ggthemes", "fishtree", "caper", "broom.mixed",
-             "emdbook", "ramcmc", "corHMM")
+             "emdbook", "ramcmc", "corHMM",
+             "GGally", "colorspace")
 
 
 ## install uninstalled pkgs from pkgList
@@ -32,7 +33,7 @@ my_mcmc <- function(data, mapping, lb=log(1e-9), ub=log(1e2), range=2,
                     density_alpha=0.5,
                     hpd_levels = c(0.5, 0.8, 0.9, 0.95),
                     ...) {
-  require("emdbook")
+  require("emdbook") ## FIXME: not sure why? remove & see what breaks?
   geom <- match.arg(geom)
   gg1 <- ggplot(data = data, mapping=mapping)
   gg1 <- switch(geom,
@@ -268,16 +269,16 @@ tidy.corhmm <- function(x,
       res <- mutate(res,
                     std.error = sds,
                     statistic = p/sds,
-                    conf.lower = estimate - qq*std.error,
-                    conf.upper = estimate + qq*std.error)
+                    conf.low = estimate - qq*std.error,
+                    conf.high = estimate + qq*std.error)
     } else if (conf.method == "profile") {
       if (is.null(profile)) {
         profile <- do.call(profile.corhmm, c(list(x), prof_args))
       }
       cfun <- function(x) {
         junk <- capture.output(r <- try(confint(x), silent=TRUE))
-        if (inherits(r, "try-error")) return(data.frame(lwr=NA, upr=NA))
-        return(setNames(r, c("lwr", "upr")))
+        if (inherits(r, "try-error")) return(data.frame(conf.low = NA, conf.high = NA))
+        return(setNames(r, c("conf.low", "conf.high")))
       }
       cc <- suppressWarnings(purrr:::map_dfr(profile, cfun, .id="term"))
       res <- full_join(res, cc, by = "term")
@@ -340,4 +341,16 @@ as.data.frame.profile.corhmm <- function(x) {
 
 contrasts.mcmc.list <- function() {
 
+}
+
+## copied from emdbook::lump.mcmc.list
+as.mcmc.mcmc.list <- function(x) {
+    x2 <- do.call("rbind", x)
+    mcpars <- sapply(x, attr, "mcpar")
+    class(x2) <- "mcmc"
+    if (var(mcpars[1, ]) > 0 || var(mcpars[3, ]) > 0)
+        stop("can't combine chains with unequal start/thin")
+    attr(x2, "mcpar") <- c(mcpars[1, 1], sum(mcpars[2, ]), mcpars[3,
+        1])
+    x2
 }
