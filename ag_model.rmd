@@ -17,12 +17,15 @@ tar_load(everything())  ## incorporate all computed values
 Approximate workflow:
 
 ```{r workflow, eval=FALSE}
+## load phylo and trait data, replace NAs with ?, combine
 get_ag_data("data/binaryTraitData.csv")
+## set up constrained state matrix
 ag_statemat1 <- with(ag_compdata, {
   ag_smdat <- corHMM::getStateMat4Dat(data)
   pars2equal <- list(c(7, 10, 20, 23), c(4, 11, 17, 24), c(2, 5, 15, 18), c(1, 8, 14, 21))
   StateMatA_constrained <- equateStateMatPars(ag_smdat$rate.mat, pars2equal)
 })
+## run basic model and add state/parameter names
 ag_model0 <- augment_model(
     corHMM(phy = ag_compdata$phy,
            data = ag_compdata$data,
@@ -30,6 +33,16 @@ ag_model0 <- augment_model(
            rate.mat = ag_statemat1)
 )
 ```
+
+```{r}
+tot_evo <- sum(ag_compdata$phy$edge.length)
+## log-hazard for 0.01 to 1000 transitions/tree
+log(c(0.01,1000)/tot_evo)
+## built in lower/upper bounds for corHMM
+log(c(1e-9, 1e-2))
+```
+
+**FIXME**: scale total edge length to 1 of tree to 1 before fitting? *or* shift parameters by `log(tot_evo)` to get expected number of events scale (exponentiate and plot parameters with `scale_x_log10()` ?
 
 ```{r cifun, cache=TRUE}
 t_list <- list(
@@ -95,6 +108,17 @@ m1L[,12] -> gain.ag_pc1_sc1
 ### intermediate values
 
 **FIXME**: do this via contrast matrix?
+
+Want {intercept, care, sperm comp, interaction} $\times$ {loss, gain, net gain}
+```{r}
+ag_mcmc1 <- as.mcmc(ag_mcmc0)
+eff_names <- c(outer(c("intercept", "pc", "sc", "pcxsc"),
+                     c("loss", "gain", "netgain"),
+                     paste, sep = "_"))
+contr <- matrix(0, ncol(ag_mcmc1), length(eff_names),
+                dimnames = list(colnames(ag_mcmc1), eff_names))
+write.csv(contr, "contr.csv")
+```
 
 ```{r}
 #effect of pc on gaining ag
