@@ -25,3 +25,8 @@ A short document on frameworks for workflows
 
 ## plain old make
 
+## targets questions
+
+- correct way to modify earlier part of pipeline but not re-run later stuff? (`tar_invalidate()` ? )
+- literate programming/docstrings for targets etc.
+- is there a `tar_make(ncores= ...)`

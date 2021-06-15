@@ -27,8 +27,6 @@ if (do_MCMCpack) {
   library(Matrix)
   ## need to "pos-defify" the cov matrix ...
   V <- as.matrix(nearPD(vcov(m0))$mat)
-  max(eigen(V)$values)
-  min(eigen(V)$values)
   S <- t(chol(V))
   make_sfun <- function(p, lb = log(1e-9), ub = log(1e2), range = 3) {
     function() {
@@ -48,8 +46,7 @@ if (do_MCMCpack) {
               nchains = 8, nclust = 8,
               n_burnin = 4000, n_iter = 44000, thin = 10,
               adapt = TRUE,
-              clust_extra = lme4:::namedList(nllfun,
-                                             MK_3state_simple))
+              clust_extra = tibble::lst(nllfun, MK_3state_simple))
   saveRDS(m1, file = "cache/MK_3state_constr1_mcmc_adapt.rds")
 
 }

@@ -1,0 +1,161 @@
+---
+title: "accessory gland model"
+---
+
+```{r setup, message=FALSE}
+source("R/utils.R")
+source("R/mcmc.R")
+source("R/functions.R")
+load_pkgs()
+library(targets)
+## tar_load(names=c(ag_compdata, ag_model0))
+tar_load(everything())
+```
+
+Approximate workflow:
+
+```{r eval=FALSE}
+get_ag_data("data/binaryTraitData.csv")
+ag_statemat1 <- with(ag_compdata, {
+  ag_smdat <- corHMM::getStateMat4Dat(data)
+  pars2equal <- list(c(7, 10, 20, 23), c(4, 11, 17, 24), c(2, 5, 15, 18), c(1, 8, 14, 21))
+  StateMatA_constrained <- equateStateMatPars(ag_smdat$rate.mat, pars2equal)
+})
+ag_model0 <- augment_model(
+    corHMM(phy = ag_compdata$phy,
+           data = ag_compdata$data,
+           rate.cat = 1,
+           rate.mat = ag_statemat1)
+)
+```
+
+```{r cifun, cache=TRUE, }
+t_list <- list(
+    wald = tidy(ag_model0, conf.int = TRUE),
+    profile = tidy(ag_model0, conf.int = TRUE,
+                   conf.method = "profile", profile = ag_profile0),
+    mcmc = tidy(ag_mcmc0, conf.int = TRUE)
+)
+tt <- bind_rows(t_list, .id = "method")
+```
+
+
+## Bayesian
+
+
+```{r bayes_traceplot, fig.width=8, fig.height=8}
+lattice::xyplot(ag_mcmc0, aspect="fill", layout=c(2,6))
+```
+
+```{r bayes_sum}
+sort(effectiveSize(ag_mcmc0))
+coda::gelman.diag(ag_mcmc0)
+```
+
+These diagnostics are OK but not great (ideally we would effective sample size up to 1000 and Gelman-Rubin ($\hat R$) statistic as low as 1.01 --- although older studies have used a higher cutoff). Probably fixable by "just" running the chain longer.
+
+```{r bayes_pairs, fig.width=10, fig.height=10}
+pairs(as.matrix(ag_mcmc0), gap = 0, pch = ".")
+```
+
+Not sure about the best way(s) to represent density: contour lines, filled contours ... change scale? Show highest posterior density contours?
+
+```{r bayes_pairs2, fig.width=10, fig.height=10, cache=TRUE}
+bp2 <- ggpairs(as.data.frame(lump.mcmc.list(ag_mcmc0)), progress=FALSE,
+        lower=list(continuous=function(...) my_mcmc(..., show_prior=FALSE)),
+        upper=list(continuous=function(...) my_mcmc(..., geom="density", show_prior=FALSE))) +
+  zmargin
+bp2_time <- system.time(print(bp2))
+```
+
+Contour levels are: 50%, 80% 90%, 95% (largest) highest posterior density regions.
+
+### naming parameters
+
+```{r}
+m1L <- emdbook::lump.mcmc.list(m1)
+m1L[,1] -> loss.sc
+m1L[,2] -> loss.pc
+m1L[,3] -> loss.ag_pc0_sc0
+m1L[,4] -> gain.sc
+m1L[,5] -> loss.ag_pc0_sc1
+m1L[,6] -> gain.pc
+m1L[,7] -> loss.ag_pc1_sc0
+m1L[,8] -> loss.ag_pc1_sc1
+m1L[,9] -> gain.ag_pc0_sc0
+m1L[,10] -> gain.ag_pc0_sc1
+m1L[,11] -> gain.ag_pc1_sc0
+m1L[,12] -> gain.ag_pc1_sc1
+```
+
+### intermediate values
+
+```{r}
+#effect of pc on gaining ag
+pc.gain.sc0 <- gain.ag_pc1_sc0 - gain.ag_pc0_sc0
+pc.gain.sc1 <- gain.ag_pc1_sc1 - gain.ag_pc0_sc1
+pc.gain <- (pc.gain.sc0+pc.gain.sc1)/2
+
+#effect of pc on losing ag
+pc.loss.sc0 <- loss.ag_pc1_sc0 - loss.ag_pc0_sc0
+pc.loss.sc1 <- loss.ag_pc1_sc1 - loss.ag_pc0_sc1
+pc.loss <- (pc.loss.sc0+pc.loss.sc1)/2
+
+#effect of sc on gaining ag
+sc.gain.pc0 <- gain.ag_pc0_sc1 - gain.ag_pc0_sc0
+sc.gain.pc1 <- gain.ag_pc1_sc1 - gain.ag_pc1_sc0
+sc.gain <- (sc.gain.pc0+sc.gain.pc1)/2
+
+#effect of pc on losing ag
+sc.loss.pc0 <- loss.ag_pc0_sc1 - loss.ag_pc0_sc0
+sc.loss.pc1 <- loss.ag_pc1_sc1 - loss.ag_pc1_sc0
+sc.loss <- (sc.loss.pc0+sc.loss.pc1)/2
+
+#net effects on ag
+pc.net <- pc.gain - pc.loss
+sc.net <- sc.gain - sc.loss
+
+df1<-data.frame(var="pc.gain",value=pc.gain)
+df2<-data.frame(var="pc.loss",value=pc.loss)
+df3<-data.frame(var="sc.gain",value=sc.gain)
+df4<-data.frame(var="sc.loss",value=sc.loss)
+df<-rbind(df1,df2,df3,df4)
+
+ggplot(df, aes(x=var, y=var1)) + geom_violin()
+```
+
+interactions?
+
+```{r int_hists}
+#redo this part
+```
+
+Graphing all CIs
+
+```{r ci_plot}
+modList <- list(Wald=wald.ci, profile=prof.ci, Bayes=bayes.ci)
+nmod <- length(modList)
+all.ci <- do.call(
+    "rbind",
+    lapply(modList, setNames, c("lwr", "upr"))
+)
+all.ci <- data.frame(
+  rate = rep(factor(1:num_pars), nmod),
+  method = rep(names(modList), each = num_pars),
+  ## estimates are the same for Wald & profile; 
+  est = c(rep(p, 2), colMeans(m1L)),
+  all.ci
+)
+all.ci$upr[is.na(all.ci$upr)] <- Inf ## extend NA confidence interval to limit of graph
+all.ci$lwr[is.na(all.ci$lwr)] <- -Inf ## extend NA confidence interval to limit of graph
+
+ggplot(
+  all.ci,
+  aes(rate, est, ymin = lwr, ymax = upr, colour = method)
+) +
+  geom_pointrange(position = position_dodge(width = 0.5)) +
+  scale_colour_discrete_qualitative() +
+  scale_y_continuous(limits=c(-20,0), oob=scales::squish) +
+  coord_flip()
+## FIXME: indicate which values are truncated?
+```

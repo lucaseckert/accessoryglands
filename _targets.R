@@ -1,6 +1,7 @@
 library("targets")
 source("R/utils.R")
 source("R/functions.R")
+source("R/mcmc.R")
 options(tidyverse.quiet = TRUE)
 tar_option_set(packages = pkgList)
 ## TO DEBUG: set tar_option_set(debug = "target_name"); tar_make(callr_function = NULL)
@@ -55,5 +56,21 @@ list(
         save(ag_compdata, ag_model0, file = fn)
         fn ## must return fn
       }
-    )
+    ),
+    tar_target(ag_mcmc0,
+               corhmm_mcmc(ag_model0,
+                           p_args=list(nllfun=make_nllfun(ag_model0)),
+                           ncores = 8,
+                           nchains = 8,
+                           n_burnin = 4000,
+                           n_iter = 44000,
+                           thin = 10,
+                           seed = 101)
+               ),
+    tar_target(ag_profile0,
+               profile(ag_model0,
+                       ncores = 12,
+                       trace = TRUE,
+                       alpha=0.05) ## less extreme than default (alpha=0.01)
+               )
 )

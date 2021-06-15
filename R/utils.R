@@ -16,7 +16,9 @@ install_pkgs <- function() {
     return(NULL)
 }
 
-
+load_pkgs <- function() {
+  invisible(lapply(pkgList, library, character.only = TRUE))
+}
 
 #' utility function for hexbin panels for MCMC pairs plot
 #' @param data ...
@@ -92,128 +94,6 @@ get_hpd2d_levels <- function(x, y, prob=c(0.9,0.95), ...) {
 
 ##
 
-#' adaptive Metropolis, modified from ramcmc package example
-#' @param postfun log-posterior  probability function
-#' @param theta0 starting value
-#' @param S initial Cholesky factor for MVN candidate distribution
-#' @param n_iter number of iterations
-#' @param n_burnin length of burnin/adapt phase
-#' @param thin thinning frequency
-#' @param adapt (logical) adapt?
-#' @param trace_level verbosity (0=none; 1=log-posterior + accept rate; 2 includes parameter values)
-#' @param trace_steps frequency of reports
-#' @param seed random number seed
-#' @param p_args list of additional arguments to pass to postfun
-## FIXME: add trace/verbose; auto-optim? return as mcmc object + attributes? multi-chain version?
-metropolis <- function(postfun,
-                       theta0,
-                       S,
-                       n_iter=1000,
-                       n_burnin=100,
-                       thin = 1,
-                       adapt = FALSE,
-                       p_args = list(),
-                       trace_level = 1,
-                       trace_steps = 100,
-                       seed = NULL) {
-  if (adapt && !require("ramcmc")) {
-    stop("need ramcmc package for adaptive MCMC")
-  }
-
-  ## FIXME: seed for parallel versions?
-  p <- length(theta0)
-  theta <- matrix(NA, nrow = ceiling((n_iter - n_burnin) / thin), ncol = p)
-  accept <- numeric(n_iter)
-  bad_steps <- 0
-
-  pwrap <- function(x) {
-    do.call("postfun",c(list(x), p_args))
-  }
-
-  ## initialize
-  S0 <- S   ## store initial cholesky factor (for comparison later if we need)
-  posterior <- pwrap(theta0)
-  theta_current <- theta0
-  j <- 0  ## storage counter
-
-  for (i in 2:n_iter) {
-    u <- rnorm(p)
-    theta_prop <- theta_current + S %*% u
-    posterior_prop <- pwrap(theta_prop)
-    acceptance_prob <- min(1, exp(posterior_prop - posterior))
-    if (!is.finite(acceptance_prob)) {
-      bad_steps <- bad_steps + 1
-      acceptance_prob <- 0
-    }
-    if (runif(1) < acceptance_prob) {
-      accept[i] <- 1
-      theta_current <- theta_prop
-      posterior <- posterior_prop
-    }
-    if (i > n_burnin && i %% thin == 0) {
-      j <- j + 1
-      theta[j, ] <- theta_current
-    }
-    if (adapt && i <= n_burnin) {
-      S <- ramcmc::adapt_S(S, u, acceptance_prob, i - 1)
-    }
-    if (trace_level > 0 && i %% trace_steps == 0) {
-      cat(sprintf("** %d: log_post = %1.2f accept_rate=%1.2f\n",
-                  i, posterior, mean(accept[1:i])))
-      if (trace_level > 1) {
-        cat(theta_current,"\n")
-      }
-    }
-  }
-  list(theta = theta, S = S,
-       acceptance_rate = sum(accept[(n_burnin + 1):n_iter]) / (n_iter - n_burnin))
-}
-
-
-#' @param postfun log-posterior
-#' @param start randomized starting function, or list of starting values
-#' @param S initial Cholesky factor for candidate distribution
-#' @param nchains number of chains
-#' @param nclust number of cores
-#' @param clust_extras additional objects needed in clust environments
-#' @param ... additional arguments to \code{metropolis}
-metrop_mult <- function(postfun, start, S, nchains,
-                        nclust = min(nchains,getOption("mc.cores", 1)),
-                        clust_extras = list(),
-                        ...) {
-
-  ## FIXME: better/less clunky way to parallelize?
-  ## (1) handling environments/objects; (2) progress bar?
-  ## (3) random-number-seed handling
-  if (is.function(start)) {
-    start <- replicate(nchains, start(), simplify=FALSE)
-  }
-  if (length(start) != nchains) stop("need as many start values as chains")
-  require("parallel")
-  mfun <- function(s) {
-    metropolis(postfun, theta0 = s, S = S, ...)
-  }
-  if (nclust == 1) {
-    res <- lapply(start, mfun)
-  } else {
-    clust_stuff <- c(list(...), clust_extras)
-    suppressMessages(
-        attach(clust_stuff) ## yes, we really want/need to do this
-    )
-    on.exit(detach(clust_stuff))
-    cl <- makeCluster(nclust)
-    clusterExport(cl, varlist = c("mfun", "metropolis", "postfun", "S",
-                                  names(clust_stuff)),
-                  envir = environment(mfun))
-    res <- parLapply(cl, start, mfun)
-    stopCluster(cl)
-  }
-  mval <- coda::as.mcmc.list(lapply(res,
-                                    function(x) coda::as.mcmc(x$theta)))
-  attr(mval, "acceptance_rate") <- vapply(res, "[[", FUN.VALUE=numeric(1),
-                                          "acceptance_rate")
-  return(mval)
-}
 
 
 #' @param dd trait data (no species names)
@@ -238,7 +118,7 @@ mk_idf <- function(index.mat) {
 
 
 
-image.corhmm <- function(x, 
+image.corhmm <- function(x,
                          aspect="iso",
                          log = TRUE,
                          include_nums = TRUE,
@@ -278,7 +158,10 @@ make_nllfun <- function(corhmm_fit) {
     a$p <- log_p
     return(do.call(corHMM:::dev.corhmm, a))
   }
-  parnames(f) <- paste0("p",seq_along(corhmm_fit$p))
+  p <- corhmm_fit$args.list$p
+  parnames(f) <- if (is.null(names(p))) {
+                   paste0("p",seq_along(p))
+                 } else names(p)
   return(f)
 }
 
@@ -286,15 +169,30 @@ corhmm_logpostfun <- function(p,
                               lb = log(1e-9),
                               ub = log(1e2),
                               range = 3,
-                              l_gainloss = log(1e-3)
+                              gainloss_pairs = NULL,
+                              lb_gainloss = log(1e-3),
+                              ub_gainloss = log(1e3),
+                              range_gainloss = 3,
+                              nllfun
                               ) {
-  ## identify gain/loss (symmetric) pairs
   prior.mean <- (lb + ub) / 2
   prior.sd <- (ub - lb) / (2 * range)
   loglik <- -1 * nllfun(p)
   log.prior <- sum(dnorm(p, mean = prior.mean, sd = prior.sd, log = TRUE))
-  ## say something about gain/loss rates, identify gain/loss pairs
-  return(loglik + log.prior) ## product of likelihood and prior -> sum of LL and log-prior
+  ## product of likelihood and prior -> sum of LL and log-prior
+  res <- loglik + log.prior
+  ## calculate gain/loss priors
+  if (!is.null(gainloss_pairs)) {
+    gl.prior.mean <- (lb_gainloss + ub_gainloss) / 2
+    gl.prior.sd <- (ub_gainloss - lb_gainloss) / (2 * range_gainloss)
+    gl.values <- vapply(gainloss_pairs,
+                        function(p) p[x[1]] - p[x[2]],
+                        FUN.VALUE = numeric(1))
+    gl.log.prior <- sum(dnorm(gl.values, mean = gl.prior.mean, sd = gl.prior.sd,
+                              log = TRUE))
+    res <- res + gl.log.prior
+  }
+  return(res)
 }
 
 #' @param model a \code{corHMM} model
@@ -328,10 +226,9 @@ par_names <- function(model) {
         stopifnot(nrow(labs)==1) ## should be unique
         lab <- paste(labs[nzchar(labs)], collapse="_")
         lastnum <- as.numeric(substr(focal, nchar(focal), nchar(focal)))
-        focal_lab <- paste(substr(focal, 1, nchar(focal) - 1),
-                           c("loss", "gain")[lastnum + 1],
+        focal_lab <- paste(c("loss", "gain")[lastnum + 1],
+                           substr(focal, 1, nchar(focal) - 1),
                            sep=".")
-        
         lab <- gsub(focal, focal_lab, lab)
         nm[i] <- lab
     }
@@ -346,4 +243,101 @@ augment_model <- function(model) {
     dimnames(model$solution) <- dimnames(model$index.mat) <- list(sn, sn)
     names(model$args.list$p) <- par_names(model)
     return(model)
+}
+
+tidy.corhmm <- function(x,
+                        conf.int = FALSE,
+                        conf.method = "wald",
+                        conf.level = 0.95,
+                        p.value = FALSE,
+                        profile = NULL,
+                        exponentiate = FALSE,
+                        prof_args = NULL,
+                        ...) {
+  f <- make_nllfun(x)
+  p <- x$args.list$p
+
+  ## FIXME: augment model here ? or assume already augmented?
+  res <- tibble(term = names(p),
+                estimate = p)
+  if (conf.int) {
+    if (conf.method == "wald") {
+      H <- numDeriv::hessian(f, p)
+      sds <- sqrt(diag(solve(H)))
+      qq <- qnorm((1+conf.level)/2)
+      res <- mutate(res,
+                    std.error = sds,
+                    statistic = p/sds,
+                    conf.lower = estimate - qq*std.error,
+                    conf.upper = estimate + qq*std.error)
+    } else if (conf.method == "profile") {
+      if (is.null(profile)) {
+        profile <- do.call(profile.corhmm, c(list(x), prof_args))
+      }
+      cfun <- function(x) {
+        junk <- capture.output(r <- try(confint(x), silent=TRUE))
+        if (inherits(r, "try-error")) return(data.frame(lwr=NA, upr=NA))
+        return(setNames(r, c("lwr", "upr")))
+      }
+      cc <- suppressWarnings(purrr:::map_dfr(profile, cfun, .id="term"))
+      res <- full_join(res, cc, by = "term")
+    }
+  }
+  if (exponentiate) {
+    res <- mutate(res, across(estimate, exp))
+    res <- mutate(res, across(starts_with("conf"), exp))
+    if ("std.error" %in% names(res)) {
+      res <- mutate(res, across(std.error, ~ . * estimate))
+    }
+  }
+  return(res)
+}
+
+profile.corhmm <- function(model,
+                           mlefun = NULL,
+                           which = NULL,
+                           quietly = FALSE,
+                           ncores = getOption("mc.cores", 2), ...) {
+  if (is.null(mlefun)) {
+    mlefun <- make_nllfun(model)
+  }
+  p <- model$args.list$p
+  ## FIXME:: use maxit=0 ?? (still need to compute Hessian,
+  ##  unless prespecified)
+  if (!quietly) cat("re-fitting with mle2\n")
+  mlefun <- bbmle::mle2(mlefun, start = p)
+  if (is.null(which)) which <- seq_along(p)
+  pfun <- function(i) {
+    profile(mlefun, which=i, ...)
+  }
+  if (ncores==1) {
+    res <- lapply(which, pfun)
+  } else {
+    ## FIXME: should build parallel capability into bbmle instead!
+    if (!quietly) cat("executing on",ncores,"cores\n")
+    cl <- parallel::makeCluster(ncores)
+    parallel::clusterEvalQ(cl, library(bbmle))
+    res <- parallel::parLapply(cl = cl, X = which, fun = pfun)
+  }
+  if (!quietly) cat("... done\n")
+  ## could try to collapse into a single profile.mle2 object ...
+  names(res) <- names(p)
+  class(res) <- "profile.corhmm"
+  return(res)
+}
+
+confint.profile.corhmm <- function(x) {
+  ## indiv components are profile.mle2 objects
+  require("bbmle")
+  lapply(x, confint)
+}
+
+as.data.frame.profile.corhmm <- function(x) {
+  ## indiv components are profile.mle2 objects
+  require("bbmle")
+  lapply(x, as.data.frame)
+}
+
+contrasts.mcmc.list <- function() {
+
 }

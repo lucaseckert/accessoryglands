@@ -13,5 +13,9 @@ Phylogenetic comparative analysis on the evolution of reproductive accessory gla
 
 Files:
 
-       accessTree.R  binaryTraitData.csv  cleanTraitData.csv  treeBlock.rds  treeSingle.rds
+- `accessTree.R`
+- `binaryTraitData.csv`
+- `cleanTraitData.csv`
+- `treeBlock.rds`
+- `treeSingle.rds`
 
