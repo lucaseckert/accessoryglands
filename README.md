@@ -11,6 +11,12 @@ Phylogenetic comparative analysis on the evolution of reproductive accessory gla
    - specify priors and do MCMC computation
    - plot/interpret results
 
+## getting started
+
+```r
+source("R/utils.R")
+install_pkgs()
+```
 Files:
 
 - `accessTree.R`
