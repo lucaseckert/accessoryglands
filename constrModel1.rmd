@@ -241,7 +241,12 @@ ggplot(df, aes(x=var, y=var1)) + geom_violin()
 interactions?
 
 ```{r int_hists}
-#redo this part
+int<-((gain.ag_pc1_sc1-loss.ag_pc1_sc1)-(gain.ag_pc0_sc1-loss.ag_pc0_sc1))-((gain.ag_pc1_sc0-loss.ag_pc1_sc0)-(gain.ag_pc0_sc0-loss.ag_pc0_sc0))
+hist(int, breaks = 100)
+
+#checked to see if it was equal the other way I was thinking about it and it is
+int2<-((gain.ag_pc1_sc1-loss.ag_pc1_sc1)-(gain.ag_pc1_sc0-loss.ag_pc1_sc0))-((gain.ag_pc0_sc1-loss.ag_pc0_sc1)-(gain.ag_pc0_sc0-loss.ag_pc0_sc0))
+hist(int2, breaks = 100)
 ```
 
 Graphing all CIs
