@@ -1,6 +1,13 @@
 
 ## BMB for 2021-06-23
 
+- finish contr
+- synthesize advice on priors (gain/loss ratios)
+- primate comparison mcmc
+- think about why some pars are so uncertain (trait combinations)
+
+## BMB for 2021-06-23
+
 - shorten names?
 - think about tree blocks
 - adjust `getdata` to allow flexibility in selected trait columns
