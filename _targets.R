@@ -67,10 +67,18 @@ list(
                            thin = 10,
                            seed = 101)
                ),
+    tar_target(ag_mcmc1,
+               as.mcmc(ag_mcmc0)
+               ),
     tar_target(ag_profile0,
                profile(ag_model0,
                        ncores = 12,
                        trace = TRUE,
                        alpha=0.05) ## less extreme than default (alpha=0.01)
+               ),
+    tar_target(ag_rmd,
+               format = "file",
+               rmarkdown::render("ag_model.rmd")
                )
 )
+

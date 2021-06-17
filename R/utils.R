@@ -137,8 +137,8 @@ image.corhmm <- function(x,
                        scales=list(x=list(at=seq(nrow(M)),labels=rlabs,
                                           rot=90),
                                    y=list(at=seq(ncol(M)),labels=clabs)),
-                       xlab="from",
-                       ylab="to",
+                       xlab="to",
+                       ylab="from",
                        sub="",
                        aspect=aspect, ...)
   if (include_nums) {
@@ -227,7 +227,7 @@ par_names <- function(model) {
         stopifnot(nrow(labs)==1) ## should be unique
         lab <- paste(labs[nzchar(labs)], collapse="_")
         lastnum <- as.numeric(substr(focal, nchar(focal), nchar(focal)))
-        focal_lab <- paste(c("loss", "gain")[lastnum + 1],
+        focal_lab <- paste(c("gain", "loss")[lastnum + 1],
                            substr(focal, 1, nchar(focal) - 1),
                            sep=".")
         lab <- gsub(focal, focal_lab, lab)
@@ -339,10 +339,6 @@ as.data.frame.profile.corhmm <- function(x) {
   lapply(x, as.data.frame)
 }
 
-contrasts.mcmc.list <- function() {
-
-}
-
 ## copied from emdbook::lump.mcmc.list
 as.mcmc.mcmc.list <- function(x) {
     x2 <- do.call("rbind", x)
@@ -354,3 +350,29 @@ as.mcmc.mcmc.list <- function(x) {
         1])
     x2
 }
+
+## replace names ...
+shorten_ag_names <- function(x) {
+  rfun <- function(s) stringr::replace(s,
+                                       c("care", "spawning"),
+                                       ## parental care / sperm competition
+                                       c("pc", "sc")
+                                       )
+  if (is.matrix(x)) {
+    colnames(x) <- rfun(colnames(x))
+  } else {
+    names(x) <- rfun(names(x))
+  }
+  return(x)
+}
+
+## set up contrast matrix - ALL ZEROS, don't overwrite existing file!
+setup_contrasts <- function(parnames,
+                            cat1 = c("intercept", "pc", "sc", "pcxsc"),
+                            cat2 = c("loss", "gain", "netgain")) {
+  cnames <- c(outer(cat1, cat2, paste, sep = "_"))
+  m <- matrix(0, nrow = length(parnames), ncol = length(cnames),
+              dimnames = list(par = parnames, effect = cnames))
+  return(m)
+}
+
