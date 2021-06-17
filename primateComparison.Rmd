@@ -3,21 +3,13 @@ title: "pagelComparison"
 output: html_document
 ---
 
-```{r pkgs,message=FALSE}
-if (packageVersion("corHMM")<"2.6.1") {
-  stop("need hacked version of corHMM. Try 'remotes::install_github(\"bbolker/corHMM\", build_vignettes=TRUE)'")
-}
-## if installation fails when building vignettes drop build_vignettes=TRUE (default is FALSE)
-library(corHMM)
-library(bbmle)     ## for likelihood profiles/CIs
-library(numDeriv)  ## for Hessian/Wald CIs
-library(MCMCpack)  ## for Bayes (Metropolis-Hastings) run
-library(coda)
-library(lattice)
-library(ggplot2); theme_set(theme_bw())
-library(colorspace)
-library(GGally)
-library(ggthemes)
+```{r}
+source("R/utils.R")
+source("R/mcmc.R")
+source("R/functions.R")
+load_pkgs()
+zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
+theme_set(theme_bw())
 ```
 
 ```{r}
@@ -38,3 +30,17 @@ RateMat <- LegendAndRateMat$rate.mat
 (MK_primate_full <- corHMM(phy = phy, data = data, rate.cat = 1, collapse = FALSE, rate.mat = RateMat))
 print(MK_primate_full)
 ```
+
+```{r}
+primate_mcmc <- 
+  corhmm_mcmc(MK_primate_full,
+              p_args=list(nllfun=make_nllfun(MK_primate_full)),
+              ncores = 3,
+              nchains = 6,
+              ## these are per chain
+              n_burnin = 4000,
+              n_iter = 44000,
+              thin = 10,
+              seed = 101)
+```
+
