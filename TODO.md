@@ -1,7 +1,7 @@
 
-## BMB for 2021-06-23
+## LE for 2021-06-23
 
-- finish contr
+- finish contr - done
 - synthesize advice on priors (gain/loss ratios)
 - primate comparison mcmc
 - think about why some pars are so uncertain (trait combinations)
