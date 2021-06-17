@@ -35,12 +35,41 @@ print(MK_primate_full)
 primate_mcmc <- 
   corhmm_mcmc(MK_primate_full,
               p_args=list(nllfun=make_nllfun(MK_primate_full)),
-              ncores = 3,
+              ncores = 1,
               nchains = 6,
               ## these are per chain
               n_burnin = 4000,
               n_iter = 44000,
               thin = 10,
               seed = 101)
+saveRDS(primate_mcmc, file = "primateMCMC.rds")
+
+primate_mcmc<-readRDS("primateMCMC.rds")
+
+m1 <- emdbook::lump.mcmc.list(primate_mcmc)
 ```
 
+```{r}
+q12 <- m1[,3]
+q21 <- m1[,1]
+q13 <- m1[,5]
+q31 <- m1[,2]
+q24 <- m1[,7]
+q42 <- m1[,4]
+q34 <- m1[,8]
+q43 <- m1[,6]
+
+df1<-data.frame(var="q12",value=q12)
+df2<-data.frame(var="q21",value=q21)
+df3<-data.frame(var="q13",value=q13)
+df4<-data.frame(var="q31",value=q31)
+df5<-data.frame(var="q24",value=q24)
+df6<-data.frame(var="q42",value=q42)
+df7<-data.frame(var="q34",value=q34)
+df8<-data.frame(var="q43",value=q43)
+df<-rbind(df1,df2,df3,df4,df5,df6,df7,df8)
+
+ggplot(df, aes(x=var1)) + facet_wrap(~var) +
+     geom_histogram(binwidth=0.1)
+#need to reorder and un-log
+```
