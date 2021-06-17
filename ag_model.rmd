@@ -100,6 +100,10 @@ Contour levels are: 50%, 80% 90%, 95% (largest) highest posterior density region
 
 ### naming parameters
 
+```{r}
+image(ag_model0)
+```
+
 ```{r parnames}
 ## FIXME: still necessary?
 m1L <- as.mcmc(ag_mcmc0)
@@ -119,18 +123,8 @@ m1L[,12] -> gain.ag_pc1_sc1
 
 ### intermediate values
 
-**FIXME**: do this via contrast matrix?
+**FIXME**:  compare results here with contrast matrix results, they don't match ...
 
-Want {intercept, care, sperm comp, interaction} $\times$ {loss, gain, net gain}
-```{r}
-ag_mcmc1 <- as.mcmc(ag_mcmc0)
-eff_names <- c(outer(c("intercept", "pc", "sc", "pcxsc"),
-                     c("loss", "gain", "netgain"),
-                     paste, sep = "_"))
-contr <- matrix(0, ncol(ag_mcmc1), length(eff_names),
-                dimnames = list(colnames(ag_mcmc1), eff_names))
-write.csv(contr, "contr.csv")
-```
 
 ```{r}
 #effect of pc on gaining ag
@@ -166,6 +160,7 @@ df<-rbind(df1,df2,df3,df4)
 print(ggplot(df, aes(x=var, y=var1))
       + geom_violin(fill="gray")
       + geom_hline(yintercept = 0, lty = 2)
+      + coord_flip()
       )
 ```
 
@@ -174,6 +169,18 @@ interactions?
 ```{r int_hists}
 int<-((gain.ag_pc1_sc1-loss.ag_pc1_sc1)-(gain.ag_pc0_sc1-loss.ag_pc0_sc1))-((gain.ag_pc1_sc0-loss.ag_pc1_sc0)-(gain.ag_pc0_sc0-loss.ag_pc0_sc0))
 hist(int, breaks = 100)
+```
+
+```r
+cmat <- read_csv("contr.csv", col_types = cols()) %>% dplyr::select(-parname) %>% as.matrix()
+cmat <- cmat[,!apply(cmat==0,2,all)]  ## drop unimplemented columns
+ag_contr <- ag_mcmc1 %*% cmat
+ag_contr_long <- (ag_contr
+  %>% as_tibble()
+  %>% pivot_longer(everything(), names_to = "contrast")
+)
+ggplot(ag_contr_long, aes(x = value, y = contrast)) + geom_violin(fill = "gray") +
+  geom_vline(xintercept = 0, lty = 2)
 ```
 
 Graphing all CIs
