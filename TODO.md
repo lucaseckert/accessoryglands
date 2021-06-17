@@ -1,4 +1,13 @@
 
+## BMB for 2021-06-23
+
+- shorten names?
+- think about tree blocks
+- adjust `getdata` to allow flexibility in selected trait columns
+- dynamic branching (for primates + ag + ag w/o missing data + .. ?
+- parameter ordering and log-scaling for params plot
+- phylo scaling (pre- or post-hoc)
+
 ## LE for 2021-06-16
 
 - discrete vs continuous comparison (Pagel/Meade/etc vs parameter estimation)
@@ -30,9 +39,8 @@ ggplot(d_long, aes(x=value)) + facet_wrap(~var) +
 
 - finish naming stuff (done)
 - fix missing data printing bug: partially done (no longer breaks, but also doesn't match number of states? collapse vs non-collapse?)
-- set up makefile (working): using "targets" instead
-   - how do we make targets depend on _functions_? (= files containing functions?) Seems geared toward data.
-   - revamp `constrModel` 
+- keep working on `targets`:
+   - dynamic 
    - target documentation?
 - tree blocks?
 - gain/loss ratio?
@@ -43,6 +51,8 @@ ggplot(d_long, aes(x=value)) + facet_wrap(~var) +
 	   differences in log-hazard rates are ("just") logs of proportional differences in gain vs loss
 	   for example, we could specify (lower bound, middle, upper bound) [loss rate is 50% higher than gain,
 	           middle = loss 10% higher than gain, upper = gain 20% higher than loss] - range +/- 2 or 3 SD
+
+* priors on branch length:
 
 ## LE for 2021-06-09
 
