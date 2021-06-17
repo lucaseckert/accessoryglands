@@ -316,7 +316,16 @@ profile.corhmm <- function(model,
   } else {
     ## FIXME: should build parallel capability into bbmle instead!
     if (!quietly) cat("executing on",ncores,"cores\n")
-    cl <- parallel::makeCluster(ncores)
+    ## work around Rstudio/R bug
+    ## https://stackoverflow.com/questions/62730783/error-in-makepsockclusternames-spec-cluster-setup-failed-3-of-3-work
+    if (Sys.getenv("RSTUDIO") == "1" &&
+        !nzchar(Sys.getenv("RSTUDIO_TERM"))
+        &&  Sys.info()["sysname"] == "Darwin"
+        && getRversion() >= "4.0.0") {
+      cl <- parallel::makeCluster(ncores, setup_strategy = "sequential")
+    } else {
+      cl <- parallel::makeCluster(ncores)
+    }
     parallel::clusterEvalQ(cl, library(bbmle))
     res <- parallel::parLapply(cl = cl, X = which, fun = pfun)
   }
