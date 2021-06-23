@@ -3,7 +3,9 @@
 Jess' advice was since retracted after further explaination. Sigal's advice fits into John's so basically John's advice should cover it and is as follows:
 
 for PC: loss 10X faster than gain - gain 5X faster than loss
+
 for SC: loss 5X faster than gain - gain 10X faster than loss
+
 for AG: loss 100-1000X faster than gain - gain 10X faster than loss
 
 baseline rates
@@ -27,3 +29,4 @@ lower bound is 10
 and say this range is +/- 3 sigma
 
 see how this compares to the default range in corHMM
+
