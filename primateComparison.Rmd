@@ -46,6 +46,8 @@ print(MK_primate_full)
 
 primate_mcmc<-readRDS("primateMCMC.rds")
 
+lattice::xyplot(primate_mcmc, layout=c(2,4), aspect="fill")
+
 m1 <- emdbook::lump.mcmc.list(primate_mcmc)
 ```
 
@@ -73,8 +75,10 @@ df$var<-factor(df$var, levels = c("q12","q13","q21","q31","q34","q24","q43","q42
 ggplot(df, aes(x=var1)) + facet_wrap(~var, nrow = 2) +
   geom_histogram(binwidth = 0.1)
 ```
+
 ```{r}
 df$var1<-exp(df$var1)
-ggplot(df, aes(x=var1)) + facet_wrap(~var, nrow = 2) +
-  geom_histogram(binwidth = 0.1)
+filter(df,var1<100)%>%ggplot(aes(x=var1)) + facet_wrap(~var, nrow = 2) +
+  geom_histogram(bins=50)+
+  scale_x_continuous(limits = c(0,100))
 ```
