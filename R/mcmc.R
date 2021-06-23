@@ -115,7 +115,6 @@ metrop_mult <- function(postfun, start, S, nchains,
     } else {
       cl <- parallel::makeCluster(nclust)
     }
-    cl <- makeCluster(nclust)
     clusterExport(cl, varlist = c("mfun", "metropolis", "postfun", "S",
                                   names(clust_stuff)),
                   envir = environment(mfun))
