@@ -32,7 +32,7 @@ print(MK_primate_full)
 ```
 
 ```{r}
-primate_mcmc <- 
+#primate_mcmc <- 
   corhmm_mcmc(MK_primate_full,
               p_args=list(nllfun=make_nllfun(MK_primate_full)),
               ncores = 3,
@@ -42,7 +42,7 @@ primate_mcmc <-
               n_iter = 44000,
               thin = 10,
               seed = 101)
-saveRDS(primate_mcmc, file = "primateMCMC.rds")
+#saveRDS(primate_mcmc, file = "primateMCMC.rds")
 
 primate_mcmc<-readRDS("primateMCMC.rds")
 
@@ -70,7 +70,11 @@ df8<-data.frame(var="q43",value=q43)
 df<-rbind(df1,df2,df3,df4,df5,df6,df7,df8)
 df$var<-factor(df$var, levels = c("q12","q13","q21","q31","q34","q24","q43","q42"))
 
-ggplot(df, aes(x=exp(var1))) + facet_wrap(~var, nrow = 2) +
-     geom_histogram(binwidth=0.1)
-#need to reorder and un-log
+ggplot(df, aes(x=var1)) + facet_wrap(~var, nrow = 2) +
+  geom_histogram(binwidth = 0.1)
+```
+```{r}
+df$var1<-exp(df$var1)
+ggplot(df, aes(x=var1)) + facet_wrap(~var, nrow = 2) +
+  geom_histogram(binwidth = 0.1)
 ```
