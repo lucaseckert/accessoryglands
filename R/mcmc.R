@@ -107,6 +107,14 @@ metrop_mult <- function(postfun, start, S, nchains,
         attach(clust_stuff) ## yes, we really want/need to do this
     )
     on.exit(detach(clust_stuff))
+    if (Sys.getenv("RSTUDIO") == "1" &&
+        !nzchar(Sys.getenv("RSTUDIO_TERM"))
+        &&  Sys.info()["sysname"] == "Darwin"
+        && getRversion() >= "4.0.0") {
+      cl <- parallel::makeCluster(nclust, setup_strategy = "sequential")
+    } else {
+      cl <- parallel::makeCluster(nclust)
+    }
     cl <- makeCluster(nclust)
     clusterExport(cl, varlist = c("mfun", "metropolis", "postfun", "S",
                                   names(clust_stuff)),

@@ -1,8 +1,11 @@
-get_ag_data <- function(file) {
+get_ag_data <- function(file, species_name = "species", trait_names = c("ag", "care", "spawning")) {
   full_data <- (file
     %>% read_csv(col_types = cols())
-    %>% dplyr::select(species, ag, care, spawning)
-    ## prepare binary trait data for corHMM missing convention
+  )
+  full_data <- full_data[c(species_name, trait_names)]
+  ## %>% dplyr::select(species, ag, care, spawning)
+  ## prepare binary trait data for corHMM missing convention
+  full_data <- (full_data
     %>% tidyr::replace_na(list(ag = "?",
                                care = "?",
                                spawning = "?"))

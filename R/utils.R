@@ -362,7 +362,7 @@ as.mcmc.mcmc.list <- function(x) {
 
 ## replace names ...
 shorten_ag_names <- function(x) {
-  rfun <- function(s) stringr::replace(s,
+  rfun <- function(s) stringr::str_replace(s,
                                        c("care", "spawning"),
                                        ## parental care / sperm competition
                                        c("pc", "sc")
