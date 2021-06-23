@@ -171,8 +171,12 @@ int<-((gain.ag_pc1_sc1-loss.ag_pc1_sc1)-(gain.ag_pc0_sc1-loss.ag_pc0_sc1))-((gai
 hist(int, breaks = 100)
 ```
 
-```r
-cmat <- read_csv("contr.csv", col_types = cols()) %>% dplyr::select(-parname) %>% as.matrix()
+```{r}
+## FIXME: make sure loss/gain is in the right order, match name orders, etc.
+cmat <- (read_csv("contr.csv", col_types = cols())
+  %>% dplyr::select(-parname) 
+  %>% as.matrix()
+)
 cmat <- cmat[,!apply(cmat==0,2,all)]  ## drop unimplemented columns
 ag_contr <- ag_mcmc1 %*% cmat
 ag_contr_long <- (ag_contr

@@ -20,7 +20,7 @@ list(
         ag_compdata,
         { get_ag_data(
             ag_binary_trait_file
-          )
+          ) %>% shorten_ag_names()
         }
     ),
     tar_target(
@@ -48,15 +48,6 @@ list(
                        rate.mat = ag_statemat1)
                 )
         }),
-    tar_target(
-      ag_exp_outfile,
-      format = "file",
-      {
-        fn <-  "cache/ag_fit.rda"
-        save(ag_compdata, ag_model0, file = fn)
-        fn ## must return fn
-      }
-    ),
     tar_target(ag_mcmc0,
                corhmm_mcmc(ag_model0,
                            p_args=list(nllfun=make_nllfun(ag_model0)),
