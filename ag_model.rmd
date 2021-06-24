@@ -25,7 +25,7 @@ get_ag_data("data/binaryTraitData.csv")
 ag_statemat1 <- with(ag_compdata, {
   ag_smdat <- corHMM::getStateMat4Dat(data)
   pars2equal <- list(c(7, 10, 20, 23), c(4, 11, 17, 24), c(2, 5, 15, 18), c(1, 8, 14, 21))
-  StateMatA_constrained <- equateStateMatPars(ag_smdat$rate.mat, pars2equal)
+  equateStateMatPars(ag_smdat$rate.mat, pars2equal)
 })
 ## run basic model and add state/parameter names
 ag_model0 <- augment_model(

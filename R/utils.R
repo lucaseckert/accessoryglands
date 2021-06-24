@@ -1,8 +1,7 @@
 pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "ggthemes", "fishtree", "caper", "broom.mixed",
              "emdbook", "ramcmc", "corHMM",
-             "GGally", "colorspace")
-
+             "GGally", "colorspace", "ggmosaic")
 
 ## install uninstalled pkgs from pkgList
 ## check corHMM version, install from bb repo if necessary
@@ -385,3 +384,11 @@ setup_contrasts <- function(parnames,
   return(m)
 }
 
+
+##' assume compdata is a list with $phylo element
+scale_phylo <- function(compdata, type = "sumbranches", scale_val = 1) {
+  if (type != "sumbranches") stop("only scaling by total sum of branch lengths")
+  compdata$phy$edge.length <-
+    compdata$phy$edge.length / sum(compdata$phy$edge.length) * scale_val
+  return(compdata)
+}
