@@ -132,6 +132,7 @@ image.corhmm <- function(x,
   M <- x$solution
   if (log) M <- log10(M)
   rlabs <- clabs <- nm
+  ## YES, for the 1000th time "from ROW to COLUMN" (see corHMM vignette)
   p <- Matrix::image(Matrix(M),
                        scales=list(x=list(at=seq(nrow(M)),labels=rlabs,
                                           rot=90),

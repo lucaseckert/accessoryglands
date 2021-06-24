@@ -1,6 +1,4 @@
 name|type|parent|branches|progress
-ag_compdata|stem|ag_compdata|0|started
-ag_compdata|stem|ag_compdata|0|built
-ag_statemat1|stem|ag_statemat1|0|started
-ag_statemat1|stem|ag_statemat1|0|built
 ag_model0|stem|ag_model0|0|started
+ag_model0|stem|ag_model0|0|built
+ag_profile0|stem|ag_profile0|0|started

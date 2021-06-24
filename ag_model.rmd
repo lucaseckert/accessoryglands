@@ -46,15 +46,32 @@ ag_mcmc0 <-
               seed = 101)
 ```
 
+## some attempts at data viz
+
 ```{r}
-tot_evo <- sum(ag_compdata$phy$edge.length)
-## log-hazard for 0.01 to 1000 transitions/tree
-log(c(0.01,1000)/tot_evo)
-## built in lower/upper bounds for corHMM
-log(c(1e-9, 1e-2))
+ggplot(ag_compdata$data) + 
+  geom_mosaic(aes(x = product(pc, sc), fill = ag)) +
+  geom_mosaic_text(aes(x = product(pc, sc), fill = ag), as.label = TRUE) +
+  scale_fill_discrete_qualitative()
 ```
 
-**FIXME**: scale total edge length to 1 of tree to 1 before fitting? *or* shift parameters by `log(tot_evo)` to get expected number of events scale (exponentiate and plot parameters with `scale_x_log10()` ?
+```{r}
+ag_compdata$data %>% mutate(across(c(pc, sc),
+                                   factor, levels = c("0", "1", "?"))) %>%
+ggplot(aes(x=pc, fill = ag)) + geom_bar() +
+  facet_wrap(~sc, labeller = label_both) +
+    scale_fill_discrete_qualitative()
+```                         
+
+##  priors
+
+- PC: gain/loss ratio from 0.1 to 5
+- SC: gain/loss ratio from 5 to 10
+- AG: gain/loss ratio from 0.001 to 10
+- baseline: from 1 (1 transition per tree) to 10*ntips (10 trans per species)
+
+Use each of these as the basis for a +/- 3 sigma range (on the log scale)
+
 
 ```{r cifun, cache=TRUE}
 t_list <- list(
@@ -105,7 +122,6 @@ image(ag_model0)
 ```
 
 ```{r parnames}
-## FIXME: still necessary?
 m1L <- as.mcmc(ag_mcmc0)
 m1L[,1] -> loss.sc
 m1L[,2] -> loss.pc
@@ -119,6 +135,12 @@ m1L[,9] -> gain.ag_pc0_sc0
 m1L[,10] -> gain.ag_pc0_sc1
 m1L[,11] -> gain.ag_pc1_sc0
 m1L[,12] -> gain.ag_pc1_sc1
+```
+
+Compare auto-names:
+
+```{r}
+par_names(m1L)
 ```
 
 ### intermediate values
