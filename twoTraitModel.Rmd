@@ -1,0 +1,73 @@
+---
+title: "Two Trait Model"
+output: html_document
+---
+
+```{r}
+source("R/utils.R")
+source("R/mcmc.R")
+source("R/functions.R")
+load_pkgs()
+zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
+theme_set(theme_bw())
+```
+
+```{r}
+allData <- read.csv("data/binaryTraitData.csv", header = TRUE)
+traitData <- with(allData,
+                  data.frame(species, ag, care, names=species))
+fullPhy <- suppressWarnings(fishtree_phylogeny(traitData$species)) ## request 607, only find 478 spp
+trimmedData <- comparative.data(fullPhy, traitData, names.col = names)
+phy <- trimmedData$phy
+data <- trimmedData$data
+getStateMat4Dat(data)
+```
+
+```{r}
+LegendAndRateMat <- getStateMat4Dat(data)
+RateMat <- LegendAndRateMat$rate.mat
+pars2equal <- list(c(3,8), c(5,7), c(1,6), c(2,4))
+print(indStateMat <- equateStateMatPars(RateMat, pars2equal))
+indModel<- corHMM(phy = phy, data = data, rate.cat = 1, root.p = c(1,0,0,0), rate.mat = indStateMat)
+print(indModel)
+```
+
+```{r}
+depModel<- corHMM(phy = phy, data = data, rate.cat = 1, root.p = c(1,0,0,0))
+print(depModel)
+```
+
+```{r}
+#likelihood ratio test, same as Pagel's test of correlated evolution used in my thesis
+print(likRatio<- -2*(indModel$loglik-depModel$loglik))
+print(p.val <- pchisq(likRatio, df = 4, lower.tail = F))
+#my thesis found a p value of < 0.001 so this is good so far
+```
+
+```{r}
+ind_twoTrait_mcmc <- 
+  corhmm_mcmc(indModel,
+              p_args=list(nllfun=make_nllfun(indModel)),
+              ncores = 3,
+              nchains = 6,
+              ## these are per chain
+              n_burnin = 4000,
+              n_iter = 44000,
+              thin = 10,
+              seed = 101)
+saveRDS(ind_twoTrait_mcmc, file = "indTwoTraitMCMC.rds")
+```
+
+```{r}
+dep_twoTrait_mcmc <- 
+  corhmm_mcmc(depModel,
+              p_args=list(nllfun=make_nllfun(depModel)),
+              ncores = 3,
+              nchains = 6,
+              ## these are per chain
+              n_burnin = 4000,
+              n_iter = 44000,
+              thin = 10,
+              seed = 101)
+saveRDS(dep_twoTrait_mcmc, file = "depTwoTraitMCMC.rds")
+```
