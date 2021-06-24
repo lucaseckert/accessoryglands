@@ -1,4 +1,9 @@
 
+## LE for 2021-06-30
+
+- run two trait model with care and compare to previous results
+- make sure roots are set
+
 ## BMB for 2021-06-30
 
 - implement priors/scaling
