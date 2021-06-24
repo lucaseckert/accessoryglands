@@ -362,11 +362,12 @@ as.mcmc.mcmc.list <- function(x) {
 
 ## replace names ...
 shorten_ag_names <- function(x) {
-  rfun <- function(s) stringr::str_replace(s,
-                                       c("care", "spawning"),
-                                       ## parental care / sperm competition
-                                       c("pc", "sc")
-                                       )
+  rfun <- function(s) {
+    ## parental care / sperm competition
+    (s %>% stringr::str_replace_all("care", "pc")
+      %>% stringr::str_replace_all("spawning", "sc")
+    )
+  }
   if (is.matrix(x)) {
     colnames(x) <- rfun(colnames(x))
   } else {
