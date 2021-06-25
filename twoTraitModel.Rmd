@@ -48,12 +48,12 @@ print(p.val <- pchisq(likRatio, df = 4, lower.tail = F))
 ind_twoTrait_mcmc <- 
   corhmm_mcmc(indModel,
               p_args=list(nllfun=make_nllfun(indModel)),
-              ncores = 3,
-              nchains = 6,
+              n_cores = 3,
+              n_chains = 6,
               ## these are per chain
               n_burnin = 4000,
               n_iter = 44000,
-              thin = 10,
+              n_thin = 10,
               seed = 101)
 saveRDS(ind_twoTrait_mcmc, file = "indTwoTraitMCMC.rds")
 ```
@@ -62,12 +62,12 @@ saveRDS(ind_twoTrait_mcmc, file = "indTwoTraitMCMC.rds")
 dep_twoTrait_mcmc <- 
   corhmm_mcmc(depModel,
               p_args=list(nllfun=make_nllfun(depModel)),
-              ncores = 3,
-              nchains = 6,
+              n_cores = 3,
+              n_chains = 6,
               ## these are per chain
               n_burnin = 4000,
               n_iter = 44000,
-              thin = 10,
+              n_thin = 10,
               seed = 101)
 saveRDS(dep_twoTrait_mcmc, file = "depTwoTraitMCMC.rds")
 ```

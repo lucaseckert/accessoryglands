@@ -166,6 +166,15 @@ make_nllfun <- function(corhmm_fit) {
   return(f)
 }
 
+#' @param parameters (log-hazard rates)
+#' @param lb lower bound(s) for baseline priors
+#' @param ub upper bound(s)
+#' @param range width of Gaussian (+/- SD between mean and lower/upper bounds)
+#' @param gainloss_pairs
+#' @param lb_gainloss
+#' @param ub_gainloss
+#' @param range_gainloss
+#' @param nllfun \emph{negative} log-likelihood function
 corhmm_logpostfun <- function(p,
                               lb = log(1e-9),
                               ub = log(1e2),
@@ -187,7 +196,7 @@ corhmm_logpostfun <- function(p,
     gl.prior.mean <- (lb_gainloss + ub_gainloss) / 2
     gl.prior.sd <- (ub_gainloss - lb_gainloss) / (2 * range_gainloss)
     gl.values <- vapply(gainloss_pairs,
-                        function(p) p[x[1]] - p[x[2]],
+                        function(x) p[x[1]] - p[x[2]],
                         FUN.VALUE = numeric(1))
     gl.log.prior <- sum(dnorm(gl.values, mean = gl.prior.mean, sd = gl.prior.sd,
                               log = TRUE))
@@ -298,7 +307,7 @@ profile.corhmm <- function(model,
                            mlefun = NULL,
                            which = NULL,
                            quietly = FALSE,
-                           ncores = getOption("mc.cores", 2), ...) {
+                           n_cores = getOption("mc.cores", 2), ...) {
   if (is.null(mlefun)) {
     mlefun <- make_nllfun(model)
   }
@@ -311,20 +320,20 @@ profile.corhmm <- function(model,
   pfun <- function(i) {
     profile(mlefun, which=i, ...)
   }
-  if (ncores==1) {
+  if (n_cores==1) {
     res <- lapply(which, pfun)
   } else {
     ## FIXME: should build parallel capability into bbmle instead!
-    if (!quietly) cat("executing on",ncores,"cores\n")
+    if (!quietly) cat("executing on",n_cores,"cores\n")
     ## work around Rstudio/R bug
     ## https://stackoverflow.com/questions/62730783/error-in-makepsockclusternames-spec-cluster-setup-failed-3-of-3-work
     if (Sys.getenv("RSTUDIO") == "1" &&
         !nzchar(Sys.getenv("RSTUDIO_TERM"))
         &&  Sys.info()["sysname"] == "Darwin"
         && getRversion() >= "4.0.0") {
-      cl <- parallel::makeCluster(ncores, setup_strategy = "sequential")
+      cl <- parallel::makeCluster(n_cores, setup_strategy = "sequential")
     } else {
-      cl <- parallel::makeCluster(ncores)
+      cl <- parallel::makeCluster(n_cores)
     }
     parallel::clusterEvalQ(cl, library(bbmle))
     res <- parallel::parLapply(cl = cl, X = which, fun = pfun)

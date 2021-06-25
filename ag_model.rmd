@@ -37,12 +37,12 @@ ag_model0 <- augment_model(
 ag_mcmc0 <- 
   corhmm_mcmc(ag_model0,
               p_args=list(nllfun=make_nllfun(ag_model0)),
-              ncores = 8,
-              nchains = 8,
+              n_cores = 8,
+              n_chains = 8,
               ## these are per chain
               n_burnin = 4000,
               n_iter = 44000,
-              thin = 10,
+              n_thin = 10,
               seed = 101)
 ```
 
@@ -65,10 +65,11 @@ ggplot(aes(x=pc, fill = ag)) + geom_bar() +
 
 ##  priors
 
-- PC: gain/loss ratio from 0.1 to 5
-- SC: gain/loss ratio from 5 to 10
-- AG: gain/loss ratio from 0.001 to 10
-- baseline: from 1 (1 transition per tree) to 10*ntips (10 trans per species)
+- all rates: from 1 (1 transition per tree) to 10*ntips (10 trans per species)
+- `pc`: gain/loss ratio from 0.1 to 5
+- `sc`: gain/loss ratio from 5 to 10
+- `ag`: gain/loss ratio from 0.001 to 10
+
 
 Use each of these as the basis for a +/- 3 sigma range (on the log scale)
 
@@ -76,8 +77,8 @@ Use each of these as the basis for a +/- 3 sigma range (on the log scale)
 ```{r cifun, cache=TRUE}
 t_list <- list(
     wald = tidy(ag_model0, conf.int = TRUE),
-    profile = tidy(ag_model0, conf.int = TRUE,
-                   conf.method = "profile", profile = ag_profile0),
+    ## profile = tidy(ag_model0, conf.int = TRUE,
+    ## conf.method = "profile", profile = ag_profile0),
     mcmc = tidy(ag_mcmc0, conf.int = TRUE)
 ) 
 all_ci <- (bind_rows(t_list, .id = "method")

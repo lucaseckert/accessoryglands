@@ -4,7 +4,7 @@
 #' @param S initial Cholesky factor for MVN candidate distribution
 #' @param n_iter number of iterations
 #' @param n_burnin length of burnin/adapt phase
-#' @param thin thinning frequency
+#' @param n_thin thinning frequency
 #' @param adapt (logical) adapt?
 #' @param trace_level verbosity (0=none; 1=log-posterior + accept rate; 2 includes parameter values)
 #' @param trace_steps frequency of reports
@@ -16,7 +16,7 @@ metropolis <- function(postfun,
                        S,
                        n_iter=1000,
                        n_burnin=100,
-                       thin = 1,
+                       n_thin = 1,
                        adapt = FALSE,
                        p_args = list(),
                        trace_level = 1,
@@ -28,7 +28,7 @@ metropolis <- function(postfun,
 
   ## FIXME: seed for parallel versions?
   p <- length(theta0)
-  theta <- matrix(NA, nrow = ceiling((n_iter - n_burnin) / thin), ncol = p)
+  theta <- matrix(NA, nrow = ceiling((n_iter - n_burnin) / n_thin), ncol = p)
   accept <- numeric(n_iter)
   bad_steps <- 0
 
@@ -56,7 +56,7 @@ metropolis <- function(postfun,
       theta_current <- theta_prop
       posterior <- posterior_prop
     }
-    if (i > n_burnin && i %% thin == 0) {
+    if (i > n_burnin && i %% n_thin == 0) {
       j <- j + 1
       theta[j, ] <- theta_current
     }
@@ -79,12 +79,12 @@ metropolis <- function(postfun,
 #' @param postfun log-posterior
 #' @param start randomized starting function, or list of starting values
 #' @param S initial Cholesky factor for candidate distribution
-#' @param nchains number of chains
-#' @param nclust number of cores
+#' @param n_chains number of chains
+#' @param n_cores number of cores
 #' @param clust_extras additional objects needed in clust environments
 #' @param ... additional arguments to \code{metropolis}
-metrop_mult <- function(postfun, start, S, nchains,
-                        nclust = min(nchains,getOption("mc.cores", 1)),
+metrop_mult <- function(postfun, start, S, n_chains,
+                        n_cores = min(n_chains,getOption("mc.cores", 1)),
                         clust_extras = list(),
                         ...) {
 
@@ -92,14 +92,14 @@ metrop_mult <- function(postfun, start, S, nchains,
   ## (1) handling environments/objects; (2) progress bar?
   ## (3) random-number-seed handling
   if (is.function(start)) {
-    start <- replicate(nchains, start(), simplify=FALSE)
+    start <- replicate(n_chains, start(), simplify=FALSE)
   }
-  if (length(start) != nchains) stop("need as many start values as chains")
+  if (length(start) != n_chains) stop("need as many start values as chains")
   require("parallel")
   mfun <- function(s) {
     metropolis(postfun, theta0 = s, S = S, ...)
   }
-  if (nclust == 1) {
+  if (n_cores == 1) {
     res <- lapply(start, mfun)
   } else {
     clust_stuff <- c(list(...), clust_extras)
@@ -111,9 +111,9 @@ metrop_mult <- function(postfun, start, S, nchains,
         !nzchar(Sys.getenv("RSTUDIO_TERM"))
         &&  Sys.info()["sysname"] == "Darwin"
         && getRversion() >= "4.0.0") {
-      cl <- parallel::makeCluster(nclust, setup_strategy = "sequential")
+      cl <- parallel::makeCluster(n_cores, setup_strategy = "sequential")
     } else {
-      cl <- parallel::makeCluster(nclust)
+      cl <- parallel::makeCluster(n_cores)
     }
     clusterExport(cl, varlist = c("mfun", "metropolis", "postfun", "S",
                                   names(clust_stuff)),
@@ -128,20 +128,28 @@ metrop_mult <- function(postfun, start, S, nchains,
   return(mval)
 }
 
-##'
-##' c1 <- corhmm_mcmc(ag_model0, p_args=list(nllfun=make_nllfun(ag_model0)), ncores = 2, n_burnin=0, n_iter=100)
+##' @param model log-posterior function
+##' @param n_cores number of parallel cores
+##' @param n_chains
+##' @param n_burnin
+##' @param n_iter
+##' @param n_thin
+##' @param start_cand_range
+##' @param seed
+##' @param p_args additional arguments to pass to the log-posterior function
+##' c1 <- corhmm_mcmc(ag_model0, p_args=list(nllfun=make_nllfun(ag_model0)), n_cores = 2, n_burnin=0, n_iter=100)
 corhmm_mcmc <- function(model,
-                        ncores = NULL,
-                        nchains = 8,
+                        n_cores = NULL,
+                        n_chains = 8,
                         n_burnin = 4000,
                         n_iter = 44000,
-                        thin = 10,
+                        n_thin = 10,
                         start_cand_range = 6,
                         seed = NULL,
                         p_args = NULL) {
 
-  if (is.null(ncores)) {
-    ncores <- min(nchains, getOption("mc.cores", 2))
+  if (is.null(n_cores)) {
+    n_cores <- min(n_chains, getOption("mc.cores", 2))
   }
 
   require("bbmle")
@@ -174,11 +182,11 @@ corhmm_mcmc <- function(model,
       corhmm_logpostfun,
       start = make_sfun(p, range=start_cand_range),
       S = S,
-      nchains = nchains,
-      nclust = ncores,
+      n_chains = n_chains,
+      n_cores = n_cores,
       n_burnin = n_burnin,
       n_iter = n_iter,
-      thin = 10,
+      n_thin = 10,
       adapt = TRUE,
       p_args = p_args,
       clust_extra = tibble::lst(model, corhmm_logpostfun))

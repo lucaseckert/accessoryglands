@@ -42,6 +42,13 @@ list(
           )
         }),
     tar_target(
+        root.p,
+        {
+          r <- rep(0, 8)
+          r[2] <- 1 ## ag0_care0_spawning1: no ag, no parental care, yes group spawning
+          r
+        }),
+    tar_target(
         ag_model0, {
             augment_model(
                 ## FIXME: quietly?
@@ -49,28 +56,43 @@ list(
                 corHMM(phy = ag_compdata$phy,
                        data = ag_compdata$data,
                        rate.cat = 1,
-                       rate.mat = ag_statemat1)
+                       rate.mat = ag_statemat1,
+                       root.p = root.p)
                 )
         }),
+    tar_target(
+        gainloss_priors,
+        list(pairs = list(c(4,1), c(6,2), c(9,3), c(10,5), c(11, 7), c(12, 8)),
+             ##        sc     pc      ag ....
+             ub = log(c(10,    5 ,  rep(10, 4))),
+             lb = log(c(5,    0.1,  rep(1e-3, 4))))
+    ),
     tar_target(ag_mcmc0,
                corhmm_mcmc(ag_model0,
-                           p_args=list(nllfun=make_nllfun(ag_model0)),
-                           ncores = 8,
-                           nchains = 8,
+                           p_args=list(nllfun = make_nllfun(ag_model0),
+                                       ## sum(edge length) scaled to 1
+                                       lb = log(1),
+                                       ub = log(10 * ape::Ntip(ag_compdata$phy)),
+                                       gainloss_pairs = gainloss_priors$pairs,
+                                       lb_gainloss = gainloss_priors$lb,
+                                       ub_gainloss = gainloss_priors$ub),
+                           n_cores = 8,
+                           n_chains = 8,
                            n_burnin = 4000,
                            n_iter = 44000,
-                           thin = 10,
+                           n_thin = 10,
                            seed = 101)
                ),
     tar_target(ag_mcmc1,
                as.mcmc(ag_mcmc0)
                ),
-    tar_target(ag_profile0,
-               profile(ag_model0,
-                       ncores = 12,
-                       trace = TRUE,
-                       alpha=0.05) ## less extreme than default (alpha=0.01)
-               ),
+    ## SKIP for now
+    ## tar_target(ag_profile0,
+    ##            profile(ag_model0,
+    ##                    n_cores = 12,
+    ##                    trace = TRUE,
+    ##                    alpha=0.05) ## less extreme than default (alpha=0.01)
+    ##            ),
     tar_target(ag_rmd,
                format = "file",
                rmarkdown::render("ag_model.rmd")
