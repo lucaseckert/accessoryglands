@@ -48,19 +48,31 @@ ag_mcmc0 <-
 
 ## some attempts at data viz
 
-```{r}
-ggplot(ag_compdata$data) + 
+pretty but useless:
+
+```{r mosaic}
+(ag_compdata$data
+  %>% mutate(ag = paste0("ag:",ag),
+             pc = paste0("ag:",pc),
+             sc = paste0("sc:",sc))
+  %>% 
+  ggplot() + 
   geom_mosaic(aes(x = product(pc, sc), fill = ag)) +
   geom_mosaic_text(aes(x = product(pc, sc), fill = ag), as.label = TRUE) +
   scale_fill_discrete_qualitative()
+)
 ```
 
+less useless: 
 ```{r}
-ag_compdata$data %>% mutate(across(c(pc, sc),
-                                   factor, levels = c("0", "1", "?"))) %>%
+(ag_compdata$data
+  %>% mutate(across(c(pc, sc), factor, levels = c(0:1, "?")))
+  %>% mutate(across(ag, factor, levels = 1:0)) ## reverse order to get ag=1 on top of bars
+  %>% 
 ggplot(aes(x=pc, fill = ag)) + geom_bar() +
   facet_wrap(~sc, labeller = label_both) +
-    scale_fill_discrete_qualitative()
+scale_fill_discrete_qualitative()
+)
 ```                         
 
 ##  priors
@@ -72,7 +84,6 @@ ggplot(aes(x=pc, fill = ag)) + geom_bar() +
 
 
 Use each of these as the basis for a +/- 3 sigma range (on the log scale)
-
 
 ```{r cifun, cache=TRUE}
 t_list <- list(
@@ -118,7 +129,7 @@ Contour levels are: 50%, 80% 90%, 95% (largest) highest posterior density region
 
 ### naming parameters
 
-```{r}
+```{r image, message=FALSE}
 image(ag_model0)
 ```
 
@@ -194,7 +205,7 @@ int<-((gain.ag_pc1_sc1-loss.ag_pc1_sc1)-(gain.ag_pc0_sc1-loss.ag_pc0_sc1))-((gai
 hist(int, breaks = 100)
 ```
 
-```{r}
+```{r compute_contrasts}
 ## FIXME: make sure loss/gain is in the right order, match name orders, etc.
 ag_mcmc1 <- shorten_ag_names(ag_mcmc1)
 cmat <- (read_csv("contr.csv", col_types = cols())
@@ -210,10 +221,15 @@ ag_contr_long <- (ag_contr
   %>% pivot_longer(everything(), names_to = "contrast")
   %>% separate(contrast, into=c("contrast", "rate"))
 )
-ggplot(ag_contr_long, aes(x = value, y = rate)) +
+```
+
+```{r plot_contrasts, fig.height=4, fig.width=10}
+ggplot(ag_contr_long, aes(x = exp(value), y = rate)) +
   facet_wrap(~ contrast) +
   geom_violin(fill = "gray") +
-  geom_vline(xintercept = 0, lty = 2)
+  stat_summary(fun.data = "median_hilow", geom = "pointrange", colour="red") +
+  geom_vline(xintercept = 1, lty = 2) +
+  scale_x_log10()
 ```
 
 Graphing all CIs
@@ -233,13 +249,21 @@ ggplot(
 ```
 
 ```{r bayes_violin}
+levs <- c(outer(FUN = paste, sep = ".",
+      c("loss","gain"),
+      c("sc","pc",
+        paste0("ag_",c(outer(paste0("pc", 0:1), paste0("sc", 0:1), paste, sep="_"))))
+      ))
+
 mcmc_long <- (ag_mcmc0
   %>% as.mcmc()
   %>% as_tibble()
   %>% pivot_longer(everything(), names_to = "term")
+  %>% mutate(across(term, factor, levels = levs))
 )
 
-ggplot(mcmc_long, aes(x = value, y = term)) +
+ggplot(mcmc_long, aes(x = exp(value), y = term)) +
   geom_violin(fill="gray") +
-  coord_cartesian(xlim=c(-20,10))
+  scale_x_log10() +
+  labs(x = "evolutionary rate", y = "")
 ```

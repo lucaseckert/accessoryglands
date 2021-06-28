@@ -6,10 +6,10 @@
 
 ## BMB for 2021-06-30
 
-- implement priors/scaling
-- shorten names?
 - think about tree blocks
-- parameter ordering and log-scaling for params plot
+- implement priors/scaling (DONE)
+- shorten names? (DONE)
+- parameter ordering and log-scaling for params plot (DONE)
 - adjust `getdata` to allow flexibility in selected trait columns (LOW)
 - dynamic branching (for primates + ag + ag w/o missing data + .. ? (LOW)
 
