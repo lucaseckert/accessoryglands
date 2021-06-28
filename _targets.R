@@ -14,18 +14,31 @@ list(
         format = "file"
     ),
     tar_target(
+        treeblock_file,
+        "data/treeBlock.rds",
+        format = "file"
+    ),
+    tar_target(
+        full_ag_data,
+        read_csv(ag_binary_trait_file, col_types = cols())
+    ),
+    tar_target(
+        treeblock,
+        readRDS("data/treeBlock.rds") %>% purrr::map(scale_phylo)
+    ),
+    tar_target(
+        fishtree_phylo,
+        suppressWarnings(
+            fishtree_phylogeny(full_ag_data$species)) %>% scale_phylo()
+    ),
+    tar_target(
         ## read trait file, grab phylo data from fishtree, combine/trim
-        ## FIXME: alternative target will be needed if we want to do tree
-        ##  blocks (trimming procedure will be different; if tree blocks
-        ## all have the same set of tip taxa, only need to trim once?
         ag_compdata,
-        {(r <- ag_binary_trait_file
-          %>% get_ag_data()
-          %>% scale_phylo()
-        )
-          r$data <- shorten_ag_names(r$data)
-          r
-        }
+        get_ag_data(full_ag_data, phylo = fishtree_phylo)
+    ),
+    tar_target(
+        ag_compdata_treeblock,
+        get_ag_data(full_ag_data, phylo = treeblock[[1]])
     ),
     tar_target(
         ## state matrix for AG problem (12 compartments)
@@ -64,6 +77,22 @@ list(
                 )
         }),
     tar_target(
+        ## FIXME: DRY
+        ag_model_treeblock, {
+            augment_model(
+                ## FIXME: quietly?
+                ## (drop node labels for one part)
+                corHMM(phy = ag_compdata_treeblock$phy,
+                       data = ag_compdata_treeblock$data,
+                       rate.cat = 1,
+                       rate.mat = ag_statemat1,
+                       root.p = root.p,
+                       lower = 0.1,                             ## 0.1 transitions per tree
+                       upper = 100 * ape::Ntip(ag_compdata$phy) ## 100 transitions per species
+                       )
+                )
+        }),
+    tar_target(
         gainloss_priors,
         list(pairs = list(c(4,1), c(6,2), c(9,3), c(10,5), c(11, 7), c(12, 8)),
              ##        sc     pc      ag ....
@@ -84,6 +113,22 @@ list(
                            n_burnin = 4000,
                            n_iter = 84000,
                            n_thin = 20,
+                           seed = 101)
+               ),
+    tar_target(ag_mcmc_treeblock,
+               corhmm_mcmc(ag_model_treeblock,
+                           p_args=list(nllfun = make_nllfun(ag_model_treeblock, treeblock = treeblock),
+                                       ## sum(edge length) scaled to 1
+                                       lb = log(1),
+                                       ub = log(10 * ape::Ntip(ag_compdata_treeblock$phy)),
+                                       gainloss_pairs = gainloss_priors$pairs,
+                                       lb_gainloss = gainloss_priors$lb,
+                                       ub_gainloss = gainloss_priors$ub),
+                           n_cores = 8,
+                           n_chains = 8,
+                           n_burnin = 400, ## 4000,
+                           n_iter = 8400, ## 84000,
+                           n_thin = 1, ## 20,
                            seed = 101)
                ),
     tar_target(ag_mcmc1,

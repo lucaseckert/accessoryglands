@@ -146,14 +146,15 @@ corhmm_mcmc <- function(model,
                         n_thin = 10,
                         start_cand_range = 6,
                         seed = NULL,
-                        p_args = NULL) {
+                        p_args = NULL,
+                        treeblock = NULL) {
 
   if (is.null(n_cores)) {
     n_cores <- min(n_chains, getOption("mc.cores", 2))
   }
 
   require("bbmle")
-  f <- make_nllfun(model)
+  f <- make_nllfun(model, treeblock = treeblock)
   p <- model$args.list$p
 
   if (!is.null(seed)) set.seed(seed)
@@ -189,7 +190,7 @@ corhmm_mcmc <- function(model,
       n_thin = 10,
       adapt = TRUE,
       p_args = p_args,
-      clust_extra = tibble::lst(model, corhmm_logpostfun))
+      clust_extra = tibble::lst(model, corhmm_logpostfun, treeblock))
 
   m1[] <- lapply(m1, function(x) { dimnames(x) <- list(NULL, names(model$args.list$p)); return(x) })
 

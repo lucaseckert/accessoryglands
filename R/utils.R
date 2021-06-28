@@ -152,11 +152,14 @@ image.corhmm <- function(x,
 
 ## wrap corhmm results to create a negative log-likelihood function
 ## (faster than calling corHMM(p = exp(log_p))
-make_nllfun <- function(corhmm_fit) {
+make_nllfun <- function(corhmm_fit, treeblock = NULL) {
   require("bbmle")
-  f <- function(log_p) {
+  f <- function(log_p, treeblock = NULL) {
     a <- corhmm_fit$args.list
     a$p <- log_p
+    if (!is.null(treeblock)) {
+      a$phy <- treeblock[[sample(length(treeblock), size = 1)]]
+    }
     return(do.call(corHMM:::dev.corhmm, a))
   }
   p <- corhmm_fit$args.list$p
@@ -183,7 +186,8 @@ corhmm_logpostfun <- function(p,
                               lb_gainloss = log(1e-3),
                               ub_gainloss = log(1e3),
                               range_gainloss = 3,
-                              nllfun
+                              nllfun,
+                              treeblock = NULL
                               ) {
   prior.mean <- (lb + ub) / 2
   prior.sd <- (ub - lb) / (2 * range)
@@ -209,7 +213,7 @@ corhmm_logpostfun <- function(p,
 #' @param data trait data associated with the model (matrix of traits only)
 #' @examples
 #' load("cache/ag_fit.rda")
-#' par_names(ag_model0, ag_compdata$data0)
+#' par_names(ag_model0, ag_compdata$data[,-1])
 par_names <- function(model) {
     data <- model$data[, -1]
     m1 <- model$index.mat
