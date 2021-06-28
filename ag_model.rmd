@@ -64,7 +64,7 @@ pretty but useless:
 ```
 
 less useless: 
-```{r}
+```{r barchart}
 (ag_compdata$data
   %>% mutate(across(c(pc, sc), factor, levels = c(0:1, "?")))
   %>% mutate(across(ag, factor, levels = 1:0)) ## reverse order to get ag=1 on top of bars
@@ -133,7 +133,7 @@ Contour levels are: 50%, 80% 90%, 95% (largest) highest posterior density region
 image(ag_model0)
 ```
 
-```{r parnames}
+```{r parnames_manual}
 m1L <- as.mcmc(ag_mcmc0)
 m1L[,1] -> loss.sc
 m1L[,2] -> loss.pc
@@ -151,7 +151,7 @@ m1L[,12] -> gain.ag_pc1_sc1
 
 Compare auto-names:
 
-```{r}
+```{r parnames}
 par_names(ag_model0)
 ```
 
@@ -160,7 +160,7 @@ par_names(ag_model0)
 **FIXME**:  compare results here with contrast matrix results
 
 
-```{r}
+```{r manual_contrasts}
 #effect of pc on gaining ag
 pc.gain.sc0 <- gain.ag_pc1_sc0 - gain.ag_pc0_sc0
 pc.gain.sc1 <- gain.ag_pc1_sc1 - gain.ag_pc0_sc1
@@ -205,7 +205,7 @@ int<-((gain.ag_pc1_sc1-loss.ag_pc1_sc1)-(gain.ag_pc0_sc1-loss.ag_pc0_sc1))-((gai
 hist(int, breaks = 100)
 ```
 
-```{r compute_contrasts}
+```{r compute_contrasts, cache = TRUE}
 ## FIXME: make sure loss/gain is in the right order, match name orders, etc.
 ag_mcmc1 <- shorten_ag_names(ag_mcmc1)
 cmat <- (read_csv("contr.csv", col_types = cols())
@@ -232,29 +232,45 @@ ggplot(ag_contr_long, aes(x = exp(value), y = rate)) +
   scale_x_log10()
 ```
 
-Graphing all CIs
+```{r sum_tab, results="asis"}
+bayes_pval <- function(x, ref=0) {
+  x <- mean(x<ref)
+  2 * min(x, 1-x)
+}
+(ag_contr_long
+  %>% group_by(contrast,rate)
+  %>% summarise(median = median(value), lwr = quantile(value, 0.025), upr = quantile(value, 0.975), p = bayes_pval(value), .groups = "drop")
+  %>% knitr::kable(digits = 3)
+)
+```
+
+
+Graphing all CIs: bounds are set to the lower/upper bounds used for corHMM fit.
 
 ```{r ci_plot}
-all_ci <- all_ci %>% replace_na(list(upr = Inf, lwr = -Inf))
+## order of parameters
+levs <- c(outer(FUN = paste, sep = ".",
+      c("loss", "gain"),
+      c("sc", "pc",
+        paste0("ag_", c(outer(paste0("pc", 0:1), paste0("sc", 0:1), paste, sep = "_"))))
+      ))
+corhmm_bounds <- log(c(lwr=0.1, upper = 100*ape::Ntip(ag_compdata$phy)))
+100 * ape::Ntip(ag_compdata$phy)
+all_ci <- all_ci %>% replace_na(list(upr = Inf, lwr = -Inf)) %>%
+  mutate(across(term, factor, levels = levs))
 ## extend NA confidence interval to limit of graph
 ggplot(
   all_ci,
-  aes(term, estimate, ymin = lwr, ymax = upr, colour = method)
+  aes(term, exp(estimate), ymin = exp(lwr), ymax = exp(upr), colour = method)
 ) +
   geom_pointrange(position = position_dodge(width = 0.5)) +
   scale_colour_discrete_qualitative() +
-  scale_y_continuous(limits=c(-20,0), oob=scales::squish) +
-  coord_flip()
-## FIXME: indicate which values are truncated?
+  scale_y_log10(limits = exp(corhmm_bounds), oob = scales::squish) +
+  coord_flip() +
+  labs(y="rate", x = "")
 ```
 
 ```{r bayes_violin}
-levs <- c(outer(FUN = paste, sep = ".",
-      c("loss","gain"),
-      c("sc","pc",
-        paste0("ag_",c(outer(paste0("pc", 0:1), paste0("sc", 0:1), paste, sep="_"))))
-      ))
-
 mcmc_long <- (ag_mcmc0
   %>% as.mcmc()
   %>% as_tibble()
@@ -263,7 +279,8 @@ mcmc_long <- (ag_mcmc0
 )
 
 ggplot(mcmc_long, aes(x = exp(value), y = term)) +
-  geom_violin(fill="gray") +
+  geom_violin(fill = "gray") +
   scale_x_log10() +
+  stat_summary(fun.data = "median_hilow", geom = "pointrange", colour="red") +
   labs(x = "evolutionary rate", y = "")
 ```

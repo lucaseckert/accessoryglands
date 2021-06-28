@@ -6,11 +6,8 @@ ag_statemat|stem|501157e516ce5954|a24886ff565e0a0b|3440c6b3b6e64362|1034414491||
 traitNames|function|c4cca37bfd74ac7a||||||||||||||
 contrasts.mcmc.list|function|7f751aef04cd03cd||||||||||||||
 shorten_names|function|274a235bfbf2569d||||||||||||||
-ag_rmd|stem|17c37488345bf3b9|e245e77dfcea62b9|c3b5fc02cdc369c1|-742077490|/home/bolker/Documents/students/eckert/accessoryglands/ag_model.html|t18795.6842650893s|c48bffc8c938c772|3923737|file|vector|||4.862||
 ag_profile0|stem|6ced16a4942a4344|298d63411a7286d5|40c8b9f540912815|-1391231188||t18795.6981871628s|fb36ab926971843c|269638|rds|vector|||1037.327||
 ag_exp_outfile|stem|f0d7857b9865585d|b1bf0a0e3079fe66|268ee710d70e4fc3|184350985|cache/ag_fit.rda|t18795.6861807255s|0f44fdcdf716599f|96434|file|vector|||0.009||
-ag_mcmc0|stem|acf6e39f66aee4ec|2eae578755fba18a|021c72e9ca5948d6|-667654544||t18803.0748592403s|0e2c1ef8174fee64|2705775|rds|vector|||1856.648||
-ag_mcmc1|stem|5d6763545fbe029d|d938b3d7e6b1c85a|79b713dd0d899158|-891139124||t18803.0748610921s|fca714d521f3eca1|2696739|rds|vector|||0.009||
 pkgList|object|d7d8c63801d86ef4||||||||||||||
 get_hpd2d_levels|function|116768d19be87173||||||||||||||
 confint.profile.corhmm|function|75043581d8a77a0c||||||||||||||
@@ -38,6 +35,9 @@ corhmm_mcmc|function|feb228dcbe1d6f89||||||||||||||
 ag_binary_trait_file|stem|c9e4f01d8ace0aca|3a35d8811869c668|ef46db3751d8e999|1100981026|data/binaryTraitData.csv|t18765.9824162409s|991dd566cbd2669a|44147|file|vector|||0.37||
 root.p|stem|0c0b11d1947def11|65b7025878dce370|80d80fb964bb545e|505401346||t18803.0527012759s|c9aaea90a821e608|53|rds|vector|||2.171||
 gainloss_priors|stem|87c46778d173d7df|5e14d040519959be|ea4d9ff4eb3d6f58|695182184||t18803.040852849s|37e90c3ecba3a0b1|177|rds|vector|||2.124||
+ag_rmd|stem|847e9d19fb5ac8c3|e245e77dfcea62b9|c3b5fc02cdc369c1|-742077490|/home/bolker/Documents/students/eckert/accessoryglands/ag_model.html|t18806.5965586419s|003e32edfd5887fa|4238589|file|vector|||10.875||
 ag_compdata|stem|16829203b83b7707|93101fe82070265a|a16393e7b4f5149e|146790090||t18803.0295437481s|f0a857b4c1695356|19455|rds|vector|||2.652||
 ag_statemat1|stem|34fbff9be0c99a15|8ac17db5d0d3b37f|df9b51006f7923d2|1019821895||t18802.0300434962s|b2a37e7acd6b186f|188|rds|vector|||0.062||
-ag_model0|stem|0952bf2617fff24e|96deca8c435d193e|d69b1270d869011a|1581865590||t18803.0533686441s|014896f0a7413180|83189|rds|vector|||57.634||
+ag_model0|stem|527bebd623b255b9|29a2893dbd1892ad|7ba95c6b6a1ff2a0|1581865590||t18806.5815890264s|1bd629d1a84ef994|83086|rds|vector|||143.722||
+ag_mcmc0|stem|ac8950300d509231|4573422c25ef633c|33609de116cfd8be|-667654544||t18806.6385759415s|4ebfe5a65528773b|5398930|rds|vector|||3629.971||
+ag_mcmc1|stem|f4783c28b7a0213d|d938b3d7e6b1c85a|fa17c0265cc134b7|-891139124||t18806.63857946s|f102c228ecc1f511|5388474|rds|vector|||0.003||

@@ -57,7 +57,10 @@ list(
                        data = ag_compdata$data,
                        rate.cat = 1,
                        rate.mat = ag_statemat1,
-                       root.p = root.p)
+                       root.p = root.p,
+                       lower = 0.1,                             ## 0.1 transitions per tree
+                       upper = 100 * ape::Ntip(ag_compdata$phy) ## 100 transitions per species
+                       )
                 )
         }),
     tar_target(
@@ -79,8 +82,8 @@ list(
                            n_cores = 8,
                            n_chains = 8,
                            n_burnin = 4000,
-                           n_iter = 44000,
-                           n_thin = 10,
+                           n_iter = 84000,
+                           n_thin = 20,
                            seed = 101)
                ),
     tar_target(ag_mcmc1,
