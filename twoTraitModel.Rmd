@@ -45,29 +45,55 @@ print(p.val <- pchisq(likRatio, df = 4, lower.tail = F))
 ```
 
 ```{r}
-ind_twoTrait_mcmc <- 
-  corhmm_mcmc(indModel,
-              p_args=list(nllfun=make_nllfun(indModel)),
-              n_cores = 3,
-              n_chains = 6,
-              ## these are per chain
-              n_burnin = 4000,
-              n_iter = 44000,
-              n_thin = 10,
-              seed = 101)
-saveRDS(ind_twoTrait_mcmc, file = "indTwoTraitMCMC.rds")
+# ind_twoTrait_mcmc <- 
+#   corhmm_mcmc(indModel,
+#               p_args=list(nllfun=make_nllfun(indModel)),
+#               n_cores = 3,
+#               n_chains = 6,
+#               ## these are per chain
+#               n_burnin = 4000,
+#               n_iter = 44000,
+#               n_thin = 10,
+#               seed = 101)
+# saveRDS(ind_twoTrait_mcmc, file = "indTwoTraitMCMC.rds")
 ```
 
 ```{r}
-dep_twoTrait_mcmc <- 
-  corhmm_mcmc(depModel,
-              p_args=list(nllfun=make_nllfun(depModel)),
-              n_cores = 3,
-              n_chains = 6,
-              ## these are per chain
-              n_burnin = 4000,
-              n_iter = 44000,
-              n_thin = 10,
-              seed = 101)
-saveRDS(dep_twoTrait_mcmc, file = "depTwoTraitMCMC.rds")
+# dep_twoTrait_mcmc <- 
+#   corhmm_mcmc(depModel,
+#               p_args=list(nllfun=make_nllfun(depModel)),
+#               n_cores = 3,
+#               n_chains = 6,
+#               ## these are per chain
+#               n_burnin = 4000,
+#               n_iter = 44000,
+#               n_thin = 10,
+#               seed = 101)
+# saveRDS(dep_twoTrait_mcmc, file = "depTwoTraitMCMC.rds")
+```
+
+```{r}
+dep_mcmc<-readRDS("depTwoTraitMCMC.rds")
+lattice::xyplot(dep_mcmc, layout=c(2,4), aspect="fill",
+                as.table = TRUE)
+```
+
+```{r}
+dep_mcmc[] <- lapply(dep_mcmc,
+                       function(x) { 
+                         colnames(x) <- c("q21", "q31", "q12", "q42",
+                                          "q13", "q43", "q24", "q34")
+                         return(x)
+                       })
+
+m1 <- as.mcmc(dep_mcmc)
+
+df <- (as.data.frame(m1)
+  %>% pivot_longer(everything(), names_to="var", values_to = "logval")
+  %>% mutate(value = exp(logval))
+)
+ggplot(df, aes(x=value)) + facet_wrap(~var, nrow = 2, scales="free") +
+  geom_histogram(bins = 100)
+
+summary(m1)
 ```
