@@ -126,9 +126,9 @@ list(
                                        ub_gainloss = gainloss_priors$ub),
                            n_cores = 8,
                            n_chains = 8,
-                           n_burnin = 400, ## 4000,
-                           n_iter = 8400, ## 84000,
-                           n_thin = 1, ## 20,
+                           n_burnin =  4000,
+                           n_iter =  84000,
+                           n_thin = 20,
                            seed = 101)
                ),
     tar_target(ag_mcmc1,

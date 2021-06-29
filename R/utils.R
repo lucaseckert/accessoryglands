@@ -407,3 +407,5 @@ scale_phylo <- function(compdata, type = "sumbranches", scale_val = 1) {
     compdata$phy$edge.length / sum(compdata$phy$edge.length) * scale_val
   return(compdata)
 }
+
+

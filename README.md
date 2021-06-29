@@ -25,3 +25,15 @@ Files:
 - `treeBlock.rds`
 - `treeSingle.rds`
 
+
+## making stuff
+
+```r
+library("targets")
+tar_load(everything())
+tar_make()
+##
+library(future)
+plan("multicore")
+tar_make_future()
+```
