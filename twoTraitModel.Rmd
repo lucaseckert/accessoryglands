@@ -95,5 +95,11 @@ df <- (as.data.frame(m1)
 ggplot(df, aes(x=value)) + facet_wrap(~var, nrow = 2, scales="free") +
   geom_histogram(bins = 100)
 
+print(ggplot(df, aes(x=var, y=value))
+      + geom_violin(fill="gray")
+      + geom_hline(yintercept = 0, lty = 2)
+      + ylim(0,0.03)
+)
+
 summary(m1)
 ```
