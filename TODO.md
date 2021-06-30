@@ -1,3 +1,14 @@
+## BMB for 07-07-30
+
+- think about weighting by state occupancy rather than equal weights???
+- visualize tip state distribution for non-treeblock/treeblock
+- consider run/comparison for spawning vs repro system?
+- why is evidence apparently stronger in 2-trait model?
+    - joint test on 2 parameters (gain diff, loss diff) ?
+	- dilution by non-focal parameters?
+- general sanity check of parameters
+- sanity check of treeblock runs
+- compute improved R-hat
 
 ## LE for 2021-06-30
 

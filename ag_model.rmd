@@ -48,12 +48,11 @@ ag_mcmc0 <-
 
 ## some attempts at data viz
 
-pretty but useless:
-
-```{r mosaic}
+```{r mosaic, eval=FALSE, echo=FALSE}
+## cool but useless
 (ag_compdata$data
   %>% mutate(ag = paste0("ag:",ag),
-             pc = paste0("ag:",pc),
+             pc = paste0("pc:",pc),
              sc = paste0("sc:",sc))
   %>% 
   ggplot() + 
@@ -206,13 +205,11 @@ hist(int, breaks = 100)
 ```
 
 ```{r compute_contrasts, cache = TRUE}
-## FIXME: make sure loss/gain is in the right order, match name orders, etc.
-ag_mcmc1 <- shorten_ag_names(ag_mcmc1)
 cmat <- (read_csv("contr.csv", col_types = cols())
   ## arrange in same order as ag_mcmc1 columns!
   %>% mutate(across(parname, ~factor(., levels=colnames(ag_mcmc1))))
   %>% arrange(parname)
-  %>% dplyr::select(-parname) 
+  %>% dplyr::select(-parname)  ## drop row name so we have a pure-numeric matrix
   %>% as.matrix()
 )
 ag_contr <- ag_mcmc1 %*% cmat
@@ -223,11 +220,15 @@ ag_contr_long <- (ag_contr
 )
 ```
 
+**FIXME**: think more about net gain and how to characterize it.
+Certainly should *not* be exponentiated, so leave it out here ...
+
 ```{r plot_contrasts, fig.height=4, fig.width=10}
-ggplot(ag_contr_long, aes(x = exp(value), y = rate)) +
+ag_contr_gainloss <- ag_contr_long %>% filter(rate != "netgain")
+ggplot(ag_contr_gainloss, aes(x = exp(value), y = rate)) +
   facet_wrap(~ contrast) +
   geom_violin(fill = "gray") +
-  stat_summary(fun.data = "median_hilow", geom = "pointrange", colour="red") +
+  stat_summary(fun.data = "median_hilow", geom = "pointrange", colour="darkred") +
   geom_vline(xintercept = 1, lty = 2) +
   scale_x_log10()
 ```
@@ -237,13 +238,12 @@ bayes_pval <- function(x, ref=0) {
   x <- mean(x<ref)
   2 * min(x, 1-x)
 }
-(ag_contr_long
+(ag_contr_gainloss
   %>% group_by(contrast,rate)
   %>% summarise(median = median(value), lwr = quantile(value, 0.025), upr = quantile(value, 0.975), p = bayes_pval(value), .groups = "drop")
   %>% knitr::kable(digits = 3)
 )
 ```
-
 
 Graphing all CIs: bounds are set to the lower/upper bounds used for corHMM fit.
 
@@ -281,6 +281,6 @@ mcmc_long <- (ag_mcmc0
 ggplot(mcmc_long, aes(x = exp(value), y = term)) +
   geom_violin(fill = "gray") +
   scale_x_log10() +
-  stat_summary(fun.data = "median_hilow", geom = "pointrange", colour="red") +
+  stat_summary(fun.data = "median_hilow", geom = "pointrange", colour="darkred") +
   labs(x = "evolutionary rate", y = "")
 ```
