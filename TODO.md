@@ -1,3 +1,16 @@
+## LE for 2021-07-07
+
+- try all of the following for the two trait model
+  1. BayesTraits and BayesFactors
+  2. Reversible Jump Models
+  3. Bayesian with contrasts (with tree block)
+  4. Pagels test
+  5. likelihood ratio test
+  6. AIC comparison
+- put it all together in a rmd to share with Sigal
+- compute ESS for bayesian stuff
+- sanity check on contrasts
+
 ## BMB for 07-07-30
 
 - think about weighting by state occupancy rather than equal weights???
