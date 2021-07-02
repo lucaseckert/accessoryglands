@@ -88,8 +88,8 @@ aic.w(aic2)
 ## 4. BayesTraits (with BayesFactors)
 
 ```{r, echo=F}
-indBayesTraits<-read.table()
-depBayesTraits<-read.table()
+indBayesTraits<-read.table("indBayesTraits.txt", header = T, sep = "\t")
+depBayesTraits<-read.table("depBayesTraits.txt", header = T, sep = "\t")
 ```
 
 ## 5. BayesTraits (with contrasts)
