@@ -32,7 +32,7 @@ names(x)<-data$species
 y<-data$care
 names(y)<-data$species
 
-phy<-bind.tip(phy,tip.label="ROOT",edge.length=0,
+phy2<-bind.tip(phy,tip.label="ROOT",edge.length=0,
     where=Ntip(phy)+1)
 
 x<-as.factor(c(setNames(0,"ROOT"),
@@ -40,7 +40,7 @@ x<-as.factor(c(setNames(0,"ROOT"),
 y<-as.factor(c(setNames(0,"ROOT"),
     setNames(as.character(y),names(y))))
 
-print(PagelsTest<-fitPagel(phy, x, y, model = "ARD"))
+print(PagelsTest<-fitPagel(phy2, x, y, model = "ARD"))
 ```
 
 ## 2. Likelihood Ratio Test
@@ -72,8 +72,33 @@ print(p.val <- pchisq(likRatio, df = 4, lower.tail = F))
 ```
 ## 3. AIC Comparison
 
+Same models as 1 and 2 except compared using AIC instead of log likelihoods.
 
+AIC comparison for the models from Pagel's test, AIC values and weights
+```{r, echo=F}
+print(aic1<-setNames(c(PagelsTest$independent.AIC, PagelsTest$dependent.AIC),c("independant","dependent")))
+aic.w(aic1)
+```
+
+AIC comparison for our corHMM models, values and weights
 ```{r}
+print(aic2<-setNames(c(indModel$AIC, depModel$AIC),c("independant","dependent")))
+aic.w(aic2)
+```
+## 4. BayesTraits (with BayesFactors)
+
+```{r, echo=F}
+indBayesTraits<-read.table()
+depBayesTraits<-read.table()
+```
+
+## 5. BayesTraits (with contrasts)
+
+## 6. BayesTraits (RJHP)
+
+## 7. Our corHMM Bayesian analysis
+
+```{r, echo=F}
 # ind_twoTrait_mcmc <- 
 #   corhmm_mcmc(indModel,
 #               p_args=list(nllfun=make_nllfun(indModel)),
@@ -87,7 +112,7 @@ print(p.val <- pchisq(likRatio, df = 4, lower.tail = F))
 # saveRDS(ind_twoTrait_mcmc, file = "indTwoTraitMCMC.rds")
 ```
 
-```{r}
+```{r, echo=F}
 # dep_twoTrait_mcmc <- 
 #   corhmm_mcmc(depModel,
 #               p_args=list(nllfun=make_nllfun(depModel)),
@@ -101,7 +126,8 @@ print(p.val <- pchisq(likRatio, df = 4, lower.tail = F))
 # saveRDS(dep_twoTrait_mcmc, file = "depTwoTraitMCMC.rds")
 ```
 
-```{r}
+
+```{r, echo=F}
 dep_mcmc<-readRDS("depTwoTraitMCMC.rds")
 lattice::xyplot(dep_mcmc, layout=c(2,4), aspect="fill",
                 as.table = TRUE)
