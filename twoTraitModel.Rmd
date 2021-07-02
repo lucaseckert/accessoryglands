@@ -1,48 +1,77 @@
 ---
 title: "Two Trait Model"
+author: Lucas Eckert
 output: html_document
 ---
-
-```{r}
+```{r, echo=F, include=F}
 source("R/utils.R")
 source("R/mcmc.R")
 source("R/functions.R")
 load_pkgs()
 zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
 theme_set(theme_bw())
+library(phytools)
 ```
 
-```{r}
+```{r, echo=F}
 allData <- read.csv("data/binaryTraitData.csv", header = TRUE)
 traitData <- with(allData,
                   data.frame(species, ag, care, names=species))
-fullPhy <- suppressWarnings(fishtree_phylogeny(traitData$species)) ## request 607, only find 478 spp
+fullPhy <- suppressWarnings(fishtree_phylogeny(traitData$species))
 trimmedData <- comparative.data(fullPhy, traitData, names.col = names)
 phy <- trimmedData$phy
 data <- trimmedData$data
-getStateMat4Dat(data)
 ```
 
+## 1. Pagel's Test
+
+Pagel's 1994 test of correlated evolution. Creates independent and dependent models of evolution and compares them using a likelihood ratio test.
 ```{r}
+x<-data$ag
+names(x)<-data$species
+y<-data$care
+names(y)<-data$species
+
+phy<-bind.tip(phy,tip.label="ROOT",edge.length=0,
+    where=Ntip(phy)+1)
+
+x<-as.factor(c(setNames(0,"ROOT"),
+    setNames(as.character(x),names(x))))
+y<-as.factor(c(setNames(0,"ROOT"),
+    setNames(as.character(y),names(y))))
+
+print(PagelsTest<-fitPagel(phy, x, y, model = "ARD"))
+```
+
+## 2. Likelihood Ratio Test
+
+This should be the same as Pagel's test. Independent and dependent models are created, this time using the same function we use to set up our Bayesian stuff later on, and the models are compared.
+
+Independent Model
+```{r, echo=F}
 LegendAndRateMat <- getStateMat4Dat(data)
 RateMat <- LegendAndRateMat$rate.mat
 pars2equal <- list(c(3,8), c(5,7), c(1,6), c(2,4))
-print(indStateMat <- equateStateMatPars(RateMat, pars2equal))
+indStateMat <- equateStateMatPars(RateMat, pars2equal)
 indModel<- corHMM(phy = phy, data = data, rate.cat = 1, root.p = c(1,0,0,0), rate.mat = indStateMat)
 print(indModel)
 ```
 
-```{r}
+Dependent Model
+```{r, echo=F}
 depModel<- corHMM(phy = phy, data = data, rate.cat = 1, root.p = c(1,0,0,0))
 print(depModel)
 ```
 
-```{r}
+Likelihood ratio and p-value
+```{r, echo=F}
 #likelihood ratio test, same as Pagel's test of correlated evolution used in my thesis
 print(likRatio<- -2*(indModel$loglik-depModel$loglik))
 print(p.val <- pchisq(likRatio, df = 4, lower.tail = F))
 #my thesis found a p value of < 0.001 so this is good so far
 ```
+## 3. AIC Comparison
+
 
 ```{r}
 # ind_twoTrait_mcmc <- 
