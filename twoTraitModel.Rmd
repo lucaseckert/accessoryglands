@@ -135,22 +135,22 @@ revJump<-read.csv("rjBayesTraits.csv", header = T)
 ## 7. Our corHMM Bayesian analysis
 
 ```{r, echo=F}
-data2<-na.omit(traitData[,1:3])
-treeblock<-fishtree_complete_phylogeny(data2$species)
-
-depTreeBlock<- corHMM(phy = treeblock[[1]], data = data2, rate.cat = 1, root.p = c(1,0,0,0))
-
-dep_treeblock_mcmc <-
-  corhmm_mcmc(depTreeBlock,
-              p_args=list(nllfun=make_nllfun(depTreeBlock), treeblock=treeblock),
-              n_cores = 3,
-              n_chains = 6,
-              ## these are per chain
-              n_burnin = 4000,
-              n_iter = 44000,
-              n_thin = 10,
-              seed = 101)
-saveRDS(dep_treeblock_mcmc, file = "depTreeBlockMCMC.rds")
+# data2<-na.omit(traitData[,1:3])
+# treeblock<-fishtree_complete_phylogeny(data2$species)
+# 
+# depTreeBlock<- corHMM(phy = treeblock[[1]], data = data2, rate.cat = 1, root.p = c(1,0,0,0))
+# 
+# dep_treeblock_mcmc <-
+#   corhmm_mcmc(depTreeBlock,
+#               p_args=list(nllfun=make_nllfun(depTreeBlock), treeblock=treeblock),
+#               n_cores = 3,
+#               n_chains = 6,
+#               ## these are per chain
+#               n_burnin = 4000,
+#               n_iter = 44000,
+#               n_thin = 10,
+#               seed = 101)
+# saveRDS(dep_treeblock_mcmc, file = "depTreeBlockMCMC.rds")
 ```
 
 ```{r, echo=F, include=F}
