@@ -45,6 +45,7 @@ y<-as.factor(c(setNames(0,"ROOT"),
 
 print(PagelsTest<-fitPagel(phy2, x, y, model = "ARD"))
 ```
+P-value indicates correlation, rate estimates indicate a faster transition to accessory glands from a state of parental care compared to no care.
 
 ## 2. Likelihood Ratio Test
 
@@ -73,6 +74,8 @@ print(likRatio<- -2*(indModel$loglik-depModel$loglik))
 print(p.val <- pchisq(likRatio, df = 4, lower.tail = F))
 #my thesis found a p value of < 0.001 so this is good so far
 ```
+LR and p-value are the same as Pagel's test. Rates are very similar.
+
 ## 3. AIC Comparison
 
 Same models as 1 and 2 except compared using AIC instead of log likelihoods.
@@ -88,9 +91,11 @@ AIC comparison for our corHMM models, values and weights
 print(aic2<-setNames(c(indModel$AIC, depModel$AIC),c("independant","dependent")))
 aic.w(aic2)
 ```
+Strong evidence in favour of the dependent model in both cases.
+
 ## 4. BayesTraits (with BayesFactors)
 
-Create the models in BayesTraits and then compare using BayesFactors, via the harmonic means of the log likelihoods
+Create the models in BayesTraits and then compare using BayesFactors, via the harmonic means of the log likelihoods. Harmonic means of ind, dep, and then the BF.
 
 ```{r, echo=F}
 indBayesTraits<-read.csv("indBayesTraits.csv", header = T)
@@ -101,6 +106,7 @@ print(depLik<-1/mean(1/depBayesTraits$Lh))
 
 print(BF<-2*(depLik-indLik))
 ```
+BF of >10 indicates "very strong evidence" of correlation
 
 ## 5. BayesTraits (with contrasts)
 
@@ -125,7 +131,7 @@ print(ggplot(df, aes(x=var, y=value))
 
 ## 6. BayesTraits (RJHP)
 
-```{r}
+```{r, echo=F}
 revJump<-read.csv("rjBayesTraits.csv", header = T)
 #to test if care has an effect on gaining ag's, i guess we can look at how often q13 qnd q24 are set to be different rates
 #q13 is the 2nd rate in the model string and q24 is the 4th rate
