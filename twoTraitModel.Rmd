@@ -3,6 +3,9 @@ title: "Two Trait Model"
 author: Lucas Eckert
 output: html_document
 ---
+
+The following are analyses of the correlation between parental care and accessory glands, done in 7 different ways. 
+
 ```{r, echo=F, include=F}
 source("R/utils.R")
 source("R/mcmc.R")
@@ -26,7 +29,7 @@ data <- trimmedData$data
 ## 1. Pagel's Test
 
 Pagel's 1994 test of correlated evolution. Creates independent and dependent models of evolution and compares them using a likelihood ratio test.
-```{r}
+```{r, echo=F}
 x<-data$ag
 names(x)<-data$species
 y<-data$care
@@ -45,7 +48,7 @@ print(PagelsTest<-fitPagel(phy2, x, y, model = "ARD"))
 
 ## 2. Likelihood Ratio Test
 
-This should be the same as Pagel's test. Independent and dependent models are created, this time using the same function we use to set up our Bayesian stuff later on, and the models are compared.
+This should be the same as Pagel's test. Independent and dependent models are created, this time using the same function we use to set up our Bayesian stuff later on.
 
 Independent Model
 ```{r, echo=F}
@@ -81,59 +84,84 @@ aic.w(aic1)
 ```
 
 AIC comparison for our corHMM models, values and weights
-```{r}
+```{r, echo=F}
 print(aic2<-setNames(c(indModel$AIC, depModel$AIC),c("independant","dependent")))
 aic.w(aic2)
 ```
 ## 4. BayesTraits (with BayesFactors)
 
+Create the models in BayesTraits and then compare using BayesFactors, via the harmonic means of the log likelihoods
+
 ```{r, echo=F}
-indBayesTraits<-read.table("indBayesTraits.txt", header = T, sep = "\t")
-depBayesTraits<-read.table("depBayesTraits.txt", header = T, sep = "\t")
+indBayesTraits<-read.csv("indBayesTraits.csv", header = T)
+depBayesTraits<-read.csv("depBayesTraits.csv", header = T)
+
+print(indLik<-1/mean(1/indBayesTraits$Lh))
+print(depLik<-1/mean(1/depBayesTraits$Lh))
+
+print(BF<-2*(depLik-indLik))
 ```
 
 ## 5. BayesTraits (with contrasts)
 
+Using the estimates from the dependent model from BayesTraits, contrasts on the effect of care on the gain, loss, and net-gain, of accessory glands
+
+```{r, echo=F}
+gain.ag.bt<-depBayesTraits$q24-depBayesTraits$q13
+loss.ag.bt<-depBayesTraits$q42-depBayesTraits$q31
+net.ag.bt<-gain.ag.bt-loss.ag.bt
+
+df1<-data.frame(var="gain",value=gain.ag.bt)
+df2<-data.frame(var="loss",value=loss.ag.bt)
+df3<-data.frame(var="net",value=net.ag.bt)
+df<-rbind(df1,df2,df3)
+
+print(ggplot(df, aes(x=var, y=value))
+      + geom_violin(fill="gray")
+      + geom_hline(yintercept = 0, lty = 2)
+      + coord_flip()
+      )
+```
+
 ## 6. BayesTraits (RJHP)
+
+```{r}
+revJump<-read.csv("rjBayesTraits.csv", header = T)
+#to test if care has an effect on gaining ag's, i guess we can look at how often q13 qnd q24 are set to be different rates
+#q13 is the 2nd rate in the model string and q24 is the 4th rate
+#tho im not sure how to see how often those are different...
+```
 
 ## 7. Our corHMM Bayesian analysis
 
 ```{r, echo=F}
-# ind_twoTrait_mcmc <- 
-#   corhmm_mcmc(indModel,
-#               p_args=list(nllfun=make_nllfun(indModel)),
-#               n_cores = 3,
-#               n_chains = 6,
-#               ## these are per chain
-#               n_burnin = 4000,
-#               n_iter = 44000,
-#               n_thin = 10,
-#               seed = 101)
-# saveRDS(ind_twoTrait_mcmc, file = "indTwoTraitMCMC.rds")
+data2<-na.omit(traitData[,1:3])
+treeblock<-fishtree_complete_phylogeny(data2$species)
+
+depTreeBlock<- corHMM(phy = treeblock[[1]], data = data2, rate.cat = 1, root.p = c(1,0,0,0))
+
+dep_treeblock_mcmc <-
+  corhmm_mcmc(depTreeBlock,
+              p_args=list(nllfun=make_nllfun(depTreeBlock), treeblock=treeblock),
+              n_cores = 3,
+              n_chains = 6,
+              ## these are per chain
+              n_burnin = 4000,
+              n_iter = 44000,
+              n_thin = 10,
+              seed = 101)
+saveRDS(dep_treeblock_mcmc, file = "depTreeBlockMCMC.rds")
 ```
 
-```{r, echo=F}
-# dep_twoTrait_mcmc <- 
-#   corhmm_mcmc(depModel,
-#               p_args=list(nllfun=make_nllfun(depModel)),
-#               n_cores = 3,
-#               n_chains = 6,
-#               ## these are per chain
-#               n_burnin = 4000,
-#               n_iter = 44000,
-#               n_thin = 10,
-#               seed = 101)
-# saveRDS(dep_twoTrait_mcmc, file = "depTwoTraitMCMC.rds")
-```
-
-
-```{r, echo=F}
-dep_mcmc<-readRDS("depTwoTraitMCMC.rds")
+```{r, echo=F, include=F}
+dep_mcmc<-readRDS("depTreeBlockMCMC.rds")
 lattice::xyplot(dep_mcmc, layout=c(2,4), aspect="fill",
                 as.table = TRUE)
+sort(effectiveSize(dep_mcmc))
+coda::gelman.diag(dep_mcmc)
 ```
 
-```{r}
+```{r, echo=F}
 dep_mcmc[] <- lapply(dep_mcmc,
                        function(x) { 
                          colnames(x) <- c("q21", "q31", "q12", "q42",
