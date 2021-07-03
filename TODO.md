@@ -1,14 +1,15 @@
 ## LE for 2021-07-07
 
 - try all of the following for the two trait model
-  1. BayesTraits and BayesFactors
+  1. BayesTraits and BayesFactors - DONE
   2. Reversible Jump Models
   3. Bayesian with contrasts (with tree block)
-  4. Pagels test
-  5. likelihood ratio test
-  6. AIC comparison
+  4. Pagels test - DONE
+  5. likelihood ratio test - DONE
+  6. AIC comparison - DONE
+  7. BayesTraits with contrasts
 - put it all together in a rmd to share with Sigal
-- compute ESS for bayesian stuff
+- compute ESS for bayesian stuff - DONE
 - sanity check on contrasts
 
 ## BMB for 07-07-30
