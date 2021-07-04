@@ -45,7 +45,7 @@ y<-as.factor(c(setNames(0,"ROOT"),
 
 print(PagelsTest<-fitPagel(phy2, x, y, model = "ARD"))
 ```
-P-value indicates correlation, rate estimates indicate a faster transition to accessory glands from a state of parental care compared to no care.
+P-value indicates correlation, rate estimates indicate a faster transition to accessory glands from a state of parental care compared to no care (about 10 fold).
 
 ## 2. Likelihood Ratio Test
 
@@ -67,12 +67,10 @@ depModel<- corHMM(phy = phy, data = data, rate.cat = 1, root.p = c(1,0,0,0))
 print(depModel)
 ```
 
-Likelihood ratio and p-value
 ```{r, echo=F}
-#likelihood ratio test, same as Pagel's test of correlated evolution used in my thesis
-print(likRatio<- -2*(indModel$loglik-depModel$loglik))
-print(p.val <- pchisq(likRatio, df = 4, lower.tail = F))
-#my thesis found a p value of < 0.001 so this is good so far
+likRatio<- -2*(indModel$loglik-depModel$loglik)
+p.val <- pchisq(likRatio, df = 4, lower.tail = F)
+print(lr<-setNames(c(likRatio, p.val), c("likelihood ratio", "p-value")))
 ```
 LR and p-value are the same as Pagel's test. Rates are very similar.
 
@@ -101,10 +99,10 @@ Create the models in BayesTraits and then compare using BayesFactors, via the ha
 indBayesTraits<-read.csv("indBayesTraits.csv", header = T)
 depBayesTraits<-read.csv("depBayesTraits.csv", header = T)
 
-print(indLik<-1/mean(1/indBayesTraits$Lh))
-print(depLik<-1/mean(1/depBayesTraits$Lh))
-
-print(BF<-2*(depLik-indLik))
+indLik<-1/mean(1/indBayesTraits$Lh)
+depLik<-1/mean(1/depBayesTraits$Lh)
+BF<-2*(depLik-indLik)
+print(setNames(c(indLik, depLik, BF), c("independent log likelihood", "dependent log likelihood", "BayesFactor")))
 ```
 BF of >10 indicates "very strong evidence" of correlation
 
@@ -127,19 +125,51 @@ print(ggplot(df, aes(x=var, y=value))
       + geom_hline(yintercept = 0, lty = 2)
       + coord_flip()
       )
+
+print(ggplot(df, aes(x=var, y=value))
+      + geom_violin(fill="gray")
+      + geom_hline(yintercept = 0, lty = 2)
+      + coord_flip()
+      + ylim(c(-20,20))
+      )
 ```
 
-## 6. BayesTraits (RJHP)
+95% confidence intervals:
+```{r, echo=F}
+print(gain.bt.ci<-quantile(gain.ag.bt, c(0.025,0.975)))
+print(loss.bt.ci<-quantile(loss.ag.bt, c(0.025,0.975)))
+print(net.bt.ci<-quantile(net.ag.bt, c(0.025,0.975)))
+```
 
+Individual rates:
+```{r, echo=F}
+df4 <- (as.data.frame(depBayesTraits[,4:11])
+  %>% pivot_longer(everything(), names_to="var", values_to = "value")
+)
+
+print(ggplot(df4, aes(x=var, y=value))
+      + geom_violin(fill="gray")
+      + geom_hline(yintercept = 0, lty = 2)
+)
+
+print(ggplot(df4, aes(x=var, y=value))
+      + geom_violin(fill="gray")
+      + geom_hline(yintercept = 0, lty = 2)
+      + ylim(c(0,20))
+)
+```
+
+## 6. BayesTraits (RJ)
+The reversible jump method varies restrictions on the rates while attempting to find the best fitting model. To test our hypothesis, we can look at how often the rates towards the gain of ags are set to be the same and how often they are set to be different, depending on the state of parental care.
 ```{r, echo=F}
 revJump<-read.csv("rjBayesTraits.csv", header = T)
-#to test if care has an effect on gaining ag's, i guess we can look at how often q13 qnd q24 are set to be different rates
-#q13 is the 2nd rate in the model string and q24 is the 4th rate
-#tho im not sure how to see how often those are different...
+rmat <- do.call("rbind",strsplit(revJump$Model.string, " "))
+mean(rmat[,2] == rmat[,4])
 ```
+The rates are the same about 75% of the time, not a lot of support for our hypothesis. 
 
 ## 7. Our corHMM Bayesian analysis
-
+Same idea as the BayesTraits contrasts, except made using our method.
 ```{r, echo=F}
 # data2<-na.omit(traitData[,1:3])
 # treeblock<-fishtree_complete_phylogeny(data2$species)
@@ -167,6 +197,7 @@ sort(effectiveSize(dep_mcmc))
 coda::gelman.diag(dep_mcmc)
 ```
 
+The contrasts for the effect of care on ag gain, loss, and netgain:
 ```{r, echo=F}
 dep_mcmc[] <- lapply(dep_mcmc,
                        function(x) { 
@@ -174,21 +205,47 @@ dep_mcmc[] <- lapply(dep_mcmc,
                                           "q13", "q43", "q24", "q34")
                          return(x)
                        })
-
 m1 <- as.mcmc(dep_mcmc)
 
-df <- (as.data.frame(m1)
+gain<-m1[,7]-m1[,5]
+loss<-m1[,4]-m1[,2]
+net<-gain-loss
+
+d1<-data.frame(var="gain",value=gain)
+d2<-data.frame(var="loss",value=loss)
+d3<-data.frame(var="net",value=net)
+d<-rbind(d1,d2,d3)
+
+print(ggplot(d, aes(x=var, y=var1))
+      + geom_violin(fill="gray")
+      + geom_hline(yintercept = 0, lty = 2)
+      + coord_flip()
+      )
+```
+
+The 95% confidence intervals:
+```{r, echo=F}
+print(gain.ci<-quantile(gain, c(0.025,0.975)))
+print(loss.ci<-quantile(loss, c(0.025,0.975)))
+print(net.ci<-quantile(net, c(0.025,0.975)))
+```
+
+The individual rates:
+```{r, echo=F}
+df0 <- (as.data.frame(m1)
   %>% pivot_longer(everything(), names_to="var", values_to = "logval")
   %>% mutate(value = exp(logval))
 )
-ggplot(df, aes(x=value)) + facet_wrap(~var, nrow = 2, scales="free") +
-  geom_histogram(bins = 100)
 
-print(ggplot(df, aes(x=var, y=value))
+print(ggplot(df0, aes(x=var, y=value))
       + geom_violin(fill="gray")
       + geom_hline(yintercept = 0, lty = 2)
-      + ylim(0,0.03)
 )
 
-summary(m1)
+print(ggplot(df0, aes(x=var, y=value))
+      + geom_violin(fill="gray")
+      + geom_hline(yintercept = 0, lty = 2)
+      + ylim(0,0.02)
+)
 ```
+
