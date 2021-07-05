@@ -2,7 +2,12 @@
 title: "accessory gland model"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
 author: "Ben Bolker and Lucas Eckert"
+output:
+  html_document:
+    code_folding: hide
 ---
+
+**fix me**: reimplement as [target markdown](https://books.ropensci.org/targets/markdown.html#markdown) ?
 
 ```{r setup, message=FALSE}
 source("R/utils.R")
@@ -12,8 +17,6 @@ load_pkgs()
 zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
 theme_set(theme_bw())
 library(targets)
-## tar_load(names=c(ag_compdata, ag_model0))
-tar_load(everything())  ## incorporate all computed values
 ```
 
 Approximate workflow:
@@ -24,7 +27,10 @@ get_ag_data("data/binaryTraitData.csv")
 ## set up constrained state matrix
 ag_statemat1 <- with(ag_compdata, {
   ag_smdat <- corHMM::getStateMat4Dat(data)
-  pars2equal <- list(c(7, 10, 20, 23), c(4, 11, 17, 24), c(2, 5, 15, 18), c(1, 8, 14, 21))
+  pars2equal <- list(c(7, 10, 20, 23),
+                     c(4, 11, 17, 24),
+                     c(2, 5, 15, 18),
+                     c(1, 8, 14, 21))
   equateStateMatPars(ag_smdat$rate.mat, pars2equal)
 })
 ## run basic model and add state/parameter names
@@ -34,9 +40,8 @@ ag_model0 <- augment_model(
            rate.cat = 1,
            rate.mat = ag_statemat1)
 )
-ag_mcmc0 <- 
-  corhmm_mcmc(ag_model0,
-              p_args=list(nllfun=make_nllfun(ag_model0)),
+ag_mcmc0 <- corhmm_mcmc(ag_model0,
+              p_args = list(nllfun = make_nllfun(ag_model0)),
               n_cores = 8,
               n_chains = 8,
               ## these are per chain
@@ -44,6 +49,10 @@ ag_mcmc0 <-
               n_iter = 44000,
               n_thin = 10,
               seed = 101)
+```
+
+```{r visnetwork}
+tar_visnetwork(targets_only = TRUE)
 ```
 
 ## some attempts at data viz
@@ -62,16 +71,18 @@ ag_mcmc0 <-
 )
 ```
 
-less useless: 
+Less useless: 
+
 ```{r barchart}
-(ag_compdata$data
-  %>% mutate(across(c(pc, sc), factor, levels = c(0:1, "?")))
-  %>% mutate(across(ag, factor, levels = 1:0)) ## reverse order to get ag=1 on top of bars
-  %>% 
-ggplot(aes(x=pc, fill = ag)) + geom_bar() +
-  facet_wrap(~sc, labeller = label_both) +
-scale_fill_discrete_qualitative()
-)
+tar_load(ag_compdata)
+print(ag_compdata$data
+      %>% mutate(across(c(pc, sc), factor, levels = c(0:1, "?")))
+      %>% mutate(across(ag, factor, levels = 1:0)) ## reverse order to get ag=1 on top of bars
+      %>% 
+      ggplot(aes(x=pc, fill = ag)) + geom_bar()
+      + facet_wrap(~sc, labeller = label_both)
+      + scale_fill_discrete_qualitative()
+      )
 ```                         
 
 ##  priors
@@ -84,12 +95,16 @@ scale_fill_discrete_qualitative()
 
 Use each of these as the basis for a +/- 3 sigma range (on the log scale)
 
-```{r cifun, cache=TRUE}
+**fixme**: make this a target too.
+
+```{r cifun}
+tar_load(ag_model0)
+tar_load(ag_mcmc0)
 t_list <- list(
     wald = tidy(ag_model0, conf.int = TRUE),
     ## profile = tidy(ag_model0, conf.int = TRUE,
     ## conf.method = "profile", profile = ag_profile0),
-    mcmc = tidy(ag_mcmc0, conf.int = TRUE)
+    mcmc = tidy(ag_mcmc0, robust = TRUE, conf.int = TRUE)
 ) 
 all_ci <- (bind_rows(t_list, .id = "method")
   %>% rename(lwr = "conf.low", upr = "conf.high")
@@ -99,13 +114,22 @@ all_ci <- (bind_rows(t_list, .id = "method")
 ## Bayesian
 
 
-```{r bayes_traceplot, fig.width=8, fig.height=8, cache=TRUE}
-lattice::xyplot(ag_mcmc0, aspect="fill", layout=c(2,6))
+```{r bayes_traceplot, fig.width=8, fig.height=8}
+tar_load(traceplot_ag_mcmc0)
+print(traceplot_ag_mcmc0)
 ```
 
-```{r bayes_sum}
+```{r bayes_sum, eval=FALSE, echo=FALSE}
+## the old way
 sort(effectiveSize(ag_mcmc0))
 coda::gelman.diag(ag_mcmc0)
+```
+
+```{r improved_rhat}
+aa <- do.call(abind, c(ag_mcmc0, list(along=3)))
+aa2 <- aperm(aa,c(1,3,2), resize=TRUE)
+source("R/monitornew.R")
+monitor(aa2)
 ```
 
 These diagnostics are OK but not great (ideally we would effective sample size up to 1000 and Gelman-Rubin ($\hat R$) statistic as low as 1.01 --- although older studies have used a higher cutoff). Probably fixable by "just" running the chain longer.
@@ -114,7 +138,7 @@ These diagnostics are OK but not great (ideally we would effective sample size u
 pairs(as.matrix(ag_mcmc0), gap = 0, pch = ".")
 ```
 
-Not sure about the best way(s) to represent density: contour lines, filled contours ... change scale? Show highest posterior density contours?
+Not sure about the best way(s) to represent density: contour lines, filled contours ... change scale? Show highest posterior density contours? (This is slow to render)
 
 ```{r bayes_pairs2, fig.width=10, fig.height=10, cache=TRUE}
 bp2 <- ggpairs(as.data.frame(lump.mcmc.list(ag_mcmc0)), progress=FALSE,
@@ -157,7 +181,6 @@ par_names(ag_model0)
 ### intermediate values
 
 **FIXME**:  compare results here with contrast matrix results
-
 
 ```{r manual_contrasts}
 #effect of pc on gaining ag
@@ -204,27 +227,43 @@ int<-((gain.ag_pc1_sc1-loss.ag_pc1_sc1)-(gain.ag_pc0_sc1-loss.ag_pc0_sc1))-((gai
 hist(int, breaks = 100)
 ```
 
-```{r compute_contrasts, cache = TRUE}
-cmat <- (read_csv("contr.csv", col_types = cols())
-  ## arrange in same order as ag_mcmc1 columns!
-  %>% mutate(across(parname, ~factor(., levels=colnames(ag_mcmc1))))
-  %>% arrange(parname)
-  %>% dplyr::select(-parname)  ## drop row name so we have a pure-numeric matrix
-  %>% as.matrix()
-)
-ag_contr <- ag_mcmc1 %*% cmat
-ag_contr_long <- (ag_contr
-  %>% as_tibble()
-  %>% pivot_longer(everything(), names_to = "contrast")
-  %>% separate(contrast, into=c("contrast", "rate"))
-)
+```{r plot_contrast_mat}
+tar_load(contrast_mat)
+image_plot(contrast_mat, xlab = "Contrast", ylab = "Rate parameter")
 ```
+
+```{r states}
+tar_load(states_df)
+pivot_longer(states_df, everything(), names_to = "state") %>%
+  ggplot(aes(x=value)) + geom_histogram(bins=25) + facet_wrap(~state)
+## sum columns then divide by total to get sum == 1
+avg_states <- apply(states_df, 2, sum, na.rm = TRUE) / sum(states_df, na.rm = TRUE)
+```
+
+Need to figure out weights e.g. if we want the intercept for `loss.ag` it should be 
+```{r eval=FALSE
+intercept_loss == sum(occ.ag0_pc{i}_sc{j} * loss.ag_pc{i}_sc{j})
+pc_loss = (sum(occ.ag0_pc1_sc{i} * loss.ag_pc1_sc{i}) - sum(occ.ag0_pc0_sc{i} * loss.ag_pc0_sc{i}))/sum(occ.ag0_pc{i}_sc{j})
+```
+
+etc. ...
 
 **FIXME**: think more about net gain and how to characterize it.
 Certainly should *not* be exponentiated, so leave it out here ...
 
+```{r contr, eval=FALSE}
+## playing with contrasts definitions/scaling
+dd <- expand.grid(f1=letters[1:2], f2 = LETTERS[1:2])
+m <- model.matrix(~f1*f2, data=dd, contrasts = list(f1=contr.sum, f2=contr.sum))
+t(solve(m))
+## cols 2 and 3 have magnitude 1/4 but we want 1/2 (diff between treatments, not dev between
+## ttt and mean)
+```
+
 ```{r plot_contrasts, fig.height=4, fig.width=10}
+tar_load(ag_contr_long)
 ag_contr_gainloss <- ag_contr_long %>% filter(rate != "netgain")
+ag_contr_gainloss %>% group_by(contrast, rate) %>% summarise(value=mean(value))
 ggplot(ag_contr_gainloss, aes(x = exp(value), y = rate)) +
   facet_wrap(~ contrast) +
   geom_violin(fill = "gray") +
@@ -270,17 +309,38 @@ ggplot(
   labs(y="rate", x = "")
 ```
 
+```{r}
+## mcmc only
+ggplot(
+  all_ci %>% filter(method=="mcmc"),
+  aes(y=term, x=exp(estimate), xmin = exp(lwr), xmax = exp(upr))) +
+  geom_pointrange() +
+  scale_x_log10()
+```
+
 ```{r bayes_violin}
 mcmc_long <- (ag_mcmc0
   %>% as.mcmc()
   %>% as_tibble()
   %>% pivot_longer(everything(), names_to = "term")
-  %>% mutate(across(term, factor, levels = levs))
-)
+)  
+##  %>% mutate(across(term, factor, levels = levs))
+##)
 
-ggplot(mcmc_long, aes(x = exp(value), y = term)) +
-  geom_violin(fill = "gray") +
-  scale_x_log10() +
-  stat_summary(fun.data = "median_hilow", geom = "pointrange", colour="darkred") +
-  labs(x = "evolutionary rate", y = "")
+print(gg_mcpars <- ggplot(mcmc_long, aes(x = exp(value), y = term)) +
+        geom_violin(fill = "gray") +
+        scale_x_log10() +
+        stat_summary(fun.data = "median_hilow", geom = "pointrange", colour="darkred") +
+        labs(x = "evolutionary rate", y = "")
+      )
+## something is messed up with 
+cidat <- all_ci %>% filter(method=="mcmc") %>% dplyr::select(term, estimate, lwr, upr) %>%
+  mutate(across(where(is.numeric), exp))
+gg_mcpars + geom_pointrange(data=cidat, aes(y=term, x= estimate, xmin=lwr, xmax=upr), colour="blue")
+
+ggplot(mcmc_long, aes(x = value, y = term)) +
+        geom_violin(fill = "gray") +
+        stat_summary(fun.data = "median_hilow", geom = "pointrange", colour="darkred")
+
 ```
+

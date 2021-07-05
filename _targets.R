@@ -1,4 +1,6 @@
 library("targets")
+library("tarchetypes")
+library("tidyverse")
 source("R/utils.R")
 source("R/functions.R")
 source("R/mcmc.R")
@@ -28,8 +30,10 @@ list(
     ),
     tar_target(
         fishtree_phylo,
-        suppressWarnings(
-            fishtree_phylogeny(full_ag_data$species)) %>% scale_phylo()
+        (suppressWarnings(
+            fishtree_phylogeny(full_ag_data$species))
+          %>% scale_phylo()
+        )
     ),
     tar_target(
         ## read trait file, grab phylo data from fishtree, combine/trim
@@ -62,6 +66,11 @@ list(
           r
         }),
     tar_target(
+        ag_corhmm_bounds,
+        c(lower = 0.1,      ## 0.1 transitions per tree
+          upper = 100 * ape::Ntip(ag_compdata$phy)) ## 100 transitions per species
+    ),
+    tar_target(
         ag_model0, {
             augment_model(
                 ## FIXME: quietly?
@@ -71,8 +80,8 @@ list(
                        rate.cat = 1,
                        rate.mat = ag_statemat1,
                        root.p = root.p,
-                       lower = 0.1,                             ## 0.1 transitions per tree
-                       upper = 100 * ape::Ntip(ag_compdata$phy) ## 100 transitions per species
+                       lower = ag_corhmm_bounds[["lower"]],
+                       upper = ag_corhmm_bounds[["upper"]]
                        )
                 )
         }),
@@ -92,6 +101,16 @@ list(
                        )
                 )
         }),
+    tar_target(comp_ci,
+               { list(
+                     wald = tidy(ag_model0, conf.int = TRUE),
+                     ## profile = tidy(ag_model0, conf.int = TRUE,
+                     ## conf.method = "profile", profile = ag_profile0),
+                     mcmc = tidy(ag_mcmc0, robust = TRUE, conf.int = TRUE)) %>%
+                   bind_rows(.id = "method")  %>%
+                   rename(lwr = "conf.low", upr = "conf.high")
+               }
+               ),
     tar_target(
         gainloss_priors,
         list(pairs = list(c(4,1), c(6,2), c(9,3), c(10,5), c(11, 7), c(12, 8)),
@@ -99,6 +118,33 @@ list(
              ub = log(c(10,    5 ,  rep(10, 4))),
              lb = log(c(5,    0.1,  rep(1e-3, 4))))
     ),
+    tar_target(
+        contrast_mat, {
+          cmat <- (read_csv("contr.csv", col_types = cols())
+            ## arrange in same order as ag_mcmc1 columns!
+            %>% mutate(across(parname, ~factor(., levels=colnames(ag_mcmc1))))
+            %>% arrange(parname)
+            %>% dplyr::select(-parname)  ## drop row name so we have a pure-numeric matrix
+            %>% as.matrix()
+          )
+          rownames(cmat) <- colnames(ag_mcmc1)
+          cmat
+        }
+    ),
+    tar_target(
+        ag_contr_long,
+        ((ag_mcmc1 %*% contrast_mat)
+          %>% as_tibble()
+          %>% pivot_longer(everything(), names_to = "contrast")
+          %>% separate(contrast, into=c("contrast", "rate"))
+        )
+    ),
+    tar_target(
+        states_df, {
+          sm <- with(ag_model0,
+                     makeSimmap(phy, data, solution, rate.cat, nSim = 100, nCores = 5))
+          purrr::map_dfr(sm, ~ get_state_occ_prop(.[["maps"]])) %>% setNames(state_names(ag_compdata$data[,-1]))
+        }),
     tar_target(ag_mcmc0,
                corhmm_mcmc(ag_model0,
                            p_args=list(nllfun = make_nllfun(ag_model0),
@@ -131,6 +177,10 @@ list(
                            n_thin = 20,
                            seed = 101)
                ),
+    tar_map(
+         values = tibble(mcmc = rlang::syms(c("ag_mcmc0", "ag_mcmc_treeblock"))),
+        tar_target(traceplot, lattice::xyplot(mcmc, aspect="fill", layout=c(2,6)))
+    ),
     tar_target(ag_mcmc1,
                as.mcmc(ag_mcmc0)
                ),
@@ -141,9 +191,9 @@ list(
     ##                    trace = TRUE,
     ##                    alpha=0.05) ## less extreme than default (alpha=0.01)
     ##            ),
-    tar_target(ag_rmd,
-               format = "file",
-               rmarkdown::render("ag_model.rmd")
+    ## use tarchetypes::tar_render() ?
+    tar_render(ag_rmd,
+               "ag_model.rmd"
                )
 )
 

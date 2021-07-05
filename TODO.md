@@ -14,7 +14,12 @@
 
 ## BMB for 07-07-30
 
-- think about weighting by state occupancy rather than equal weights???
+- SANITY CHECK. Lots of weird plots, what did I mess up?
+   - probably phylo scaling
+
+- reorder params before Bayes pairs plots?
+
+- think about weighting by state occupancy rather than equal weights when computing contrasts???
 - visualize tip state distribution for non-treeblock/treeblock
 - consider run/comparison for spawning vs repro system?
 - why is evidence apparently stronger in 2-trait model?

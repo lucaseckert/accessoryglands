@@ -1,7 +1,8 @@
 pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "ggthemes", "fishtree", "caper", "broom.mixed",
              "emdbook", "ramcmc", "corHMM",
-             "GGally", "colorspace", "ggmosaic")
+             "GGally", "colorspace", "ggmosaic", "targets", "tarchetypes",
+             "abind")
 
 ## install uninstalled pkgs from pkgList
 ## check corHMM version, install from bb repo if necessary
@@ -401,11 +402,27 @@ setup_contrasts <- function(parnames,
 
 
 ##' assume compdata is a list with $phylo element
-scale_phylo <- function(compdata, type = "sumbranches", scale_val = 1) {
+scale_phylo <- function(phy, type = "sumbranches", scale_val = 1) {
   if (type != "sumbranches") stop("only scaling by total sum of branch lengths")
-  compdata$phy$edge.length <-
-    compdata$phy$edge.length / sum(compdata$phy$edge.length) * scale_val
-  return(compdata)
+  orig_sumbranches <- sum(phy$edge.length)
+  phy$edge.length <- phy$edge.length / orig_sumbranches * scale_val
+  attr(phy, "orig_sumbranches") <- orig_sumbranches
+  return(phy)
+}
+
+#' @param m the 'map' component of a simmap object
+get_state_occ_prop <- function(m) {
+  s <- unlist(m)
+  tapply(s, list(names(s)), sum)
+}
+
+image_plot <- function(m, xlab="", ylab = "", sub = "") {
+  image(Matrix(m),
+      scales=list(x=list(at=seq(ncol(m)),labels=colnames(m),
+                         rot=90),
+                  y=list(at=seq(nrow(m)),labels=rownames(m))),
+      xlab = xlab, ylab = ylab, sub = sub)
 }
 
 
+## how do we incorporate these (elegantly/easily) into the contrasts calculation?

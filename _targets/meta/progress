@@ -1,7 +1,3 @@
 name|type|parent|branches|progress
-ag_mcmc_treeblock|stem|ag_mcmc_treeblock|0|started
-ag_mcmc_treeblock|stem|ag_mcmc_treeblock|0|built
-ag_mcmc0|stem|ag_mcmc0|0|started
-ag_mcmc0|stem|ag_mcmc0|0|built
-ag_mcmc1|stem|ag_mcmc1|0|started
-ag_mcmc1|stem|ag_mcmc1|0|built
+ag_rmd|stem|ag_rmd|0|started
+ag_rmd|stem|ag_rmd|0|built
