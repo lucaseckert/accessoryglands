@@ -1,0 +1,73 @@
+---
+title: "accessory gland model: Bayesian diagnostics"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+author: "Ben Bolker and Lucas Eckert"
+output:
+  html_document:
+    code_folding: hide
+---
+
+```{r setup, message=FALSE}
+source("R/utils.R")
+source("R/mcmc.R")
+source("R/functions.R")
+source("R/monitornew.R")
+load_pkgs()
+zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
+theme_set(theme_bw())
+library(targets)
+```
+
+## fishphylo
+
+```{r bayes_traceplot, fig.width=8, fig.height=8}
+tar_load(traceplot_ag_mcmc0)
+print(traceplot_ag_mcmc0)
+```
+
+```{r improved_rhat}
+tar_load(ag_mcmc0)
+aa <- do.call(abind, c(ag_mcmc0, list(along=3)))
+aa2 <- aperm(aa,c(1,3,2), resize=TRUE)
+monitor(aa2)
+```
+
+```{r bayes_pairs, fig.width=10, fig.height=10, echo=FALSE, eval=FALSE}
+pairs(as.matrix(ag_mcmc0), gap = 0, pch = ".")
+```
+
+**fixme**: output the PNG file as a target so we don't have to re-render when building this document?
+
+```{r bayes_pairs2, fig.width=10, fig.height=10, cache=TRUE}
+bp2 <- ggpairs(as.data.frame(lump.mcmc.list(ag_mcmc0)), progress=FALSE,
+        lower=list(continuous=function(...) my_mcmc(..., show_prior=FALSE)),
+        upper=list(continuous=function(...) my_mcmc(..., geom="density", show_prior=FALSE))) +
+  zmargin
+bp2_time <- system.time(print(bp2))
+```
+
+Contour levels are: 50%, 80% 90%, 95% (largest) highest posterior density regions.
+
+
+## treeblock
+
+
+```{r traceplot_tb, fig.width=8, fig.height=8}
+tar_load(traceplot_ag_mcmc_tb)
+print(traceplot_ag_mcmc_tb)
+```
+
+```{r improved_rhat_tb}
+tar_load(ag_mcmc_tb)
+aa <- do.call(abind, c(ag_mcmc_tb, list(along=3)))
+aa2 <- aperm(aa,c(1,3,2), resize=TRUE)
+monitor(aa2)
+```
+
+```{r bayes_pairs_tb, fig.width=10, fig.height=10, cache=TRUE}
+bp3 <- ggpairs(as.data.frame(lump.mcmc.list(ag_mcmc_tb)), progress=FALSE,
+        lower=list(continuous=function(...) my_mcmc(..., show_prior=FALSE)),
+        upper=list(continuous=function(...) my_mcmc(..., geom="density", show_prior=FALSE))) +
+  zmargin
+bp3_time <- system.time(print(bp3))
+```

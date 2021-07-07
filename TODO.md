@@ -18,7 +18,7 @@
    - probably phylo scaling
 
 - reorder params before Bayes pairs plots?
-
+- make bayes diagnostics (trace plots, pairs plots, monitornew) in a separate doc?
 - think about weighting by state occupancy rather than equal weights when computing contrasts???
 - visualize tip state distribution for non-treeblock/treeblock
 - consider run/comparison for spawning vs repro system?
@@ -27,7 +27,7 @@
 	- dilution by non-focal parameters?
 - general sanity check of parameters
 - sanity check of treeblock runs
-- compute improved R-hat
+- compute improved R-hat (DONE)
 
 ## LE for 2021-06-30
 

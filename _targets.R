@@ -41,7 +41,7 @@ list(
         get_ag_data(full_ag_data, phylo = fishtree_phylo)
     ),
     tar_target(
-        ag_compdata_treeblock,
+        ag_compdata_tb,
         get_ag_data(full_ag_data, phylo = treeblock[[1]])
     ),
     tar_target(
@@ -87,12 +87,12 @@ list(
         }),
     tar_target(
         ## FIXME: DRY
-        ag_model_treeblock, {
+        ag_model_tb, {
             augment_model(
                 ## FIXME: quietly?
                 ## (drop node labels for one part)
-                corHMM(phy = ag_compdata_treeblock$phy,
-                       data = ag_compdata_treeblock$data,
+                corHMM(phy = ag_compdata_tb$phy,
+                       data = ag_compdata_tb$data,
                        rate.cat = 1,
                        rate.mat = ag_statemat1,
                        root.p = root.p,
@@ -131,19 +131,32 @@ list(
           cmat
         }
     ),
-    tar_target(
-        ag_contr_long,
-        ((ag_mcmc1 %*% contrast_mat)
+    tar_map(
+        values = tibble(mcmc = rlang::syms(c("ag_mcmc0", "ag_mcmc_tb"))),
+        tar_target(contr_long,
+        ((as.mcmc(mcmc) %*% contrast_mat)
           %>% as_tibble()
           %>% pivot_longer(everything(), names_to = "contrast")
           %>% separate(contrast, into=c("contrast", "rate"))
-        )
+        ))
     ),
     tar_target(
         states_df, {
           sm <- with(ag_model0,
                      makeSimmap(phy, data, solution, rate.cat, nSim = 100, nCores = 5))
           purrr::map_dfr(sm, ~ get_state_occ_prop(.[["maps"]])) %>% setNames(state_names(ag_compdata$data[,-1]))
+        }),
+    tar_target(
+        all_ci, {
+          t_list <- list(
+              wald = tidy(ag_model0, conf.int = TRUE),
+              ## profile = tidy(ag_model0, conf.int = TRUE,
+              ## conf.method = "profile", profile = ag_profile0),
+              mcmc = tidy(ag_mcmc0, robust = TRUE, conf.int = TRUE)
+          )
+          (bind_rows(t_list, .id = "method")
+            %>% rename(lwr = "conf.low", upr = "conf.high")
+          )
         }),
     tar_target(ag_mcmc0,
                corhmm_mcmc(ag_model0,
@@ -161,12 +174,12 @@ list(
                            n_thin = 20,
                            seed = 101)
                ),
-    tar_target(ag_mcmc_treeblock,
-               corhmm_mcmc(ag_model_treeblock,
-                           p_args=list(nllfun = make_nllfun(ag_model_treeblock, treeblock = treeblock),
+    tar_target(ag_mcmc_tb,
+               corhmm_mcmc(ag_model_tb,
+                           p_args=list(nllfun = make_nllfun(ag_model_tb, treeblock = treeblock),
                                        ## sum(edge length) scaled to 1
                                        lb = log(1),
-                                       ub = log(10 * ape::Ntip(ag_compdata_treeblock$phy)),
+                                       ub = log(10 * ape::Ntip(ag_compdata_tb$phy)),
                                        gainloss_pairs = gainloss_priors$pairs,
                                        lb_gainloss = gainloss_priors$lb,
                                        ub_gainloss = gainloss_priors$ub),
@@ -178,7 +191,7 @@ list(
                            seed = 101)
                ),
     tar_map(
-         values = tibble(mcmc = rlang::syms(c("ag_mcmc0", "ag_mcmc_treeblock"))),
+        values = tibble(mcmc = rlang::syms(c("ag_mcmc0", "ag_mcmc_tb"))),
         tar_target(traceplot, lattice::xyplot(mcmc, aspect="fill", layout=c(2,6)))
     ),
     tar_target(ag_mcmc1,
@@ -194,6 +207,9 @@ list(
     ## use tarchetypes::tar_render() ?
     tar_render(ag_rmd,
                "ag_model.rmd"
+               ),
+    tar_render(ag_bayes_rmd,
+               "ag_bayesdiag.rmd"
                )
-)
 
+)

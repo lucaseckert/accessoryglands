@@ -51,12 +51,15 @@ ag_mcmc0 <- corhmm_mcmc(ag_model0,
               seed = 101)
 ```
 
-```{r visnetwork}
+**fixme**: get rid of tidyverse msgs?
+```{r visnetwork, message=FALSE}
 tar_visnetwork(targets_only = TRUE)
 ```
 
 ## some attempts at data viz
 
+Numbers of tips in each category (`pc` = male parental care; `sc` = sperm competition (i.e. group spawning); `ag` = accessory glands), depending on whether we use the partial (but fully genetically resolved) tree (`fishphylo`) or the imputed trees (`treeblock`).
+	
 ```{r mosaic, eval=FALSE, echo=FALSE}
 ## cool but useless
 (ag_compdata$data
@@ -71,18 +74,24 @@ tar_visnetwork(targets_only = TRUE)
 )
 ```
 
-Less useless: 
-
 ```{r barchart}
 tar_load(ag_compdata)
-print(ag_compdata$data
-      %>% mutate(across(c(pc, sc), factor, levels = c(0:1, "?")))
-      %>% mutate(across(ag, factor, levels = 1:0)) ## reverse order to get ag=1 on top of bars
-      %>% 
-      ggplot(aes(x=pc, fill = ag)) + geom_bar()
-      + facet_wrap(~sc, labeller = label_both)
-      + scale_fill_discrete_qualitative()
-      )
+tar_load(ag_compdata_tb)
+barplot_trans <- (. 
+  %>% mutate(across(c(pc, sc), factor, levels = c(0:1, "?")))
+  %>% mutate(across(ag, factor, levels = 1:0)) ## reverse order to get ag=1 on top of bars
+)
+bar_data <- purrr::map_dfr(list(fishphylo = ag_compdata$data,
+                    treeblock = ag_compdata_tb$data),
+               barplot_trans,
+               .id = "phylo")
+gg1 <- (ggplot(bar_data, aes(x=pc, fill = ag))
+  + geom_bar()
+  + facet_grid(phylo~sc, labeller = label_both)
+  + scale_fill_discrete_qualitative()
+  + zmargin
+)
+print(gg1)
 ```                         
 
 ##  priors
@@ -95,60 +104,14 @@ print(ag_compdata$data
 
 Use each of these as the basis for a +/- 3 sigma range (on the log scale)
 
-**fixme**: make this a target too.
-
 ```{r cifun}
 tar_load(ag_model0)
 tar_load(ag_mcmc0)
-t_list <- list(
-    wald = tidy(ag_model0, conf.int = TRUE),
-    ## profile = tidy(ag_model0, conf.int = TRUE,
-    ## conf.method = "profile", profile = ag_profile0),
-    mcmc = tidy(ag_mcmc0, robust = TRUE, conf.int = TRUE)
-) 
-all_ci <- (bind_rows(t_list, .id = "method")
-  %>% rename(lwr = "conf.low", upr = "conf.high")
-)
+tar_load(all_ci)
 ```
 
 ## Bayesian
 
-
-```{r bayes_traceplot, fig.width=8, fig.height=8}
-tar_load(traceplot_ag_mcmc0)
-print(traceplot_ag_mcmc0)
-```
-
-```{r bayes_sum, eval=FALSE, echo=FALSE}
-## the old way
-sort(effectiveSize(ag_mcmc0))
-coda::gelman.diag(ag_mcmc0)
-```
-
-```{r improved_rhat}
-aa <- do.call(abind, c(ag_mcmc0, list(along=3)))
-aa2 <- aperm(aa,c(1,3,2), resize=TRUE)
-source("R/monitornew.R")
-monitor(aa2)
-```
-
-These diagnostics are OK but not great (ideally we would effective sample size up to 1000 and Gelman-Rubin ($\hat R$) statistic as low as 1.01 --- although older studies have used a higher cutoff). Probably fixable by "just" running the chain longer.
-
-```{r bayes_pairs, fig.width=10, fig.height=10, echo=FALSE, eval=FALSE}
-pairs(as.matrix(ag_mcmc0), gap = 0, pch = ".")
-```
-
-Not sure about the best way(s) to represent density: contour lines, filled contours ... change scale? Show highest posterior density contours? (This is slow to render)
-
-```{r bayes_pairs2, fig.width=10, fig.height=10, cache=TRUE}
-bp2 <- ggpairs(as.data.frame(lump.mcmc.list(ag_mcmc0)), progress=FALSE,
-        lower=list(continuous=function(...) my_mcmc(..., show_prior=FALSE)),
-        upper=list(continuous=function(...) my_mcmc(..., geom="density", show_prior=FALSE))) +
-  zmargin
-bp2_time <- system.time(print(bp2))
-```
-
-Contour levels are: 50%, 80% 90%, 95% (largest) highest posterior density regions.
 
 ### naming parameters
 
@@ -156,7 +119,7 @@ Contour levels are: 50%, 80% 90%, 95% (largest) highest posterior density region
 image(ag_model0)
 ```
 
-```{r parnames_manual}
+```{r parnames_manual, echo=FALSE, eval=FALSE}
 m1L <- as.mcmc(ag_mcmc0)
 m1L[,1] -> loss.sc
 m1L[,2] -> loss.pc
@@ -172,17 +135,22 @@ m1L[,11] -> gain.ag_pc1_sc0
 m1L[,12] -> gain.ag_pc1_sc1
 ```
 
-Compare auto-names:
+Auto-names:
 
 ```{r parnames}
 par_names(ag_model0)
 ```
 
-### intermediate values
+## Contrasts matrix
 
-**FIXME**:  compare results here with contrast matrix results
+This connects the parameters we estimate (e.g. `loss.ag_pc0_sc0`, loss rate of accessory glands when parental care and sperm competition are both absent) to the values we are interested in (e.g. `pc_loss`, effect of parental care on loss rate of accessory glands).
 
-```{r manual_contrasts}
+**fixme**: 
+
+- reorder matrix for visualization?
+- include weights by (imputed) state occupancy?
+
+```{r manual_contrasts, echo=FALSE, eval=FALSE}
 #effect of pc on gaining ag
 pc.gain.sc0 <- gain.ag_pc1_sc0 - gain.ag_pc0_sc0
 pc.gain.sc1 <- gain.ag_pc1_sc1 - gain.ag_pc0_sc1
@@ -220,9 +188,7 @@ print(ggplot(df, aes(x=var, y=var1))
       )
 ```
 
-interactions?
-
-```{r int_hists}
+```{r int_hists, echo=FALSE, eval=FALSE}
 int<-((gain.ag_pc1_sc1-loss.ag_pc1_sc1)-(gain.ag_pc0_sc1-loss.ag_pc0_sc1))-((gain.ag_pc1_sc0-loss.ag_pc1_sc0)-(gain.ag_pc0_sc0-loss.ag_pc0_sc0))
 hist(int, breaks = 100)
 ```
@@ -232,18 +198,22 @@ tar_load(contrast_mat)
 image_plot(contrast_mat, xlab = "Contrast", ylab = "Rate parameter")
 ```
 
-```{r states}
+Distribution of states in the tree (computed from stochastic character mapping, histograms represent 100 simulations):
+
+```{r states, warning=FALSE}
 tar_load(states_df)
 pivot_longer(states_df, everything(), names_to = "state") %>%
-  ggplot(aes(x=value)) + geom_histogram(bins=25) + facet_wrap(~state)
+  ggplot(aes(x=value)) + geom_histogram(bins=25) + facet_wrap(~state) + zmargin
 ## sum columns then divide by total to get sum == 1
 avg_states <- apply(states_df, 2, sum, na.rm = TRUE) / sum(states_df, na.rm = TRUE)
 ```
 
-Need to figure out weights e.g. if we want the intercept for `loss.ag` it should be 
-```{r eval=FALSE
-intercept_loss == sum(occ.ag0_pc{i}_sc{j} * loss.ag_pc{i}_sc{j})
-pc_loss = (sum(occ.ag0_pc1_sc{i} * loss.ag_pc1_sc{i}) - sum(occ.ag0_pc0_sc{i} * loss.ag_pc0_sc{i}))/sum(occ.ag0_pc{i}_sc{j})
+Need to figure out weights e.g. if we want the intercept for `loss.ag` it should be  something like:
+
+```{r wts, eval=FALSE}
+intercept_loss <- sum(occ.ag0_pc{i}_sc{j} * loss.ag_pc{i}_sc{j})
+pc_loss <- (sum(occ.ag0_pc1_sc{i} * loss.ag_pc1_sc{i}) - sum(occ.ag0_pc0_sc{i} * loss.ag_pc0_sc{i})) /
+  sum(occ.ag0_pc{i}_sc{j})
 ```
 
 etc. ...
@@ -261,16 +231,39 @@ t(solve(m))
 ```
 
 ```{r plot_contrasts, fig.height=4, fig.width=10}
-tar_load(ag_contr_long)
-ag_contr_gainloss <- ag_contr_long %>% filter(rate != "netgain")
-ag_contr_gainloss %>% group_by(contrast, rate) %>% summarise(value=mean(value))
-ggplot(ag_contr_gainloss, aes(x = exp(value), y = rate)) +
+tar_load(contr_long_ag_mcmc0)
+tar_load(contr_long_ag_mcmc_tb)
+ag_contr_gainloss <- purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
+                                         treeblock=contr_long_ag_mcmc_tb),
+                                    filter, rate != "netgain",
+                                    .id = "phylo")
+
+## ag_contr_gainloss %>% group_by(contrast, rate) %>% summarise(value=mean(value), .groups = "drop")
+gg_sum <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = rate)) +
   facet_wrap(~ contrast) +
-  geom_violin(fill = "gray") +
-  stat_summary(fun.data = "median_hilow", geom = "pointrange", colour="darkred") +
+  geom_violin(aes(fill = phylo), alpha=0.6) +
+  stat_summary(fun.data = "median_hilow", geom = "pointrange", aes(group=phylo),
+               ## width by trial and error; not sure what determines this?
+               position = position_dodge(width=0.875),
+               colour = "gray30") +
   geom_vline(xintercept = 1, lty = 2) +
-  scale_x_log10()
+  scale_x_log10() +
+  zmargin +
+  scale_fill_discrete_qualitative() +
+  scale_colour_discrete_qualitative() +
+  labs(x="expected transitions/proportional difference in rates")
+print(gg_sum)
 ```
+
+```{r, echo = FALSE, eval = FALSE}
+## double-checking bar width for sc gain/treeblock: visual discrepancy (Hmisc::smedian.hilow) with table below (quantiles)?
+ggb <- ggplot_build(gg_sum)
+ggb$data[[2]] %>% dplyr::select(group, PANEL, x, y, xmin, xmax) %>% mutate(across(where(is.numeric), ~ . * log(10)))
+filter(ag_contr_gainloss, contrast == "sc", rate == "gain", phylo == "treeblock") %>%
+  pull(value) %>% Hmisc::smedian.hilow()
+```
+
+Note: values below are still on log scale ...
 
 ```{r sum_tab, results="asis"}
 bayes_pval <- function(x, ref=0) {
@@ -278,13 +271,18 @@ bayes_pval <- function(x, ref=0) {
   2 * min(x, 1-x)
 }
 (ag_contr_gainloss
-  %>% group_by(contrast,rate)
+  %>% group_by(phylo,contrast,rate)
   %>% summarise(median = median(value), lwr = quantile(value, 0.025), upr = quantile(value, 0.975), p = bayes_pval(value), .groups = "drop")
   %>% knitr::kable(digits = 3)
 )
 ```
 
-Graphing all CIs: bounds are set to the lower/upper bounds used for corHMM fit.
+**Conclusion**: treeblock and fishphylo results are nearly identical, treeblock results are *slightly* clearer.
+
+Graphing all CIs: bounds are set to the lower/upper bounds used for corHMM fit. Vertical lines show the mean and ± 2 SD of the priors.
+
+**fixme**: reverse legend order? figure out why `loss.sc` decreases under Bayes?
+
 
 ```{r ci_plot}
 ## order of parameters
@@ -294,7 +292,8 @@ levs <- c(outer(FUN = paste, sep = ".",
         paste0("ag_", c(outer(paste0("pc", 0:1), paste0("sc", 0:1), paste, sep = "_"))))
       ))
 corhmm_bounds <- log(c(lwr=0.1, upper = 100*ape::Ntip(ag_compdata$phy)))
-100 * ape::Ntip(ag_compdata$phy)
+corhmm_prior <- log(c(lwr=1, upper = 10*ape::Ntip(ag_compdata$phy)))
+corhmm_mid <- mean(corhmm_bounds)
 all_ci <- all_ci %>% replace_na(list(upr = Inf, lwr = -Inf)) %>%
   mutate(across(term, factor, levels = levs))
 ## extend NA confidence interval to limit of graph
@@ -306,10 +305,12 @@ ggplot(
   scale_colour_discrete_qualitative() +
   scale_y_log10(limits = exp(corhmm_bounds), oob = scales::squish) +
   coord_flip() +
-  labs(y="rate", x = "")
+  labs(y="rate", x = "") +
+  geom_hline(yintercept =exp(corhmm_mid), lty=2) +
+  geom_hline(yintercept = exp(corhmm_prior), lty=2, col="gray")
 ```
 
-```{r}
+```{r mcmc_only, eval=FALSE}
 ## mcmc only
 ggplot(
   all_ci %>% filter(method=="mcmc"),
@@ -324,23 +325,5 @@ mcmc_long <- (ag_mcmc0
   %>% as_tibble()
   %>% pivot_longer(everything(), names_to = "term")
 )  
-##  %>% mutate(across(term, factor, levels = levs))
-##)
-
-print(gg_mcpars <- ggplot(mcmc_long, aes(x = exp(value), y = term)) +
-        geom_violin(fill = "gray") +
-        scale_x_log10() +
-        stat_summary(fun.data = "median_hilow", geom = "pointrange", colour="darkred") +
-        labs(x = "evolutionary rate", y = "")
-      )
-## something is messed up with 
-cidat <- all_ci %>% filter(method=="mcmc") %>% dplyr::select(term, estimate, lwr, upr) %>%
-  mutate(across(where(is.numeric), exp))
-gg_mcpars + geom_pointrange(data=cidat, aes(y=term, x= estimate, xmin=lwr, xmax=upr), colour="blue")
-
-ggplot(mcmc_long, aes(x = value, y = term)) +
-        geom_violin(fill = "gray") +
-        stat_summary(fun.data = "median_hilow", geom = "pointrange", colour="darkred")
-
 ```
 
