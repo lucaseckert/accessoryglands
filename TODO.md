@@ -14,20 +14,19 @@
 
 ## BMB for 07-07-30
 
-- SANITY CHECK. Lots of weird plots, what did I mess up?
-   - probably phylo scaling
-
+- weight contrasts by state occupancy
+- likelihood (point) comparison, 4 way (independent, pc-only, sc-only, full {pc+sc})
+- move tech/devel stuff out of `ag_model.rmd`, more text/explanation
 - reorder params before Bayes pairs plots?
-- make bayes diagnostics (trace plots, pairs plots, monitornew) in a separate doc?
-- think about weighting by state occupancy rather than equal weights when computing contrasts???
-- visualize tip state distribution for non-treeblock/treeblock
+
 - consider run/comparison for spawning vs repro system?
 - why is evidence apparently stronger in 2-trait model?
     - joint test on 2 parameters (gain diff, loss diff) ?
 	- dilution by non-focal parameters?
-- general sanity check of parameters
-- sanity check of treeblock runs
+- general sanity check of parameters (DONE)
+- sanity check of treeblock runs (DONE)
 - compute improved R-hat (DONE)
+- visualize tip state distribution for non-treeblock/treeblock (DONE)
 
 ## LE for 2021-06-30
 

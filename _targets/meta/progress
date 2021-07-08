@@ -1,3 +1,6 @@
 name|type|parent|branches|progress
-ag_rmd|stem|ag_rmd|0|started
-ag_rmd|stem|ag_rmd|0|built
+gainloss_priors|stem|gainloss_priors|0|started
+gainloss_priors|stem|gainloss_priors|0|built
+ag_mcmc_tb|stem|ag_mcmc_tb|0|started
+ag_mcmc_tb|stem|ag_mcmc_tb|0|built
+ag_mcmc0|stem|ag_mcmc0|0|started

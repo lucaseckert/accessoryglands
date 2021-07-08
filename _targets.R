@@ -116,7 +116,7 @@ list(
         list(pairs = list(c(4,1), c(6,2), c(9,3), c(10,5), c(11, 7), c(12, 8)),
              ##        sc     pc      ag ....
              ub = log(c(10,    5 ,  rep(10, 4))),
-             lb = log(c(5,    0.1,  rep(1e-3, 4))))
+             lb = log(c(0.2,    0.1,  rep(1e-3, 4))))
     ),
     tar_target(
         contrast_mat, {
