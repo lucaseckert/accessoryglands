@@ -66,6 +66,6 @@ ag_model_indep|stem|4205da47a9fcc6db|4c935b7aa35e9252|908a1640dcb6d430|-10344743
 ag_model_sc|stem|90911bfa0ca10674|c5b52ea2147eb725|e2ed59faa323afba|-1601407025||t18816.8019560985s|aee8945f01d9ff28|83099|rds|vector|||35.683||
 states_df|stem|b20d9c50ac9a31a0|04a6abbd8ad29ec2|33de3707b4b4af57|-11073825||t18816.8435295778s|e5551e70abb62e79|6240|rds|vector|||7.803||
 comp_ci|stem|e1c892f483eb7ca9|773903548c218029|1a65c79e08588eac|-1338865570||t18816.8439002654s|4e9f33b51e2b3d7d|1210|rds|vector|||25.094||
-all_ci|stem|e1c892f483eb7ca9|5164503d0fe0625e|99edf23d5d0f48b3|-903984374||t18816.8441949361s|4e9f33b51e2b3d7d|1210|rds|vector|||25.451||
+all_ci|stem|39107378e4c2f3c8|533c5ee3ba1c5e19|8d21f2963ca6f3c6|-903984374||t18817.0567186487s|6830b6b804b0a566|1620|rds|vector|||27.027||
 contrast_mat|stem|dc75a45f7bbaafe0|4ff4777e3e91564d|a39eb79dedabbb2a|-1647510704||t18816.8444571075s|c17e80c208491e7f|363|rds|vector|||0.029||
-ag_rmd|stem|b18fd607736803e5|7d7ab483924fc9c4|99d713f5b71ed3ba|-742077490|ag_model.html*ag_model.rmd*ag_model_files|t18817.0534051752s|fb75d1c6a5252feb|5730709|file|vector|||11.81|Removed 9 rows containing nonfinite values stat_bin.|
+ag_rmd|stem|401205ecabdc18cf|7d7ab483924fc9c4|bb0bb0a8923198f5|-742077490|ag_model.html*ag_model.rmd*ag_model_files|t18817.0752056892s|6951a6248b7e001e|6636284|file|vector|||12.657|Removed 9 rows containing nonfinite values stat_bin.|

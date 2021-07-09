@@ -14,7 +14,7 @@
 
 ## BMB for 07-07-30
 
-- weight contrasts by state occupancy
+- weight contrasts by state occupancy (????)
 - likelihood (point) comparison, 4 way (independent, pc-only, sc-only, full {pc+sc})
 - move tech/devel stuff out of `ag_model.rmd`, more text/explanation
 - reorder params before Bayes pairs plots?

@@ -88,6 +88,17 @@ p3 <- (gheatmap(p2, dd[,"sc", drop=FALSE], width=0.1, offset=0.002)
 print(p3)
 ```
 
+## Likelihood comparison
+
+```{r likcomp, results="asis"}
+tar_load(starts_with("ag_model"))
+knitr::kable(as.data.frame(bbmle::AICtab(ag_model_indep, ag_model_pc, ag_model_sc, ag_model_pcsc,
+                                         logLik = TRUE)),
+             digits=1)
+```
+
+Show all likelihood ratio test comparisons?
+
 ##  Priors
 
 According to @pagel_bayesian_2006, the prior distributions on the rate parameters are determined as follows:
@@ -120,7 +131,7 @@ r_scaled <- r*(0.1*n_edge)
 
 We tried to choose priors more mindfully. We started by scaling the branch lengths to set the *sum* of all the branch lengths (i.e. the total evolutionary time experienced by all lineages to 1). Event rates of discrete transitions are measured on the *hazard* scale (probability density of an event per unit time); a rate of $r$ corresponds to a mean of $r$ transitions per unit time. We therefore set the lower limit of our prior to 0.1, meaning an expectation of only a single transition over the entire tree. For a tree with $N$ species, we set the upper limit of the prior to $100 N$, i.e. an expectation of 100 transitions *per species*. These are obviously extreme values; we used a log-Normal prior with the (geometric) mean set halfway between these values (an expectation of `r round(exp(mean(b)))` events of the course of the tree, or `r round(exp(mean(b))/ntip)` events per species in our phylogeny of `r ntip` species), and the standard deviation set so that the range between the lower and upper limits is 6 SD. This range corresponds to a 0.26% prior probability that the rates are beyond the limits.
 
-(Talk about uniform prior issues? [@yang_bayesian_2006; carpenter_computational_2017; thorson_uniform_2017])
+(Talk about uniform prior issues? [@yang_bayesian_2006; @carpenter_computational_2017; @thorson_uniform_2017])
 
 ```{r prior_plot, warning=FALSE}
 ## plot(density(r))
@@ -263,8 +274,7 @@ filter(ag_contr_gainloss, contrast == "sc", rate == "gain", phylo == "treeblock"
   pull(value) %>% Hmisc::smedian.hilow()
 ```
 
-Note: values below are still on log scale ...
-
+Only showing treeblock (preferred) results ...
 ```{r sum_tab, results="asis"}
 bayes_pval <- function(x, ref=0) {
   x <- mean(x<ref)
@@ -273,6 +283,10 @@ bayes_pval <- function(x, ref=0) {
 (ag_contr_gainloss
   %>% group_by(phylo,contrast,rate)
   %>% summarise(median = median(value), lwr = quantile(value, 0.025), upr = quantile(value, 0.975), p = bayes_pval(value), .groups = "drop")
+  %>% filter(phylo == "treeblock")
+  %>% dplyr::select(-phylo)
+  %>% mutate(across(c(median, lwr, upr), exp))
+  %>% mutate(across(p, ~ ifelse(contrast=="intercept", NA, .)))
   %>% knitr::kable(digits = 3)
 )
 ```
@@ -281,7 +295,9 @@ bayes_pval <- function(x, ref=0) {
 
 Graphing all CIs: bounds are set to the lower/upper bounds used for corHMM fit. Vertical lines show the mean and ± 2 SD of the priors.
 
-**fixme**: reverse legend order? figure out why `loss.sc` decreases under Bayes?
+**fixme**: reverse legend order?
+
+**fixme**: understand why average rates are so high, loss rates > gain rates?  Does this have something to do with not weighting? (i.e. loss can only operate when AG is present, which is rare)?
 
 
 ```{r ci_plot}
@@ -299,7 +315,7 @@ all_ci <- all_ci %>% replace_na(list(upr = Inf, lwr = -Inf)) %>%
 ## extend NA confidence interval to limit of graph
 ggplot(
   all_ci,
-  aes(term, exp(estimate), ymin = exp(lwr), ymax = exp(upr), colour = method)
+  aes(term, exp(estimate), ymin = exp(lwr), ymax = exp(upr), colour = method, shape = method)
 ) +
   geom_pointrange(position = position_dodge(width = 0.5)) +
   scale_colour_discrete_qualitative() +
@@ -310,21 +326,14 @@ ggplot(
   geom_hline(yintercept = exp(corhmm_prior), lty=2, col="gray")
 ```
 
-```{r mcmc_only, eval=FALSE}
-## mcmc only
-ggplot(
-  all_ci %>% filter(method=="mcmc"),
-  aes(y=term, x=exp(estimate), xmin = exp(lwr), xmax = exp(upr))) +
-  geom_pointrange() +
-  scale_x_log10()
-```
+Not sure if we can do something pretty with character mappings ... ? reduce to trait-by-trait maps?
 
-```{r bayes_violin}
-mcmc_long <- (ag_mcmc0
-  %>% as.mcmc()
-  %>% as_tibble()
-  %>% pivot_longer(everything(), names_to = "term")
-)  
+```{r}
+set.seed(1)
+sm0 <- with(ag_model_pcsc,
+            makeSimmap(phy, data, solution, rate.cat, nSim = 1))
+sm0[[1]]$tip.label[] <- ""
+phytools::plotSimmap(sm0[[1]], type="fan")
 ```
 
 ## References

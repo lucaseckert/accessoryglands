@@ -223,7 +223,8 @@ list(
               wald = tidy(ag_model_pcsc, conf.int = TRUE),
               ## profile = tidy(ag_model_pcsc, conf.int = TRUE,
               ## conf.method = "profile", profile = ag_profile0),
-              mcmc = tidy(ag_mcmc0, robust = TRUE, conf.int = TRUE)
+              mcmc = tidy(ag_mcmc0, robust = TRUE, conf.int = TRUE),
+              mcmc_treeblock = tidy(ag_mcmc_tb, robust = TRUE, conf.int = TRUE)
           )
           (bind_rows(t_list, .id = "method")
             %>% rename(lwr = "conf.low", upr = "conf.high")
