@@ -7,27 +7,37 @@ source("R/mcmc.R")
 options(tidyverse.quiet = TRUE)
 tar_option_set(packages = pkgList)
 ## TO DEBUG: set tar_option_set(debug = "target_name"); tar_make(callr_function = NULL)
+tar_option_set(debug = "ag_pcsc_pars")
 ## tar_option_set(debug = "ag_compdata")
 list(
+
+    ## trait data file
     tar_target(
-        ## trait data
         ag_binary_trait_file,
         "data/binaryTraitData.csv",
         format = "file"
     ),
+
+    ## imputed phylogenies file
     tar_target(
         treeblock_file,
         "data/treeBlock.rds",
         format = "file"
     ),
+
+    ## read trait data
     tar_target(
         full_ag_data,
         read_csv(ag_binary_trait_file, col_types = cols())
     ),
+
+    ## read imputed phylogenies
     tar_target(
         treeblock,
         readRDS("data/treeBlock.rds") %>% purrr::map(scale_phylo)
     ),
+
+    ## read full (genetic-data-only) phylogenies
     tar_target(
         fishtree_phylo,
         (suppressWarnings(
@@ -35,58 +45,118 @@ list(
           %>% scale_phylo()
         )
     ),
+
+    ## FIXME: target_map() these two
+    ## read trait file, combine with fishtree phylo / trim
     tar_target(
-        ## read trait file, grab phylo data from fishtree, combine/trim
         ag_compdata,
         get_ag_data(full_ag_data, phylo = fishtree_phylo)
     ),
+
+    ## read trait file, combine with *first* tree block phylo
     tar_target(
         ag_compdata_tb,
         get_ag_data(full_ag_data, phylo = treeblock[[1]])
     ),
+
+    ## set constraints on rate equality
+    ## these are derived by staring at the results of corHMM::getStateMat4Dat(ag_compdata$data)
+    ## along with state names and figuring out which transitions to constrain
+    ## least-constrained model
     tar_target(
-        ## state matrix for AG problem (12 compartments)
-        ag_statemat1, {
-          ## debugging
-          ## data <- ag_compdata$data
-          ## with(data, table(ag, care, spawning))
-          with(ag_compdata, {
-              ag_smdat <- corHMM::getStateMat4Dat(data)
-              ## FIXME: name/number match here?
-              pars2equal <- list(c(7, 10, 20, 23), c(4, 11, 17, 24), c(2, 5, 15, 18), c(1, 8, 14, 21))
-              equateStateMatPars(ag_smdat$rate.mat, pars2equal)
-          }
+        pcsc_pars,
+        list(c(7, 10, 20, 23),  ## all pc_gain rates
+             c(4, 11, 17, 24),  ## all sc_gain rates
+             c(2, 5, 15, 18),   ## all pc_loss rates
+             c(1, 8, 14, 21))   ## all sc_loss rates
+    ),
+    ## add constraints: ag gain/loss depends only on pc
+    tar_target(
+        pc_pars,
+        c(pcsc_pars,
+          list(c(13, 16), ## ag_gain with pc==0 (sc==0 or 1)
+               c(19, 22), ## ag_gain with pc==1 (sc==0 or 1)
+               c(3,   6), ## ag_loss with pc==0
+               c(9,  12)) ## ag_gain with pc==1
           )
-        }),
+    ),
+    ## add constraints: ag gain/loss depends only on sc
     tar_target(
-        root.p,
-        {
+        sc_pars,
+        c(pcsc_pars,
+          list(c(13, 19), ## ag_gain with sc==0
+               c(16, 22), ## ag_gain with sc==1
+               c(3,   9), ## ag_loss with sc==0
+               c(6,  12)) ## ag_gain with sc==1
+          )
+    ),
+
+    ## add constraints: ag gain/loss is independent of sc, pc
+    tar_target(
+        indep_pars,
+        c(pcsc_pars,
+          list(c(13, 16, 19, 22), ## ag_gain
+               c(3, 6,  9, 12) ## ag_loss
+               )
+          )
+    ),
+
+    ## construct state matrices/indices for all models
+    tar_map(
+        values = tibble(
+            nm = c("pcsc", "pc", "sc", "indep"),
+            eqstatepars =
+              rlang::syms(c("pcsc_pars",
+                            "pc_pars",
+                            "sc_pars",
+                            "indep_pars"))),
+        names = nm,
+        tar_target(ag_statemat, {
+          ag_smdat <- corHMM::getStateMat4Dat(ag_compdata$data)
+          equateStateMatPars(ag_smdat$rate.mat, eqstatepars)
+        })
+    ),
+
+    ## define root state
+    tar_target(
+        root.p, {
           r <- rep(0, 8)
           r[2] <- 1 ## ag0_care0_spawning1: no ag, no parental care, yes group spawning
           r
         }),
+
+    ## define bounds for corHMM fits
     tar_target(
         ag_corhmm_bounds,
         c(lower = 0.1,      ## 0.1 transitions per tree
           upper = 100 * ape::Ntip(ag_compdata$phy)) ## 100 transitions per species
     ),
-    tar_target(
-        ag_model0, {
+
+    ## fit corHMM models for all sets of constraints
+    tar_map(
+        values = tibble(
+            nm = c("pcsc","pc","sc","indep"),
+            statemat = rlang::syms(c("ag_statemat_pcsc",
+                                     "ag_statemat_pc",
+                                     "ag_statemat_sc",
+                                     "ag_statemat_indep"))),
+        names = nm,
+        tar_target(
+            ag_model,
             augment_model(
-                ## FIXME: quietly?
-                ## (drop node labels for one part)
                 corHMM(phy = ag_compdata$phy,
                        data = ag_compdata$data,
                        rate.cat = 1,
-                       rate.mat = ag_statemat1,
+                       rate.mat = statemat,
                        root.p = root.p,
                        lower = ag_corhmm_bounds[["lower"]],
                        upper = ag_corhmm_bounds[["upper"]]
                        )
-                )
-        }),
+                ))
+    ),
+
     tar_target(
-        ## FIXME: DRY
+        ## FIXME: DRY (via tar_map) and/or don't bother with 'fishphylo' fit?
         ag_model_tb, {
             augment_model(
                 ## FIXME: quietly?
@@ -94,17 +164,18 @@ list(
                 corHMM(phy = ag_compdata_tb$phy,
                        data = ag_compdata_tb$data,
                        rate.cat = 1,
-                       rate.mat = ag_statemat1,
+                       rate.mat = ag_statemat_pcsc,
                        root.p = root.p,
                        lower = 0.1,                             ## 0.1 transitions per tree
                        upper = 100 * ape::Ntip(ag_compdata$phy) ## 100 transitions per species
                        )
                 )
         }),
+
     tar_target(comp_ci,
                { list(
-                     wald = tidy(ag_model0, conf.int = TRUE),
-                     ## profile = tidy(ag_model0, conf.int = TRUE,
+                     wald = tidy(ag_model_pcsc, conf.int = TRUE),
+                     ## profile = tidy(ag_model_pcsc, conf.int = TRUE,
                      ## conf.method = "profile", profile = ag_profile0),
                      mcmc = tidy(ag_mcmc0, robust = TRUE, conf.int = TRUE)) %>%
                    bind_rows(.id = "method")  %>%
@@ -142,15 +213,15 @@ list(
     ),
     tar_target(
         states_df, {
-          sm <- with(ag_model0,
+          sm <- with(ag_model_pcsc,
                      makeSimmap(phy, data, solution, rate.cat, nSim = 100, nCores = 5))
           purrr::map_dfr(sm, ~ get_state_occ_prop(.[["maps"]])) %>% setNames(state_names(ag_compdata$data[,-1]))
         }),
     tar_target(
         all_ci, {
           t_list <- list(
-              wald = tidy(ag_model0, conf.int = TRUE),
-              ## profile = tidy(ag_model0, conf.int = TRUE,
+              wald = tidy(ag_model_pcsc, conf.int = TRUE),
+              ## profile = tidy(ag_model_pcsc, conf.int = TRUE,
               ## conf.method = "profile", profile = ag_profile0),
               mcmc = tidy(ag_mcmc0, robust = TRUE, conf.int = TRUE)
           )
@@ -159,8 +230,8 @@ list(
           )
         }),
     tar_target(ag_mcmc0,
-               corhmm_mcmc(ag_model0,
-                           p_args=list(nllfun = make_nllfun(ag_model0),
+               corhmm_mcmc(ag_model_pcsc,
+                           p_args=list(nllfun = make_nllfun(ag_model_pcsc),
                                        ## sum(edge length) scaled to 1
                                        lb = log(1),
                                        ub = log(10 * ape::Ntip(ag_compdata$phy)),
@@ -199,7 +270,7 @@ list(
                ),
     ## SKIP for now
     ## tar_target(ag_profile0,
-    ##            profile(ag_model0,
+    ##            profile(ag_model_pcsc,
     ##                    n_cores = 12,
     ##                    trace = TRUE,
     ##                    alpha=0.05) ## less extreme than default (alpha=0.01)

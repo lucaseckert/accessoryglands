@@ -2,7 +2,7 @@ pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "ggthemes", "fishtree", "caper", "broom.mixed",
              "emdbook", "ramcmc", "corHMM",
              "GGally", "colorspace", "ggmosaic", "targets", "tarchetypes",
-             "abind", "cowplot", "patchwork")
+             "abind", "cowplot", "patchwork", "ggtree", "ggnewscale")
 
 ## install uninstalled pkgs from pkgList
 ## check corHMM version, install from bb repo if necessary
@@ -117,15 +117,13 @@ mk_idf <- function(index.mat) {
   return(df)
 }
 
-
-
-image.corhmm <- function(x,
-                         aspect="iso",
-                         log = TRUE,
-                         include_nums = TRUE,
-                         pnum_col = "red",
-                         pnum_cex = 1.5,
-                         ...) {
+plot.corhmm <- function(x,
+                        aspect="iso",
+                        log = TRUE,
+                        include_nums = TRUE,
+                        pnum_col = "red",
+                        pnum_cex = 1.5,
+                        ...) {
   require("Matrix")
   require("latticeExtra")
   dd <- x$data[, -1] ## no species names

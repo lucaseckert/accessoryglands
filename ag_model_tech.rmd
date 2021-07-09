@@ -1,0 +1,183 @@
+---
+title: "accessory gland model: technical details"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+author: "Ben Bolker and Lucas Eckert"
+output:
+  html_document:
+    code_folding: hide
+---
+
+<!-- **fix me**: reimplement as [target markdown](https://books.ropensci.org/targets/markdown.html#markdown) ? -->
+
+```{r setup, message=FALSE}
+source("R/utils.R")
+source("R/mcmc.R")
+source("R/functions.R")
+load_pkgs()
+zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
+theme_set(theme_bw())
+library(targets)
+```
+
+**fixme**: get rid of tidyverse msgs?
+```{r visnetwork, message=FALSE}
+tar_visnetwork(targets_only = TRUE)
+```
+
+##  priors
+
+- all rates: from 1 (1 transition per tree) to 10*ntips (10 trans per species)
+- `pc`: gain/loss ratio from 0.1 to 5
+- `sc`: gain/loss ratio from 5 to 10
+- `ag`: gain/loss ratio from 0.001 to 10
+
+
+Use each of these as the basis for a +/- 3 sigma range (on the log scale)
+
+```{r cifun}
+tar_load(ag_model0)
+tar_load(ag_mcmc0)
+tar_load(all_ci)
+```
+
+## naming parameters
+
+```{r image, message=FALSE}
+image(ag_model0)
+```
+
+## Contrasts matrix
+
+This connects the parameters we estimate (e.g. `loss.ag_pc0_sc0`, loss rate of accessory glands when parental care and sperm competition are both absent) to the values we are interested in (e.g. `pc_loss`, effect of parental care on loss rate of accessory glands).
+
+**fixme**: 
+
+- reorder matrix for visualization?
+- include weights by (imputed) state occupancy?
+
+
+```{r plot_contrast_mat}
+tar_load(contrast_mat)
+image_plot(contrast_mat, xlab = "Contrast", ylab = "Rate parameter")
+```
+
+Distribution of states in the tree (computed from stochastic character mapping, histograms represent 100 simulations):
+
+```{r states, warning=FALSE}
+tar_load(states_df)
+pivot_longer(states_df, everything(), names_to = "state") %>%
+  ggplot(aes(x=value)) + geom_histogram(bins=25) + facet_wrap(~state) + zmargin
+## sum columns then divide by total to get sum == 1
+avg_states <- apply(states_df, 2, sum, na.rm = TRUE) / sum(states_df, na.rm = TRUE)
+```
+
+Need to figure out weights e.g. if we want the intercept for `loss.ag` it should be  something like:
+
+```{r wts, eval=FALSE}
+intercept_loss <- sum(occ.ag0_pc{i}_sc{j} * loss.ag_pc{i}_sc{j})
+pc_loss <- (sum(occ.ag0_pc1_sc{i} * loss.ag_pc1_sc{i}) - sum(occ.ag0_pc0_sc{i} * loss.ag_pc0_sc{i})) /
+  sum(occ.ag0_pc{i}_sc{j})
+```
+
+etc. ...
+
+**FIXME**: think more about net gain and how to characterize it.
+Certainly should *not* be exponentiated, so leave it out here ...
+
+```{r contr, eval=FALSE}
+## playing with contrasts definitions/scaling
+dd <- expand.grid(f1=letters[1:2], f2 = LETTERS[1:2])
+m <- model.matrix(~f1*f2, data=dd, contrasts = list(f1=contr.sum, f2=contr.sum))
+t(solve(m))
+## cols 2 and 3 have magnitude 1/4 but we want 1/2 (diff between treatments, not dev between
+## ttt and mean)
+```
+
+```{r plot_contrasts, fig.height=4, fig.width=10}
+tar_load(contr_long_ag_mcmc0)
+tar_load(contr_long_ag_mcmc_tb)
+ag_contr_gainloss <- purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
+                                         treeblock=contr_long_ag_mcmc_tb),
+                                    filter, rate != "netgain",
+                                    .id = "phylo")
+
+gg_sum <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = rate)) +
+  facet_wrap(~ contrast) +
+  geom_violin(aes(fill = phylo), alpha=0.6) +
+  stat_summary(fun.data = "median_hilow", geom = "pointrange", aes(group=phylo),
+               ## width by trial and error; not sure what determines this?
+               position = position_dodge(width=0.875),
+               colour = "gray30") +
+  geom_vline(xintercept = 1, lty = 2) +
+  scale_x_log10() +
+  zmargin +
+  scale_fill_discrete_qualitative() +
+  scale_colour_discrete_qualitative() +
+  labs(x="expected transitions/proportional difference in rates")
+print(gg_sum)
+```
+
+Note: values below are still on log scale ...
+
+```{r sum_tab, results="asis"}
+bayes_pval <- function(x, ref=0) {
+  x <- mean(x<ref)
+  2 * min(x, 1-x)
+}
+(ag_contr_gainloss
+  %>% group_by(phylo,contrast,rate)
+  %>% summarise(median = median(value), lwr = quantile(value, 0.025), upr = quantile(value, 0.975), p = bayes_pval(value), .groups = "drop")
+  %>% knitr::kable(digits = 3)
+)
+```
+
+**Conclusion**: treeblock and fishphylo results are nearly identical, treeblock results are *slightly* clearer.
+
+Graphing all CIs: bounds are set to the lower/upper bounds used for corHMM fit. Vertical lines show the mean and ± 2 SD of the priors.
+
+**fixme**: reverse legend order? figure out why `loss.sc` decreases under Bayes?
+
+
+```{r ci_plot}
+## order of parameters
+levs <- c(outer(FUN = paste, sep = ".",
+      c("loss", "gain"),
+      c("sc", "pc",
+        paste0("ag_", c(outer(paste0("pc", 0:1), paste0("sc", 0:1), paste, sep = "_"))))
+      ))
+corhmm_bounds <- log(c(lwr=0.1, upper = 100*ape::Ntip(ag_compdata$phy)))
+corhmm_prior <- log(c(lwr=1, upper = 10*ape::Ntip(ag_compdata$phy)))
+corhmm_mid <- mean(corhmm_bounds)
+all_ci <- all_ci %>% replace_na(list(upr = Inf, lwr = -Inf)) %>%
+  mutate(across(term, factor, levels = levs))
+## extend NA confidence interval to limit of graph
+ggplot(
+  all_ci,
+  aes(term, exp(estimate), ymin = exp(lwr), ymax = exp(upr), colour = method)
+) +
+  geom_pointrange(position = position_dodge(width = 0.5)) +
+  scale_colour_discrete_qualitative() +
+  scale_y_log10(limits = exp(corhmm_bounds), oob = scales::squish) +
+  coord_flip() +
+  labs(y="rate", x = "") +
+  geom_hline(yintercept =exp(corhmm_mid), lty=2) +
+  geom_hline(yintercept = exp(corhmm_prior), lty=2, col="gray")
+```
+
+```{r mcmc_only, eval=FALSE}
+## mcmc only
+ggplot(
+  all_ci %>% filter(method=="mcmc"),
+  aes(y=term, x=exp(estimate), xmin = exp(lwr), xmax = exp(upr))) +
+  geom_pointrange() +
+  scale_x_log10()
+```
+
+```{r bayes_violin}
+mcmc_long <- (ag_mcmc0
+  %>% as.mcmc()
+  %>% as_tibble()
+  %>% pivot_longer(everything(), names_to = "term")
+)  
+```
+

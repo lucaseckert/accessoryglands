@@ -1,13 +1,14 @@
 ---
-title: "accessory gland model"
+title: "evolution of accessory glands: interaction with parental care and mating system"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
 author: "Ben Bolker and Lucas Eckert"
 output:
   html_document:
     code_folding: hide
+bibliography: corHMM.bib	
 ---
 
-**fix me**: reimplement as [target markdown](https://books.ropensci.org/targets/markdown.html#markdown) ?
+<!-- **fix me**: reimplement as [target markdown](https://books.ropensci.org/targets/markdown.html#markdown) ? -->
 
 ```{r setup, message=FALSE}
 source("R/utils.R")
@@ -19,44 +20,9 @@ theme_set(theme_bw())
 library(targets)
 ```
 
-Approximate workflow:
+The goal is to understand the role of paternal care of offspring (male parental care) and sperm competition in driving the evolution of accessory glands. While male parental care is a fairly unambiguous binary trait, sperm competition is harder to classify.  Here we use spawning context (pair spawning vs. group spawning) as a proxy for sperm competition.
 
-```{r workflow, eval=FALSE}
-## load phylo and trait data, replace NAs with ?, combine
-get_ag_data("data/binaryTraitData.csv")
-## set up constrained state matrix
-ag_statemat1 <- with(ag_compdata, {
-  ag_smdat <- corHMM::getStateMat4Dat(data)
-  pars2equal <- list(c(7, 10, 20, 23),
-                     c(4, 11, 17, 24),
-                     c(2, 5, 15, 18),
-                     c(1, 8, 14, 21))
-  equateStateMatPars(ag_smdat$rate.mat, pars2equal)
-})
-## run basic model and add state/parameter names
-ag_model0 <- augment_model(
-    corHMM(phy = ag_compdata$phy,
-           data = ag_compdata$data,
-           rate.cat = 1,
-           rate.mat = ag_statemat1)
-)
-ag_mcmc0 <- corhmm_mcmc(ag_model0,
-              p_args = list(nllfun = make_nllfun(ag_model0)),
-              n_cores = 8,
-              n_chains = 8,
-              ## these are per chain
-              n_burnin = 4000,
-              n_iter = 44000,
-              n_thin = 10,
-              seed = 101)
-```
-
-**fixme**: get rid of tidyverse msgs?
-```{r visnetwork, message=FALSE}
-tar_visnetwork(targets_only = TRUE)
-```
-
-## some attempts at data viz
+## data
 
 Numbers of tips in each category (`pc` = male parental care; `sc` = sperm competition (i.e. group spawning); `ag` = accessory glands), depending on whether we use the partial (but fully genetically resolved) tree (`fishphylo`) or the imputed trees (`treeblock`).
 	
@@ -94,108 +60,113 @@ gg1 <- (ggplot(bar_data, aes(x=pc, fill = ag))
 print(gg1)
 ```                         
 
-##  priors
+**fixme**: not sure why "ag" has an NA category?
+**fixme**: this is drawn with the first treeblock example. Show which taxa are imputed?
 
-- all rates: from 1 (1 transition per tree) to 10*ntips (10 trans per species)
+```{r phylo_plot, message=FALSE}
+tar_load(treeblock)
+tar_load(ag_compdata_tb)
+dd <- ag_compdata_tb$data
+rownames(dd) <- dd$species
+dd <- dd[,-1]
+dd$ag <- factor(dd$ag)
+dd[c("sc", "pc")] <- lapply(dd[c("sc", "pc")], factor, levels = c("0","1","?"))
+## https://yulab-smu.top/treedata-book/chapter7.html
+circ <- ggtree(treeblock[[1]], layout = "fan", open.angle=5)
+p1 <- (gheatmap(circ, dd[,"ag", drop=FALSE], width=0.1)
+  + scale_fill_manual(name = "ag", values=paste0("grey", c(90,10)))
+  + new_scale_fill()
+)
+p2 <- (gheatmap(p1, dd[,"pc", drop=FALSE], width=0.1, offset=0.001)
+  + scale_fill_manual(name = "pc", breaks = c("0", "1", "?"), values=c("darkblue", "lightblue", "grey50"))
+  + new_scale_fill()
+  )
+p3 <- (gheatmap(p2, dd[,"sc", drop=FALSE], width=0.1, offset=0.002)
+  + scale_fill_manual(name = "sc", breaks = c("0", "1", "?"), values=c("darkred", "pink", "grey50"))
+  + new_scale_fill()
+  )
+print(p3)
+```
+
+##  Priors
+
+According to @pagel_bayesian_2006, the prior distributions on the rate parameters are determined as follows:
+
+> We did not specify the mean or variance of the gamma but rather seeded its two parameters, normally labeled $a$ and $b$, by drawing from a uniform (0–10) hyperprior distribution. The use of a hyperprior allows the investigator to remain relatively uncommitted about the details of the prior distribution, allowing them to be estimated from the data. In most comparative studies, investigators have very little information about the mean and variance of the rate coefficients.
+
+This is a mild overstatement: the hyperparameters induce their own distribution (see below).
+
+@pagel_bayesian_2006 also comment that the prior scale also depends on the units in which branch length is measured.  The BayesTraits package provides an option to scale  branch lengths so that the *mean* branch length is 0.1 [@meade_bayestraits_2016].
+
+```{r prior_calcs}
+n <- 100000
+set.seed(101)
+r <- rgamma(n, shape = runif(n, 0, 10), scale = runif(n, 0, 10))
+## BayesTrait scales *mean* branch length to 0.1
+## in our case
+tot_edge <- attr(treeblock[[1]], "orig_sumbranches")
+n_edge <- length(treeblock[[1]]$edge.length)
+## our mean branch length is 1/n_edge, Pagel & Meade's is 0.1
+## Pagel & Meade's total branch length is 0.1*n_edge
+ntip <- ape::Ntip(treeblock[[1]])
+b <- log(c(0.1, 100*ntip))
+m <- mean(b)
+sd <- (b[2]-m)/3
+## scale from log to log10
+m <- m / log(10)
+sd <- sd / log(10)
+r_scaled <- r*(0.1*n_edge)
+```
+
+We tried to choose priors more mindfully. We started by scaling the branch lengths to set the *sum* of all the branch lengths (i.e. the total evolutionary time experienced by all lineages to 1). Event rates of discrete transitions are measured on the *hazard* scale (probability density of an event per unit time); a rate of $r$ corresponds to a mean of $r$ transitions per unit time. We therefore set the lower limit of our prior to 0.1, meaning an expectation of only a single transition over the entire tree. For a tree with $N$ species, we set the upper limit of the prior to $100 N$, i.e. an expectation of 100 transitions *per species*. These are obviously extreme values; we used a log-Normal prior with the (geometric) mean set halfway between these values (an expectation of `r round(exp(mean(b)))` events of the course of the tree, or `r round(exp(mean(b))/ntip)` events per species in our phylogeny of `r ntip` species), and the standard deviation set so that the range between the lower and upper limits is 6 SD. This range corresponds to a 0.26% prior probability that the rates are beyond the limits.
+
+(Talk about uniform prior issues? [@yang_bayesian_2006; carpenter_computational_2017; thorson_uniform_2017])
+
+```{r prior_plot, warning=FALSE}
+## plot(density(r))
+brkvec <- seq(-2,6, by =2)
+ggplot(data.frame(r=r_scaled),
+       aes(x=log10(r))) +
+  geom_density(fill="grey") +
+  stat_function(fun = function(x) dnorm(x, m, sd), geom ="area", col="blue", fill="blue", alpha=0.2) +
+  scale_x_continuous(breaks = brkvec,
+                     labels = 10^brkvec,
+                     limits=c(-3,6),
+                     sec.axis = sec_axis( ~ . - log10(ntip),
+                                         name = "transitions per species",
+                                         breaks = brkvec-3,
+                                         labels = 10^(brkvec-3)
+                                         )) +
+  labs(y="prior probability density", x = "expected events per tree")
+```
+
+Here are the 95% quantile ranges of the prior distributions:
+
+```{r prior_tab}
+qq <- quantile(r, c(0.025, 0.975))
+qqr <- qq*(0.1*n_edge)
+rlims <- m + c(-1.96,1.96)*sd
+qtab <- matrix(c(qqr, qqr/ntip, 10^rlims, 10^rlims/ntip), nrow=2, byrow=TRUE,
+               dimnames = list(c("Pagel & Meade", "ours"),
+                               c("min per tree", "max per tree", "min per species", "max per species")))
+knitr::kable(as.data.frame(qtab), digits=3)
+```
+
+### Gain/loss priors
+
+We also decided to put prior distributions on the ratio of gain rate to loss rate. (Need to put more discussion/justification here.)  This is less important since we also chose to fix the root (ancestral state) of the population at "no accessory glands, no paternal care, group rather pair spawning"; specifying this information should orient the tree and make it easier to distinguish losses from gains.
+
 - `pc`: gain/loss ratio from 0.1 to 5
 - `sc`: gain/loss ratio from 5 to 10
 - `ag`: gain/loss ratio from 0.001 to 10
 
-
-Use each of these as the basis for a +/- 3 sigma range (on the log scale)
+As with the priors on the rates, each of these ranges is used as the basis for 
+a +/- 3 SD range (on the log scale) of the ratio.
 
 ```{r cifun}
-tar_load(ag_model0)
+tar_load(ag_model_pcsc)
 tar_load(ag_mcmc0)
 tar_load(all_ci)
-```
-
-## Bayesian
-
-
-### naming parameters
-
-```{r image, message=FALSE}
-image(ag_model0)
-```
-
-```{r parnames_manual, echo=FALSE, eval=FALSE}
-m1L <- as.mcmc(ag_mcmc0)
-m1L[,1] -> loss.sc
-m1L[,2] -> loss.pc
-m1L[,3] -> loss.ag_pc0_sc0
-m1L[,4] -> gain.sc
-m1L[,5] -> loss.ag_pc0_sc1
-m1L[,6] -> gain.pc
-m1L[,7] -> loss.ag_pc1_sc0
-m1L[,8] -> loss.ag_pc1_sc1
-m1L[,9] -> gain.ag_pc0_sc0
-m1L[,10] -> gain.ag_pc0_sc1
-m1L[,11] -> gain.ag_pc1_sc0
-m1L[,12] -> gain.ag_pc1_sc1
-```
-
-Auto-names:
-
-```{r parnames}
-par_names(ag_model0)
-```
-
-## Contrasts matrix
-
-This connects the parameters we estimate (e.g. `loss.ag_pc0_sc0`, loss rate of accessory glands when parental care and sperm competition are both absent) to the values we are interested in (e.g. `pc_loss`, effect of parental care on loss rate of accessory glands).
-
-**fixme**: 
-
-- reorder matrix for visualization?
-- include weights by (imputed) state occupancy?
-
-```{r manual_contrasts, echo=FALSE, eval=FALSE}
-#effect of pc on gaining ag
-pc.gain.sc0 <- gain.ag_pc1_sc0 - gain.ag_pc0_sc0
-pc.gain.sc1 <- gain.ag_pc1_sc1 - gain.ag_pc0_sc1
-pc.gain <- (pc.gain.sc0+pc.gain.sc1)/2
-
-#effect of pc on losing ag
-pc.loss.sc0 <- loss.ag_pc1_sc0 - loss.ag_pc0_sc0
-pc.loss.sc1 <- loss.ag_pc1_sc1 - loss.ag_pc0_sc1
-pc.loss <- (pc.loss.sc0+pc.loss.sc1)/2
-
-#effect of sc on gaining ag
-sc.gain.pc0 <- gain.ag_pc0_sc1 - gain.ag_pc0_sc0
-sc.gain.pc1 <- gain.ag_pc1_sc1 - gain.ag_pc1_sc0
-sc.gain <- (sc.gain.pc0+sc.gain.pc1)/2
-
-#effect of pc on losing ag
-sc.loss.pc0 <- loss.ag_pc0_sc1 - loss.ag_pc0_sc0
-sc.loss.pc1 <- loss.ag_pc1_sc1 - loss.ag_pc1_sc0
-sc.loss <- (sc.loss.pc0+sc.loss.pc1)/2
-
-#net effects on ag
-pc.net <- pc.gain - pc.loss
-sc.net <- sc.gain - sc.loss
-
-df1<-data.frame(var="pc.gain",value=pc.gain)
-df2<-data.frame(var="pc.loss",value=pc.loss)
-df3<-data.frame(var="sc.gain",value=sc.gain)
-df4<-data.frame(var="sc.loss",value=sc.loss)
-df<-rbind(df1,df2,df3,df4)
-
-print(ggplot(df, aes(x=var, y=var1))
-      + geom_violin(fill="gray")
-      + geom_hline(yintercept = 0, lty = 2)
-      + coord_flip()
-      )
-```
-
-```{r int_hists, echo=FALSE, eval=FALSE}
-int<-((gain.ag_pc1_sc1-loss.ag_pc1_sc1)-(gain.ag_pc0_sc1-loss.ag_pc0_sc1))-((gain.ag_pc1_sc0-loss.ag_pc1_sc0)-(gain.ag_pc0_sc0-loss.ag_pc0_sc0))
-hist(int, breaks = 100)
-```
-
-```{r plot_contrast_mat}
-tar_load(contrast_mat)
-image_plot(contrast_mat, xlab = "Contrast", ylab = "Rate parameter")
 ```
 
 Distribution of states in the tree (computed from stochastic character mapping, histograms represent 100 simulations):
@@ -205,12 +176,13 @@ tar_load(states_df)
 pivot_longer(states_df, everything(), names_to = "state") %>%
   ggplot(aes(x=value)) + geom_histogram(bins=25) + facet_wrap(~state) + zmargin
 ## sum columns then divide by total to get sum == 1
-avg_states <- apply(states_df, 2, sum, na.rm = TRUE) / sum(states_df, na.rm = TRUE)
+states_avg <- apply(states_df, 2, sum, na.rm = TRUE) / sum(states_df, na.rm = TRUE)
 ```
 
 Need to figure out weights e.g. if we want the intercept for `loss.ag` it should be  something like:
 
 ```{r wts, eval=FALSE}
+tar_load(starts_with("contrast"))
 intercept_loss <- sum(occ.ag0_pc{i}_sc{j} * loss.ag_pc{i}_sc{j})
 pc_loss <- (sum(occ.ag0_pc1_sc{i} * loss.ag_pc1_sc{i}) - sum(occ.ag0_pc0_sc{i} * loss.ag_pc0_sc{i})) /
   sum(occ.ag0_pc{i}_sc{j})
@@ -229,6 +201,34 @@ t(solve(m))
 ## cols 2 and 3 have magnitude 1/4 but we want 1/2 (diff between treatments, not dev between
 ## ttt and mean)
 ```
+
+```{r wtd_contrasts}
+tar_load(contrast_mat)
+wts <- rep(NA, nrow(contrast_mat))
+names(wts) <- rownames(contrast_mat)
+snm <- names(states_avg)
+wts["gain.sc"] <- sum(states_avg[grepl("sc0", snm)])  ## can gain sc whenever sc==0
+wts["loss.sc"] <- sum(states_avg[grepl("sc1", snm)])  ##  "  lose  "    "     sc==1
+wts["gain.pc"] <- sum(states_avg[grepl("pc0", snm)])  ## can gain pc whenever pc==0
+wts["loss.pc"] <- sum(states_avg[grepl("pc1", snm)])  ##  "  lose pc    "     pc==1
+## can gain ag when ag==0 are missing; fill in values for 
+gain.ag_states <- grep("^gain.ag", names(wts), value = TRUE)
+wts[gain.ag_states] <- states_avg[gsub("^gain.ag_", "ag0_", gain.ag_states)]
+loss.ag_states <- grep("^loss.ag", names(wts), value = TRUE)
+wts[loss.ag_states] <- states_avg[gsub("^loss.ag_", "ag1_", loss.ag_states)]
+
+## scale contrast values by the time spent in the relevant state
+contrast_mat_wt <- sweep(contrast_mat, 1, wts, "*")
+
+## now scale each column (contrast) by the _total_ time spent in the relevant states
+pos_mat <- contrast_mat != 0
+storage.mode(pos_mat) <- "numeric"
+col_vals <- colSums(sweep(pos_mat, 1, wts, "*"))
+contrast_mat_wt <- sweep(contrast_mat_wt, 2, col_vals, "/")
+##plot_grid(image_plot(contrast_mat), image_plot(contrast_mat_wt))
+```
+
+Hmm, not sure about weighted contrasts any more. It's tricky.
 
 ```{r plot_contrasts, fig.height=4, fig.width=10}
 tar_load(contr_long_ag_mcmc0)
@@ -326,4 +326,6 @@ mcmc_long <- (ag_mcmc0
   %>% pivot_longer(everything(), names_to = "term")
 )  
 ```
+
+## References
 
