@@ -11,9 +11,9 @@ install_pkgs <- function() {
     ip <- installed.packages()
     to_install <- setdiff(pkgList, c(rownames(ip), "corHMM"))
     install.packages(to_install)
-    if (!require("corHMM") || packageVersion("corHMM") < "2.7.1.1") {
-        remotes::install_github("bbolker/corHMM")
-    }
+    ## since install_github checks hashes, don't bother with a check
+    remotes::install_github("bbolker/corHMM")
+    remotes::install_github("YuLab-SMU/ggtree")
     return(NULL)
 }
 
