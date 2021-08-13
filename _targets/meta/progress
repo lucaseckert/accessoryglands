@@ -35,4 +35,4 @@ contrast_mat|stem|contrast_mat|0|skipped
 contr_long_ag_mcmc_tb|stem|contr_long_ag_mcmc_tb|0|skipped
 contr_long_ag_mcmc0|stem|contr_long_ag_mcmc0|0|skipped
 ag_rmd|stem|ag_rmd|0|started
-ag_rmd|stem|ag_rmd|0|errored
+ag_rmd|stem|ag_rmd|0|built

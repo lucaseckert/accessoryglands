@@ -2,7 +2,8 @@ pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "ggthemes", "fishtree", "caper", "broom.mixed",
              "emdbook", "ramcmc", "corHMM",
              "GGally", "colorspace", "ggmosaic", "targets", "tarchetypes",
-             "abind", "cowplot", "patchwork", "ggtree", "ggnewscale")
+             "abind", "cowplot", "patchwork", "ggtree", "ggnewscale",
+             "diagram")
 
 ## install uninstalled pkgs from pkgList
 ## check corHMM version, install from bb repo if necessary

@@ -41,13 +41,14 @@ all_ci|stem|39107378e4c2f3c8|533c5ee3ba1c5e19|8d21f2963ca6f3c6|-903984374||t1882
 contrast_mat|stem|dc75a45f7bbaafe0|4ff4777e3e91564d|a39eb79dedabbb2a|-1647510704||t18826.7307747372s|c17e80c208491e7f|363|rds|vector|||0.029||
 contr_long_ag_mcmc_tb|stem|f44a30ef7b957f38|67558e2f82567212|8315f06c175eeb88|342616559||t18826.7307747372s|3a25802b1f050d8f|5603647|rds|vector|||6.8||
 contr_long_ag_mcmc0|stem|f8d0a988d39e168f|b587dd0c334172d8|cb0dfe227c8aab75|-1968552797||t18826.7307746909s|1447955bebaafcce|5607220|rds|vector|||6.676||
+ag_bayes_rmd|stem|98de2613155b1dab|391e32738b59a0ab|dd4060470404e6de|-691555391|ag_bayesdiag.html*ag_bayesdiag.rmd*ag_bayesdiag_files|t18838.9934394968s|414df8aa1b1512db|6322923|file|vector|||959.823||
 get_hpd2d_levels|function|116768d19be87173||||||||||||||
 corhmm_logpostfun|function|1570a7c632fbc675||||||||||||||
 shorten_ag_names|function|a1210a0b2ff3674d||||||||||||||
 make_nllfun|function|3699401c7c396ec1||||||||||||||
 metropolis|function|c0842a386a01e090||||||||||||||
 get_state_occ_prop|function|9770d326425d8de7||||||||||||||
-pkgList|object|16b152ecd8a58dfd||||||||||||||
+pkgList|object|0075850907110758||||||||||||||
 setup_contrasts|function|212729ba2f17fed7||||||||||||||
 state_names|function|a1c5b74dd8333b88||||||||||||||
 mk_idf|function|e80e6cb9fc863d49||||||||||||||
@@ -60,12 +61,11 @@ my_mcmc|function|c64506e87548ed21||||||||||||||
 get_ag_data|function|eb5c218e3a9ba713||||||||||||||
 profile.corhmm|function|719284142802cb36||||||||||||||
 metrop_mult|function|cd40b430f7c8a71b||||||||||||||
-install_pkgs|function|5c3719168a514774||||||||||||||
-load_pkgs|function|ce570daa71d4a45c||||||||||||||
+install_pkgs|function|7620777f15c68047||||||||||||||
+load_pkgs|function|74606c836131f167||||||||||||||
 par_names|function|5c02da343d8107f1||||||||||||||
 plot.corhmm|function|665908d833c5865a||||||||||||||
 tidy.corhmm|function|14af206e018a3406||||||||||||||
 corhmm_mcmc|function|abf1dfbb8f7529b7||||||||||||||
 augment_model|function|4d0f9d16952a4f03||||||||||||||
-ag_bayes_rmd|stem|98de2613155b1dab|391e32738b59a0ab|dd4060470404e6de|-691555391|ag_bayesdiag.html*ag_bayesdiag.rmd*ag_bayesdiag_files|t18838.9934394968s|414df8aa1b1512db|6322923|file|vector|||959.823||
-ag_rmd|stem|401205ecabdc18cf|7d7ab483924fc9c4|bb0bb0a8923198f5|-742077490|ag_model.html*ag_model.rmd*ag_model_files|t18817.0752056892s||6636284|file|vector|||3.548||argument caller_env is missing, with no default
+ag_rmd|stem|4037028009fd52f0|b5d3490895c8b2fd|d96d614d7570192a|-742077490|ag_model.html*ag_model.rmd|t18852.7676469715s|fa034e33bdf8f655|2323619|file|vector|||21.337|Removed 9 rows containing nonfinite values stat_bin.|

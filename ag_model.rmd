@@ -8,7 +8,7 @@ output:
 bibliography: corHMM.bib	
 ---
 
-<!-- **fix me**: reimplement as [target markdown](https://books.ropensci.org/targets/markdown.html#markdown) ? -->
+
 
 ```{r setup, message=FALSE}
 source("R/utils.R")
@@ -64,6 +64,7 @@ print(gg1)
 **fixme**: this is drawn with the first treeblock example. Show which taxa are imputed?
 
 ```{r phylo_plot, message=FALSE}
+## slow: cache?
 tar_load(treeblock)
 tar_load(ag_compdata_tb)
 dd <- ag_compdata_tb$data
@@ -90,14 +91,52 @@ print(p3)
 
 ## Likelihood comparison
 
+The classic "dichotomanic" (= in love with dichotomous/discrete answers) ways to do this analysis would be to fit a series of nested models corresponding to specific null models/tests and 
+(1) do likelihood ratio tests on pairs of nested models; (2) use information theoretic criteria (AIC/BIC/whatever) to rank the models/choose the best model. Pagel and Meade's reversible-jump MCMC machinery is a fancier way to do this; it's more general, testing all possible combinations of sets of equal rates, and gives a better [less approximate] estimate of the posterior probabilities of the different sub-models.
+
 ```{r likcomp, results="asis"}
-tar_load(starts_with("ag_model"))
-knitr::kable(as.data.frame(bbmle::AICtab(ag_model_indep, ag_model_pc, ag_model_sc, ag_model_pcsc,
-                                         logLik = TRUE)),
-             digits=1)
+ag_models <- paste0("ag_model_",
+                    c("pcsc","pc","sc","indep"))
+## tar_load(all_of(ag_models))
+## needs to be done explicitly to keep targets pkg happy
+tar_load("ag_model_pcsc")
+tar_load("ag_model_pc")
+tar_load("ag_model_sc")
+tar_load("ag_model_indep")
+atab <- as.data.frame(bbmle::AICtab(ag_model_indep, ag_model_pc, ag_model_sc, ag_model_pcsc,
+                                    logLik = TRUE))
+dtab <- data.frame(desc = c("AG dep on PC, SC & interaction",
+                            "AG dep only on PC",
+                            "AG dep only on SC",
+                            "AG evol indep of PC, SC"),
+                   row.names = ag_models)
+atab2 <- merge(dtab, atab, by = 0) %>% dplyr::select(desc, dAIC, dLogLik, df) %>% arrange(dAIC)
+knitr::kable(atab2, digits=1)
 ```
 
-Show all likelihood ratio test comparisons?
+Show all likelihood ratio test comparisons.
+
+```{r lrtest, fig.width=8, fig.height=8}
+## want all
+mnames <- gsub("ag_model_","",ag_models)[c(2,4,3,1)]
+anfun <- function(m1, m2) {
+    aa <- anova(m1,m2)
+    sprintf("atop(Delta*dev==%1.1f,p==%1.1g)",
+            ## "Δdev=%1.1f\np=%1.1g",
+            aa$delta_dev[2], aa$pval[2])
+}
+A <- matrix(NA_character_,4,4,
+            dimnames=list(mnames, mnames))
+A["indep","pc"] <- anfun(ag_model_pc, ag_model_indep)
+A["indep","sc"] <- anfun(ag_model_sc, ag_model_indep)
+A["sc","pcsc"] <- anfun(ag_model_pcsc, ag_model_sc)
+A["pc","pcsc"] <- anfun(ag_model_pcsc, ag_model_pc)
+A["indep","pcsc"] <- anfun(ag_model_pcsc, ag_model_indep)
+plotmat(A, curve = 0, box.size = 0.08)
+```
+
+- The likelihood comparisons and the AIC comparisons provide the same general conclusions.
+- It would be interesting to compare an *additive* model (PC and SC independently influence AG evolution rate, but they don't interact) with the current interactive model, but it would require a little bit more machinery that I haven't implemented yet (most generally, creating rate sets as arbitrary linear combinations of parameters)
 
 ##  Priors
 
@@ -335,6 +374,23 @@ sm0 <- with(ag_model_pcsc,
 sm0[[1]]$tip.label[] <- ""
 phytools::plotSimmap(sm0[[1]], type="fan")
 ```
+
+---
+
+## to do
+
+### technical
+
+- reimplement as [target markdown](https://books.ropensci.org/targets/markdown.html#markdown) ?
+- switch violin plots to pointrange (or 50/90 pointranges)?
+- dot-whisker plot comparing the parameters of the restricted models
+
+### statistical
+
+- implement weighting by branch state: for a given focal trait (`ag`) and modifier (`sc`), want to weight the elements of the contrast only by the *non-focal* trait (e.g. if `w_pc0` and `w_pc1 = 1-w_pc0` are the overall fractions of time that the branches are in the corresponding states, then we want the `sc_loss` contrast to be `w_pc0*(loss.ag_pc0_sc1-loss.ag_pc0_sc0) + (1-w_pc0)*(loss.ag_pc1_sc1-loss.ag_pc1_sc0)`. (The factors in front of the parenthesized terms are currently 1/2.) Similar expressions would apply to the gain term and to the `pc` analogues.
+- why does the result from the AIC/LRT results seem so much stronger than the Bayesian results? e.g., compare the LRT test p-values with the parameter-level Bayesian p-values. The pc-vs-indep and sc-vs-indep p-values are extremely strong; why isn't this matched by the parameter p-values? (We can still argue that the Bayesian results are more interpretable etc. - and if we want to look at parameter values and uncertainties, we really need Bayes - but it is a little disappointing, and surprising.)
+
+---
 
 ## References
 
