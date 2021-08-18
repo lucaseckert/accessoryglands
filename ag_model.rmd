@@ -8,8 +8,6 @@ output:
 bibliography: corHMM.bib	
 ---
 
-
-
 ```{r setup, message=FALSE}
 source("R/utils.R")
 source("R/mcmc.R")
@@ -20,7 +18,7 @@ theme_set(theme_bw())
 library(targets)
 ```
 
-The goal is to understand the role of paternal care of offspring (male parental care) and sperm competition in driving the evolution of accessory glands. While male parental care is a fairly unambiguous binary trait, sperm competition is harder to classify.  Here we use spawning context (pair spawning vs. group spawning) as a proxy for sperm competition.
+The goal is to understand the role of paternal care of offspring (male parental care) and sperm competition in driving the evolution of accessory glands. While male parental care is a fairly unambiguous binary trait, sperm competition is harder to classify.  Here we use spawning context (pair spawning vs. group spawning) as a proxy for sperm competition. (**Note** from John Fitzpatrick: we should be careful how we phrase this, may want to replace "sperm competition" with "spawning behaviour" throughout. Leaving it alone for now, though.)
 
 ## data
 
@@ -60,8 +58,8 @@ gg1 <- (ggplot(bar_data, aes(x=pc, fill = ag))
 print(gg1)
 ```                         
 
-**fixme**: not sure why "ag" has an NA category?
-**fixme**: this is drawn with the first treeblock example. Show which taxa are imputed?
+**fixme**: why is `Tylosurus_acus_melanotgus` but not in data?
+**fixme**: this is drawn with the first treeblock example. Show which taxa are imputed? (Probably too much work, just note that some phylo structure is imputed ...)
 
 ```{r phylo_plot, message=FALSE}
 ## slow: cache?
@@ -73,7 +71,9 @@ dd <- dd[,-1]
 dd$ag <- factor(dd$ag)
 dd[c("sc", "pc")] <- lapply(dd[c("sc", "pc")], factor, levels = c("0","1","?"))
 ## https://yulab-smu.top/treedata-book/chapter7.html
-circ <- ggtree(treeblock[[1]], layout = "fan", open.angle=5)
+
+tt <- drop.tip(treeblock[[1]], setdiff(treeblock[[1]]$tip.label, rownames(dd)))
+circ <- ggtree(tt, layout = "fan", open.angle=5)
 p1 <- (gheatmap(circ, dd[,"ag", drop=FALSE], width=0.1)
   + scale_fill_manual(name = "ag", values=paste0("grey", c(90,10)))
   + new_scale_fill()
@@ -88,6 +88,8 @@ p3 <- (gheatmap(p2, dd[,"sc", drop=FALSE], width=0.1, offset=0.002)
   )
 print(p3)
 ```
+
+Note that, across the entire phylogeny, accessory glands are (1) relatively rare (we knew this from the barplot above) and (2) phylogenetically concentrated (list families/clades in which they occur? Label them on the plot?) This means that any inference is likely be moderately difficult ...
 
 ## Likelihood comparison
 
@@ -283,27 +285,43 @@ Hmm, not sure about weighted contrasts any more. It's tricky.
 ```{r plot_contrasts, fig.height=4, fig.width=10}
 tar_load(contr_long_ag_mcmc0)
 tar_load(contr_long_ag_mcmc_tb)
-ag_contr_gainloss <- purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
-                                         treeblock=contr_long_ag_mcmc_tb),
+tar_load(contr_long_ag_priorsamp)
+ag_contr_gainloss <- (purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
+                                         treeblock=contr_long_ag_mcmc_tb,
+                                         prior = contr_long_ag_priorsamp),
                                     filter, rate != "netgain",
                                     .id = "phylo")
-
+    %>% mutate(across(phylo, factor,
+                      levels=rev(c("prior","treeblock","fishphylo"))))
+)
 ## ag_contr_gainloss %>% group_by(contrast, rate) %>% summarise(value=mean(value), .groups = "drop")
 gg_sum <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = rate)) +
   facet_wrap(~ contrast) +
   geom_violin(aes(fill = phylo), alpha=0.6) +
-  stat_summary(fun.data = "median_hilow", geom = "pointrange", aes(group=phylo),
-               ## width by trial and error; not sure what determines this?
-               position = position_dodge(width=0.875),
-               colour = "gray30") +
+    stat_summary(fun.data = "median_hilow",
+                 geom = "linerange", aes(group=phylo),
+                 ## width by trial and error; not sure what determines this?
+                 position = position_dodge(width=0.875),
+                 colour = "red",
+                 size = 2, alpha = 0.5) +
+    stat_summary(fun = median,
+                 geom = "point", aes(group=phylo),
+                 ## width by trial and error; not sure what determines this?
+                 position = position_dodge(width=0.875),
+                 colour = "black",
+                 pch = 3,
+                 size = 2) + 
   geom_vline(xintercept = 1, lty = 2) +
   scale_x_log10() +
   zmargin +
-  scale_fill_discrete_qualitative() +
-  scale_colour_discrete_qualitative() +
+  ## scale_fill_discrete_qualitative() +
+  scale_fill_grey(guide = guide_legend(reverse = TRUE)) +
+  ## scale_colour_discrete_qualitative() +
   labs(x="expected transitions/proportional difference in rates")
 print(gg_sum)
 ```
+
+Hmm, this says the results differ less from the priors than I would have thought / priors are more constraining than I thought (is that partly because the constraints represent sums of independent prior values, so they get 'shrunk'?)
 
 ```{r, echo = FALSE, eval = FALSE}
 ## double-checking bar width for sc gain/treeblock: visual discrepancy (Hmisc::smedian.hilow) with table below (quantiles)?
@@ -334,12 +352,11 @@ bayes_pval <- function(x, ref=0) {
 
 Graphing all CIs: bounds are set to the lower/upper bounds used for corHMM fit. Vertical lines show the mean and ± 2 SD of the priors.
 
-**fixme**: reverse legend order?
-
 **fixme**: understand why average rates are so high, loss rates > gain rates?  Does this have something to do with not weighting? (i.e. loss can only operate when AG is present, which is rare)?
 
 
 ```{r ci_plot}
+tar_load(prior_ci)
 ## order of parameters
 levs <- c(outer(FUN = paste, sep = ".",
       c("loss", "gain"),
@@ -353,37 +370,54 @@ all_ci <- all_ci %>% replace_na(list(upr = Inf, lwr = -Inf)) %>%
   mutate(across(term, factor, levels = levs))
 ## extend NA confidence interval to limit of graph
 ggplot(
-  all_ci,
-  aes(term, exp(estimate), ymin = exp(lwr), ymax = exp(upr), colour = method, shape = method)
+    all_ci,
+    aes(term, exp(estimate), colour = method, shape = method)
 ) +
-  geom_pointrange(position = position_dodge(width = 0.5)) +
-  scale_colour_discrete_qualitative() +
-  scale_y_log10(limits = exp(corhmm_bounds), oob = scales::squish) +
-  coord_flip() +
-  labs(y="rate", x = "") +
-  geom_hline(yintercept =exp(corhmm_mid), lty=2) +
-  geom_hline(yintercept = exp(corhmm_prior), lty=2, col="gray")
+    geom_pointrange(position = position_dodge(width = 0.5),
+                    aes(ymin = exp(lwr), ymax = exp(upr))) +
+    scale_colour_discrete_qualitative(guide=guide_legend(reverse=TRUE)) +
+    scale_y_log10(limits = exp(corhmm_bounds), oob = scales::squish) +
+    coord_flip() +
+    labs(y="rate", x = "") +
+    geom_point(data = tidyr::pivot_longer(prior_ci, -term),
+               aes(y = exp(value)), shape = 16, size = 2, colour = "gray")
+## geom_hline(yintercept =exp(corhmm_mid), lty=2) +
+## geom_hline(yintercept = exp(corhmm_prior), lty=2, col="gray")
 ```
 
 Not sure if we can do something pretty with character mappings ... ? reduce to trait-by-trait maps?
 
-```{r}
+```{r stochmap, message=FALSE}
 set.seed(1)
 sm0 <- with(ag_model_pcsc,
             makeSimmap(phy, data, solution, rate.cat, nSim = 1))
 sm0[[1]]$tip.label[] <- ""
-phytools::plotSimmap(sm0[[1]], type="fan")
+nm <- rownames(sm0[[1]]$Q)
+## cols <- setNames(colorspace::qualitative_hcl(length(nm)), seq(nm))
+cols <- setNames(iwanthue(length(nm)), seq(nm))
+phytools::plotSimmap(sm0[[1]], type="fan", colors = cols,
+                     mar=c(2,2,2,8))
+par(mar=c(0,0,0,0), new=TRUE)
+plot(0:1,0:1, type="n", ann=FALSE)
+legend("topright", col = cols, legend=nm, lty = 1, lwd=2)
 ```
+
+**fixme**: combine with circplot for tip states? use strong palette distinction between ag/non-ag colours?
 
 ---
 
 ## to do
+
+### logistical
+
+- compose e-mail to Beaulieu, O'Meara et al
 
 ### technical
 
 - reimplement as [target markdown](https://books.ropensci.org/targets/markdown.html#markdown) ?
 - switch violin plots to pointrange (or 50/90 pointranges)?
 - dot-whisker plot comparing the parameters of the restricted models
+- 
 
 ### statistical
 

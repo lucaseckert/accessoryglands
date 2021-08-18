@@ -3,7 +3,7 @@ pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "emdbook", "ramcmc", "corHMM",
              "GGally", "colorspace", "ggmosaic", "targets", "tarchetypes",
              "abind", "cowplot", "patchwork", "ggtree", "ggnewscale",
-             "diagram")
+             "diagram", "hues")
 
 ## install uninstalled pkgs from pkgList
 ## check corHMM version, install from bb repo if necessary
@@ -178,6 +178,7 @@ make_nllfun <- function(corhmm_fit, treeblock = NULL) {
 #' @param ub_gainloss
 #' @param range_gainloss
 #' @param nllfun \emph{negative} log-likelihood function
+#' @param negative return negative log posterior?
 corhmm_logpostfun <- function(p,
                               lb = log(1e-9),
                               ub = log(1e2),
@@ -187,11 +188,11 @@ corhmm_logpostfun <- function(p,
                               ub_gainloss = log(1e3),
                               range_gainloss = 3,
                               nllfun,
-                              treeblock = NULL
+                              negative = FALSE
                               ) {
   prior.mean <- (lb + ub) / 2
   prior.sd <- (ub - lb) / (2 * range)
-  loglik <- -1 * nllfun(p)
+  loglik <- -1*nllfun(p)
   log.prior <- sum(dnorm(p, mean = prior.mean, sd = prior.sd, log = TRUE))
   ## product of likelihood and prior -> sum of LL and log-prior
   res <- loglik + log.prior
@@ -206,6 +207,7 @@ corhmm_logpostfun <- function(p,
                               log = TRUE))
     res <- res + gl.log.prior
   }
+  if (negative) res <- -1*res
   return(res)
 }
 
@@ -425,3 +427,21 @@ image_plot <- function(m, xlab="", ylab = "", sub = "") {
 
 
 ## how do we incorporate these (elegantly/easily) into the contrasts calculation?
+
+tidy.mle2 <- function (x, conf.int = FALSE, conf.level = 0.95,
+                       conf.method = "spline", ...) 
+{
+    co <- bbmle::coef(bbmle::summary(x))
+    ret <- broom:::as_tidy_tibble(co, new_names = c("estimate", 
+        "std.error", "statistic", "p.value"))
+    if (conf.int) {
+        ci <- bbmle::confint(x, level = conf.level, method = conf.method)
+        if (is.null(dim(ci))) {
+            ci <- matrix(ci, nrow = 1)
+        }
+        colnames(ci) <- c("conf.low", "conf.high")
+        ci <- as_tibble(ci)
+        ret <- dplyr::bind_cols(ret, ci)
+    }
+    as_tibble(ret)
+}

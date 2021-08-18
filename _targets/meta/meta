@@ -37,18 +37,23 @@ traceplot_ag_mcmc_tb|stem|e786da6c49bca368|1fd105482c383f59|6b351d4db887599e|-15
 traceplot_ag_mcmc0|stem|8372dc7a7a7ba575|e45aa71b6a5c074a|0b2e926331d146c9|621346276||t18826.7307753391s|010aae93849bc059|30570750|rds|vector|||0.744||
 ag_mcmc1|stem|72321fd0f8012918|d938b3d7e6b1c85a|90d201dea44f1307|-891139124||t18826.7307745057s|89f28125779c5a28|5385441|rds|vector|||0.016||
 comp_ci|stem|e1c892f483eb7ca9|773903548c218029|1a65c79e08588eac|-1338865570||t18826.7307745983s|4e9f33b51e2b3d7d|1210|rds|vector|||25.094||
-all_ci|stem|39107378e4c2f3c8|533c5ee3ba1c5e19|8d21f2963ca6f3c6|-903984374||t18826.7307745983s|6830b6b804b0a566|1620|rds|vector|||27.027||
 contrast_mat|stem|dc75a45f7bbaafe0|4ff4777e3e91564d|a39eb79dedabbb2a|-1647510704||t18826.7307747372s|c17e80c208491e7f|363|rds|vector|||0.029||
 contr_long_ag_mcmc_tb|stem|f44a30ef7b957f38|67558e2f82567212|8315f06c175eeb88|342616559||t18826.7307747372s|3a25802b1f050d8f|5603647|rds|vector|||6.8||
 contr_long_ag_mcmc0|stem|f8d0a988d39e168f|b587dd0c334172d8|cb0dfe227c8aab75|-1968552797||t18826.7307746909s|1447955bebaafcce|5607220|rds|vector|||6.676||
 ag_bayes_rmd|stem|98de2613155b1dab|391e32738b59a0ab|dd4060470404e6de|-691555391|ag_bayesdiag.html*ag_bayesdiag.rmd*ag_bayesdiag_files|t18838.9934394968s|414df8aa1b1512db|6322923|file|vector|||959.823||
+ag_priorsamp|stem|2b16859a8c2d2d26|631f0179d8c0c45e|68739c490e729e2a|1146734896||t18856.8322896037s|2ba35dd96fa6914f|5474252|rds|vector|||21.697||
+contr_long_ag_priorsamp|stem|56eb66729cf78251|291c2aea6dae58b3|ae1433150f5fe5cf|-1125731114||t18856.834208304s|5120afa9a607a04c|5643134|rds|vector|||10.191||
+ag_model_pcsc_prior|stem|f3a5b3870193dc07|c3c9eb06bc3e3db1|d9d39fe8262b234d|-1965651918||t18856.8443897478s|812044b1f9c9fb07|190609|rds|vector|||106.571||
+all_ci|stem|25d39b56033de0a4|f51dbef81fc687aa|23ecb28df22823e8|-903984374||t18856.8450141731s|9ef2671124b1cc31|2229|rds|vector|||53.828||
+prior_ci|stem|e631cc4414b2d1fa|12486242b87c2070|8f66169fef05af11|-890414428||t18856.8495753064s|e8f841da6aca5d39|402|rds|vector|||2.853||
 get_hpd2d_levels|function|116768d19be87173||||||||||||||
-corhmm_logpostfun|function|1570a7c632fbc675||||||||||||||
+corhmm_logpostfun|function|4365c55f67ab374a||||||||||||||
+tidy.mle2|function|0bf34263dd3a1c27||||||||||||||
 shorten_ag_names|function|a1210a0b2ff3674d||||||||||||||
 make_nllfun|function|3699401c7c396ec1||||||||||||||
 metropolis|function|c0842a386a01e090||||||||||||||
 get_state_occ_prop|function|9770d326425d8de7||||||||||||||
-pkgList|object|0075850907110758||||||||||||||
+pkgList|object|500ab4e1eccf88ce||||||||||||||
 setup_contrasts|function|212729ba2f17fed7||||||||||||||
 state_names|function|a1c5b74dd8333b88||||||||||||||
 mk_idf|function|e80e6cb9fc863d49||||||||||||||
@@ -61,11 +66,11 @@ my_mcmc|function|c64506e87548ed21||||||||||||||
 get_ag_data|function|eb5c218e3a9ba713||||||||||||||
 profile.corhmm|function|719284142802cb36||||||||||||||
 metrop_mult|function|cd40b430f7c8a71b||||||||||||||
-install_pkgs|function|7620777f15c68047||||||||||||||
-load_pkgs|function|74606c836131f167||||||||||||||
+install_pkgs|function|7ea7fe93718f40b6||||||||||||||
+load_pkgs|function|9c874e0536c2a339||||||||||||||
 par_names|function|5c02da343d8107f1||||||||||||||
 plot.corhmm|function|665908d833c5865a||||||||||||||
 tidy.corhmm|function|14af206e018a3406||||||||||||||
-corhmm_mcmc|function|abf1dfbb8f7529b7||||||||||||||
+corhmm_mcmc|function|198f1b267c4d7a65||||||||||||||
 augment_model|function|4d0f9d16952a4f03||||||||||||||
-ag_rmd|stem|4037028009fd52f0|b5d3490895c8b2fd|d96d614d7570192a|-742077490|ag_model.html*ag_model.rmd|t18852.7676469715s|fa034e33bdf8f655|2323619|file|vector|||21.337|Removed 9 rows containing nonfinite values stat_bin.|
+ag_rmd|stem|33b883caa34d2ca7|cc6ac95148dab019|6e61d211677afd81|-742077490|ag_model.html*ag_model.rmd|t18856.8877315657s|b26b455159134474|2294040|file|vector|||27.27|Removed 9 rows containing nonfinite values stat_bin.|

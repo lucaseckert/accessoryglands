@@ -171,7 +171,29 @@ list(
                        )
                 )
         }),
-
+    tar_target(ag_model_pcsc_prior,
+    {
+        nll <- make_nllfun(ag_model_pcsc)
+        p <- coef(ag_model_pcsc)
+        cc <- corhmm_logpostfun
+        p[] <- 0
+        parnames(cc) <- names(p)
+        mle2(cc,
+             start = p,
+             trace = TRUE,
+             vecpar = TRUE,
+             data = list(nllfun = nll,
+                         negative = TRUE,
+                         ## sum(edge length) scaled to 1
+                         lb = log(1),
+                         ub = log(10 * ape::Ntip(ag_compdata$phy)),
+                         gainloss_pairs = gainloss_priors$pairs,
+                         lb_gainloss = gainloss_priors$lb,
+                         ub_gainloss = gainloss_priors$ub),
+             control = list(maxit = 1e4, trace = 1),
+             method = "BFGS"
+             )
+    }),
     tar_target(comp_ci,
                { list(
                      wald = tidy(ag_model_pcsc, conf.int = TRUE),
@@ -203,13 +225,15 @@ list(
         }
     ),
     tar_map(
-        values = tibble(mcmc = rlang::syms(c("ag_mcmc0", "ag_mcmc_tb"))),
+        values = tibble(mcmc = rlang::syms(c("ag_mcmc0", "ag_mcmc_tb",
+                                             "ag_priorsamp"))),
         tar_target(contr_long,
-        ((as.mcmc(mcmc) %*% contrast_mat)
-          %>% as_tibble()
-          %>% pivot_longer(everything(), names_to = "contrast")
-          %>% separate(contrast, into=c("contrast", "rate"))
-        ))
+           ((as.mcmc(mcmc) %*% contrast_mat)
+               %>% as_tibble()
+               %>% pivot_longer(everything(), names_to = "contrast")
+               %>% separate(contrast, into=c("contrast", "rate"))
+           ),
+        )
     ),
     tar_target(
         states_df, {
@@ -221,6 +245,8 @@ list(
         all_ci, {
           t_list <- list(
               wald = tidy(ag_model_pcsc, conf.int = TRUE),
+              wald_prior = tidy(ag_model_pcsc_prior, conf.int = TRUE,
+                                conf.method = "quad"),
               ## profile = tidy(ag_model_pcsc, conf.int = TRUE,
               ## conf.method = "profile", profile = ag_profile0),
               mcmc = tidy(ag_mcmc0, robust = TRUE, conf.int = TRUE),
@@ -230,6 +256,16 @@ list(
             %>% rename(lwr = "conf.low", upr = "conf.high")
           )
         }),
+    tar_target(
+        prior_ci,
+            (as.mcmc(ag_priorsamp)
+                %>% apply(MARGIN = 2, quantile, c(0.025, 0.975))
+                %>% t()
+                %>% as.data.frame()
+                %>% setNames(c("lwr", "upr"))
+                %>% tibble::rownames_to_column("term")
+            )
+    ),
     tar_target(ag_mcmc0,
                corhmm_mcmc(ag_model_pcsc,
                            p_args=list(nllfun = make_nllfun(ag_model_pcsc),
@@ -244,7 +280,8 @@ list(
                            n_burnin = 4000,
                            n_iter = 84000,
                            n_thin = 20,
-                           seed = 101)
+                           seed = 101),
+               cue = tar_cue(mode="never")
                ),
     tar_target(ag_mcmc_tb,
                corhmm_mcmc(ag_model_tb,
@@ -259,6 +296,21 @@ list(
                            n_chains = 8,
                            n_burnin =  4000,
                            n_iter =  84000,
+                           n_thin = 20,
+                           seed = 101),
+               cue = tar_cue(mode="never")
+               ),
+    tar_target(ag_priorsamp,
+               corhmm_mcmc(ag_model_pcsc,
+                           p_args=list(nllfun = function(x) 1,
+                                       ## sum(edge length) scaled to 1
+                                       lb = log(1),
+                                       ub = log(10 * ape::Ntip(ag_compdata$phy)),
+                                       gainloss_pairs = gainloss_priors$pairs,
+                                       lb_gainloss = gainloss_priors$lb,
+                                       ub_gainloss = gainloss_priors$ub),
+                           n_burnin = 4000,
+                           n_iter = 84000,
                            n_thin = 20,
                            seed = 101)
                ),
