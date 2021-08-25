@@ -73,4 +73,4 @@ plot.corhmm|function|665908d833c5865a||||||||||||||
 tidy.corhmm|function|14af206e018a3406||||||||||||||
 corhmm_mcmc|function|198f1b267c4d7a65||||||||||||||
 augment_model|function|4d0f9d16952a4f03||||||||||||||
-ag_rmd|stem|33b883caa34d2ca7|cc6ac95148dab019|6e61d211677afd81|-742077490|ag_model.html*ag_model.rmd|t18856.8877315657s|b26b455159134474|2294040|file|vector|||27.27|Removed 9 rows containing nonfinite values stat_bin.|
+ag_rmd|stem|f5899133d9b88cdd|cc6ac95148dab019|6e61d211677afd81|-742077490|ag_model.html*ag_model.rmd|t18863.6911358237s|1e0110bd80acfe19|2744072|file|vector|||28.59|Removed 9 rows containing nonfinite values stat_bin.|

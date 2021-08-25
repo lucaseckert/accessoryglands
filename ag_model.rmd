@@ -58,10 +58,10 @@ gg1 <- (ggplot(bar_data, aes(x=pc, fill = ag))
 print(gg1)
 ```                         
 
-**fixme**: why is `Tylosurus_acus_melanotgus` but not in data?
+**fixme**: why is `Tylosurus_acus_melanotgus` but not in data? (It was causing an `NA` value in the `ag` legend)
 **fixme**: this is drawn with the first treeblock example. Show which taxa are imputed? (Probably too much work, just note that some phylo structure is imputed ...)
 
-```{r phylo_plot, message=FALSE}
+```{r phylo_plot, message=FALSE, fig.width=8, fig.height=8}
 ## slow: cache?
 tar_load(treeblock)
 tar_load(ag_compdata_tb)
@@ -173,6 +173,8 @@ r_scaled <- r*(0.1*n_edge)
 We tried to choose priors more mindfully. We started by scaling the branch lengths to set the *sum* of all the branch lengths (i.e. the total evolutionary time experienced by all lineages to 1). Event rates of discrete transitions are measured on the *hazard* scale (probability density of an event per unit time); a rate of $r$ corresponds to a mean of $r$ transitions per unit time. We therefore set the lower limit of our prior to 0.1, meaning an expectation of only a single transition over the entire tree. For a tree with $N$ species, we set the upper limit of the prior to $100 N$, i.e. an expectation of 100 transitions *per species*. These are obviously extreme values; we used a log-Normal prior with the (geometric) mean set halfway between these values (an expectation of `r round(exp(mean(b)))` events of the course of the tree, or `r round(exp(mean(b))/ntip)` events per species in our phylogeny of `r ntip` species), and the standard deviation set so that the range between the lower and upper limits is 6 SD. This range corresponds to a 0.26% prior probability that the rates are beyond the limits.
 
 (Talk about uniform prior issues? [@yang_bayesian_2006; @carpenter_computational_2017; @thorson_uniform_2017])
+
+**todo**: maybe it's no longer relevant, but does BayesTraits *really* use flat priors by default?? Double-check manual ...
 
 ```{r prior_plot, warning=FALSE}
 ## plot(density(r))
@@ -299,11 +301,13 @@ gg_sum <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = rate)) +
   facet_wrap(~ contrast) +
   geom_violin(aes(fill = phylo), alpha=0.6) +
     stat_summary(fun.data = "median_hilow",
-                 geom = "linerange", aes(group=phylo),
+                 geom = "errorbar",
+                 aes(group=phylo),
                  ## width by trial and error; not sure what determines this?
                  position = position_dodge(width=0.875),
                  colour = "red",
-                 size = 2, alpha = 0.5) +
+                 ## size = 2,
+                 alpha = 0.5) +
     stat_summary(fun = median,
                  geom = "point", aes(group=phylo),
                  ## width by trial and error; not sure what determines this?
@@ -321,7 +325,13 @@ gg_sum <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = rate)) +
 print(gg_sum)
 ```
 
-Hmm, this says the results differ less from the priors than I would have thought / priors are more constraining than I thought (is that partly because the constraints represent sums of independent prior values, so they get 'shrunk'?)
+- Red bars are 95% (quantile) confidence intervals.
+- Conclusions
+    - priors are more constraining than I thought (is that partly because the constraints represent sums of independent prior values, so they get 'shrunk'?)
+   - fishphylo/treeblock results differ very little (treeblock results are *slightly* stronger, especially if we're fixated on significance at the 5% level)
+   - gain/loss intercepts differ/are asymmetric because of the priors we used.
+
+
 
 ```{r, echo = FALSE, eval = FALSE}
 ## double-checking bar width for sc gain/treeblock: visual discrepancy (Hmisc::smedian.hilow) with table below (quantiles)?
