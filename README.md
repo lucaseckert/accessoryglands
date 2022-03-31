@@ -37,3 +37,5 @@ library(future)
 plan("multicore")
 tar_make_future()
 ```
+
+google drive [link](https://drive.google.com/drive/folders/1S5KwLDQavshwS8i0e9_g1jRiVUw8rnLO?usp=sharing)
