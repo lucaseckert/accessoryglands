@@ -35,7 +35,7 @@ tar_visnetwork(targets_only = TRUE)
 Use each of these as the basis for a +/- 3 sigma range (on the log scale)
 
 ```{r cifun}
-tar_load(ag_model0)
+tar_load(ag_model_indep)
 tar_load(ag_mcmc0)
 tar_load(all_ci)
 ```
@@ -43,7 +43,7 @@ tar_load(all_ci)
 ## naming parameters
 
 ```{r image, message=FALSE}
-image(ag_model0)
+plot(ag_model_indep)
 ```
 
 ## Contrasts matrix

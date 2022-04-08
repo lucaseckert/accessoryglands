@@ -334,6 +334,9 @@ list(
                ),
     tar_render(ag_bayes_rmd,
                "ag_bayesdiag.rmd"
-               )
-
+               ),
+    ## clean up/rescue?
+    ## tar_render(ag_model_tech_html,
+    ## "ag_model_tech.rmd"
+    ## )
 )
