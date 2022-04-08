@@ -328,13 +328,12 @@ list(
     ##                    trace = TRUE,
     ##                    alpha=0.05) ## less extreme than default (alpha=0.01)
     ##            ),
-    ## use tarchetypes::tar_render() ?
     tar_render(ag_rmd,
                "ag_model.rmd"
                ),
     tar_render(ag_bayes_rmd,
                "ag_bayesdiag.rmd"
-               ),
+               )
     ## clean up/rescue?
     ## tar_render(ag_model_tech_html,
     ## "ag_model_tech.rmd"
