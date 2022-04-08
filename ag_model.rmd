@@ -331,6 +331,50 @@ print(gg_sum)
    - fishphylo/treeblock results differ very little (treeblock results are *slightly* stronger, especially if we're fixated on significance at the 5% level)
    - gain/loss intercepts differ/are asymmetric because of the priors we used.
 
+```{r}
+tar_load(contr_long_ag_mcmc0)
+tar_load(contr_long_ag_mcmc_tb)
+tar_load(contr_long_ag_priorsamp)
+ag_contr_gainloss <- (purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
+                                         treeblock=contr_long_ag_mcmc_tb,
+                                         prior = contr_long_ag_priorsamp),
+                                    filter, rate != "netgain",
+                                    .id = "phylo")
+    %>% mutate(across(phylo, factor,
+                      levels=rev(c("prior","treeblock","fishphylo"))))
+    ## but we only care about treeblock for the paper
+    %>% filter(phylo == "treeblock")
+)
+gg_sum <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colour = rate)) +
+    geom_violin(aes(fill = rate), alpha=0.6) +
+    stat_summary(fun.data = "median_hilow",
+                 geom = "errorbar",
+                 aes(group=rate),
+                 ## width by trial and error; not sure what determines this?
+                 position = position_dodge(width=0.875),
+                 colour = "black") +
+    stat_summary(fun = median,
+                 geom = "point", aes(group=rate),
+                 ## width by trial and error; not sure what determines this?
+                 position = position_dodge(width=0.875),
+                 colour = "black",
+                 pch = 3,
+                 size = 2) + 
+  geom_vline(xintercept = 1, lty = 2) +
+  scale_x_log10(labels = function(x) format(x, scientific = FALSE)) +
+  zmargin +
+  scale_colour_manual(name="", labels = c("Gain","Loss"), values = c("firebrick","royalblue"))+
+  scale_fill_manual(name="", labels = c("Gain","Loss"), values = c("firebrick","royalblue"))+
+  scale_y_discrete(breaks=c("intercept","pcxsc","sc","pc"), 
+                   labels=c("Intercept", "Interaction", "Spawning Mode", "Parental Care"),
+                   limits=c("intercept","pcxsc","sc","pc"))+
+  labs(x="Proportional Difference in Rates", y="")+
+  theme(panel.grid = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        axis.text = element_text(size = 10, color = "black"),
+        axis.title.x = element_text(size = 12))
+print(gg_sum)
+```
 
 
 ```{r, echo = FALSE, eval = FALSE}
