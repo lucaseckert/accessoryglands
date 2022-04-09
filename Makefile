@@ -1,5 +1,5 @@
-constrModel1.html: constrModel1.rmd cache/MK_3state_constr1_mcmc.rds
-	echo "rmarkdown::render('constrModel1.rmd')" | R --slave
+setup:
+	Rscript -e "source('R/utils.R'); options('repos'='https://cloud.r-project.org'); install_pkgs()"
 
-## cache/MK_3state_constr1_mcmc.rds: ...
-##	
+all:
+	Rscript -e "library(targets); library(future); plan('multicore'); tar_make_future()"
