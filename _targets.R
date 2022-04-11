@@ -6,9 +6,15 @@ source("R/functions.R")
 source("R/mcmc.R")
 options(tidyverse.quiet = TRUE)
 tar_option_set(packages = pkgList)
+redo_mcmc <- TRUE
+run_mcmc <- function() {
+  tar_cue(if (redo_mcmc) "thorough" else "never")
+}
+
 ## TO DEBUG: set tar_option_set(debug = "target_name"); tar_make(callr_function = NULL)
-tar_option_set(debug = "ag_pcsc_pars")
+## tar_option_set(debug = "ag_pcsc_pars")
 ## tar_option_set(debug = "ag_compdata")
+
 list(
 
     ## trait data file
@@ -281,7 +287,7 @@ list(
                            n_iter = 84000,
                            n_thin = 20,
                            seed = 101),
-               cue = tar_cue(mode="never")
+               cue = run_mcmc()
                ),
     tar_target(ag_mcmc_tb,
                corhmm_mcmc(ag_model_tb,
@@ -298,7 +304,7 @@ list(
                            n_iter =  84000,
                            n_thin = 20,
                            seed = 101),
-               cue = tar_cue(mode="never")
+               cue = run_mcmc()
                ),
     tar_target(ag_priorsamp,
                corhmm_mcmc(ag_model_pcsc,
