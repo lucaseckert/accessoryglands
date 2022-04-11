@@ -28,14 +28,25 @@ Files:
 
 ## making stuff
 
+To run single-threaded:
+
 ```r
-library("targets")
-tar_load(everything())
+library(targets)
 tar_make()
-##
+```
+
+Or multi-threaded:
+
+```r
+library(targets)
 library(future)
 plan("multicore")
 tar_make_future()
 ```
 
+To load existing products (e.g. for debugging):
+
+```r
+tar_load(everything())
+```
 google drive [link](https://drive.google.com/drive/folders/1S5KwLDQavshwS8i0e9_g1jRiVUw8rnLO?usp=sharing)
