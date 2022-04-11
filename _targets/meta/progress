@@ -37,5 +37,4 @@ comp_ci|stem|comp_ci|0|skipped
 traceplot_ag_mcmc_tb|stem|traceplot_ag_mcmc_tb|0|skipped
 contr_long_ag_mcmc_tb|stem|contr_long_ag_mcmc_tb|0|skipped
 ag_model_sc|stem|ag_model_sc|0|skipped
-ag_bayes_rmd|stem|ag_bayes_rmd|0|skipped
-ag_rmd|stem|ag_rmd|0|skipped
+ag_bayes_rmd|stem|ag_bayes_rmd|0|started
