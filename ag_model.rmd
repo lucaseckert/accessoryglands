@@ -459,6 +459,8 @@ legend("topright", col = cols, legend=nm, lty = 1, lwd=2)
 **fixme**: combine with circplot for tip states? use strong palette distinction between ag/non-ag colours?
 
 ```{r, echo=F}
+tar_load(ag_model_pcsc)
+require(phytools)
 set.seed(1)
 sm1 <- with(ag_model_pcsc,
             makeSimmap(phy, data, solution, rate.cat, nSim = 100))
@@ -474,16 +476,26 @@ smSum<-summary(sm1)
 nodeProbs<-as.data.frame(smSum$ace)
 nodeProbs$ag1<-rowSums(nodeProbs[,5:8])
 nodeProbs$ag<-as.factor(round(nodeProbs$ag1, digits = 0))
-agNodes<-rownames(subset(nodeProbs, ag==1))
-agNodes
+allAgNodes<-rownames(subset(nodeProbs, ag==1))
+#The node/tips where AGs first evolved: Lepidogalaxias salamandroides, 767, Cheilinus undulatus, 737, 615, 533, Hoplosternum littorale, 850, 845, Rita rita, 839, 836, Pangasius pangasius, 830
 
-plot.new()
-plot(ag_model_pcsc$phy)
-nodelabels(pch = 19,agNodes)
+agNodes<-c(767,737,615,533,850,845,839,836,830)
+agTips<-c("Lepidogalaxias_salamandroides","Cheilinus_undulatus","Hoplosternum_littorale","Rita_rita","Pangasius_pangasius")
 
 plot(obj1,type="fan",ftype="off", lwd=2)
 nodelabels(node = agNodes, pch = 19)
-tiplabels(tip = agNodes, pch = 19)
+tiplabels(tip = agTips, pch = 19)
+#tip labels not working for some reason
+
+require(diversitree)
+data<-read.csv(file.choose())
+data2<-data.frame(care=data$care, spawning=data$spawning, row.names = data$species)
+
+cols1<-list(care=c("#fdae6b","#e6550d"), spawning=c("#C7EBFC","#3182bd"))
+labs1<-c("Parental Care","Spawning Mode")
+str1<-list(care=c("No Male Care","Male Care"), spawning=c("Pair Spawning", "Group Spawning"))
+
+trait.plot(ag_model_pcsc$phy, data2, cols1, cex.lab = 0.2,lab = labs1, str = str1, cex.legend = 0.5)
 
 ```
 
