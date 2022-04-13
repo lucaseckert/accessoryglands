@@ -458,6 +458,36 @@ legend("topright", col = cols, legend=nm, lty = 1, lwd=2)
 
 **fixme**: combine with circplot for tip states? use strong palette distinction between ag/non-ag colours?
 
+```{r, echo=F}
+set.seed(1)
+sm1 <- with(ag_model_pcsc,
+            makeSimmap(phy, data, solution, rate.cat, nSim = 100))
+agSims<-lapply(sm1,mergeMappedStates,c(1:4),"ag0")
+agSims<-lapply(agSims,mergeMappedStates,c(5:8),"ag1")
+class(agSims)<-c("multiSimmap","multiPhylo")
+
+obj1<-densityMap(agSims, plot=FALSE)
+n<-length(obj1$cols)
+obj1$cols[1:n]<-colorRampPalette(c("grey25","deeppink3"), space="Lab")(n)
+
+smSum<-summary(sm1)
+nodeProbs<-as.data.frame(smSum$ace)
+nodeProbs$ag1<-rowSums(nodeProbs[,5:8])
+nodeProbs$ag<-as.factor(round(nodeProbs$ag1, digits = 0))
+agNodes<-rownames(subset(nodeProbs, ag==1))
+agNodes
+
+plot.new()
+plot(ag_model_pcsc$phy)
+nodelabels(pch = 19,agNodes)
+
+plot(obj1,type="fan",ftype="off", lwd=2)
+nodelabels(node = agNodes, pch = 19)
+tiplabels(tip = agNodes, pch = 19)
+
+```
+
+
 ---
 
 ## to do
