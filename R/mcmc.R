@@ -171,6 +171,7 @@ corhmm_mcmc <- function(model,
   ## or: start with a sensible diagonal, let adapt=TRUE adjust it
   S <- diag(rep(0.1, length(p)))
 
+  ## starting values (only need to be sensible)
   make_sfun <- function(p, lb = log(1e-9), ub = log(1e2), range = 3) {
     function() {
       prior.mean <- (lb + ub) / 2

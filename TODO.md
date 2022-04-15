@@ -1,3 +1,18 @@
+## BMB (13 April 2022)
+
+- keep writing
+- dig out description of BayesTraits priors?
+- work on figs?
+- write a technical supplement (separate from bayes diag, but more detailed than current ag_model summary; i.e. update `ag_model_tech.rmd` ...
+- review of use of BayesTraits/corHMM/etc. in current literature??
+- cleanup/code stuff
+   - use `renv` for package versions?
+   - priors should be specified externally to `_targets` file
+   - work on occupancy-weighted contrasts or is this a lost cause?
+- priors:
+   - check lower/upper bounds in `ag_model_tb` (0.1 to 100N) vs `ag_model_pscs_prior` (1 to 10N) ??
+   - check/compute implied priors on contrasts ...
+
 ## LE for 2021-07-07
 
 - try all of the following for the two trait model
