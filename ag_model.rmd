@@ -345,7 +345,7 @@ ag_contr_gainloss <- (purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
     ## but we only care about treeblock for the paper
     %>% filter(phylo == "treeblock")
 )
-gg_sum <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colour = rate)) +
+gg_sum_nice <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colour = rate)) +
     geom_violin(aes(fill = rate), alpha=0.6) +
     stat_summary(fun.data = "median_hilow",
                  geom = "errorbar",
@@ -373,9 +373,49 @@ gg_sum <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colour = r
         panel.border = element_rect(colour = "black", fill=NA, size=1),
         axis.text = element_text(size = 10, color = "black"),
         axis.title.x = element_text(size = 12))
-print(gg_sum)
+print(gg_sum_nice)
 ```
-
+```{r}
+tar_load(contr_long_ag_mcmc0)
+tar_load(contr_long_ag_mcmc_tb)
+tar_load(contr_long_ag_priorsamp)
+ag_contr_gainloss <- (purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
+                                         treeblock=contr_long_ag_mcmc_tb,
+                                         prior = contr_long_ag_priorsamp),
+                                    filter, rate != "netgain",
+                                    .id = "phylo")
+    %>% mutate(across(phylo, factor,
+                      levels=rev(c("prior","treeblock","fishphylo"))))
+    ## but we only care about treeblock for the paper
+    %>% filter(phylo == "treeblock")
+    %>% filter(rate == "gain")
+)
+gg_sum_gain <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast)) +
+    geom_violin(color="deeppink3", fill="deeppink3", alpha=0.7) +
+    stat_summary(fun.data = "median_hilow",
+                 geom = "errorbar",
+                 ## width by trial and error; not sure what determines this?
+                 position = position_dodge(width=0.875),
+                 colour = "black") +
+    stat_summary(fun = median,
+                 geom = "point",
+                 position = position_dodge(width=0.875),
+                 colour = "black",
+                 pch = 3,
+                 size = 2) + 
+  geom_vline(xintercept = 1, lty = 2) +
+  scale_x_log10(labels = function(x) format(x, scientific = FALSE)) +
+  zmargin +
+  scale_y_discrete(breaks=c("intercept","pcxsc","sc","pc"), 
+                   labels=c("Intercept", "Interaction", "Spawning Mode", "Parental Care"),
+                   limits=c("intercept","pcxsc","sc","pc"))+
+  labs(x="Proportional Difference in Rates", y="")+
+  theme(panel.grid = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        axis.text = element_text(size = 10, color = "black"),
+        axis.title.x = element_text(size = 12))
+print(gg_sum_gain)
+```
 
 ```{r, echo = FALSE, eval = FALSE}
 ## double-checking bar width for sc gain/treeblock: visual discrepancy (Hmisc::smedian.hilow) with table below (quantiles)?
@@ -470,7 +510,7 @@ class(agSims)<-c("multiSimmap","multiPhylo")
 
 obj1<-densityMap(agSims, plot=FALSE)
 n<-length(obj1$cols)
-obj1$cols[1:n]<-colorRampPalette(c("grey25","deeppink3"), space="Lab")(n)
+obj1$cols[1:n]<-colorRampPalette(c("grey60","firebrick"), space="Lab")(n)
 
 smSum<-summary(sm1)
 nodeProbs<-as.data.frame(smSum$ace)
@@ -483,15 +523,15 @@ agNodes<-c(767,737,615,533,850,845,839,836,830)
 agTips<-c("Lepidogalaxias_salamandroides","Cheilinus_undulatus","Hoplosternum_littorale","Rita_rita","Pangasius_pangasius")
 
 plot(obj1,type="fan",ftype="off", lwd=2)
-nodelabels(node = agNodes, pch = 19)
-tiplabels(tip = agTips, pch = 19)
+nodelabels(node = agNodes, pch = 21, col="firebrick4", bg="firebrick", cex=1.5, lwd=2)
+tiplabels(tip = agTips, pch = 21, col="firebrick4", bg="firebrick", cex=1.5, lwd=2)
 #tip labels not working for some reason
 
 require(diversitree)
 data<-read.csv(file.choose())
 data2<-data.frame(care=data$care, spawning=data$spawning, row.names = data$species)
 
-cols1<-list(care=c("#fdae6b","#e6550d"), spawning=c("#C7EBFC","#3182bd"))
+cols1<-list(care=c("#E49BFF","#8F09C0"), spawning=c("#A0D8EE","#3182bd"))
 labs1<-c("Parental Care","Spawning Mode")
 str1<-list(care=c("No Male Care","Male Care"), spawning=c("Pair Spawning", "Group Spawning"))
 
