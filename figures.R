@@ -11,7 +11,6 @@ library(diversitree)
 
 # FIGURE 1 ----------------------------------------------------------------
 tar_load(ag_model_pcsc)
-require(phytools)
 set.seed(1)
 sm1 <- with(ag_model_pcsc,
             makeSimmap(phy, data, solution, rate.cat, nSim = 100))
@@ -38,7 +37,7 @@ nodelabels(node = agNodes, pch = 21, col="firebrick4", bg="firebrick", cex=1.5, 
 tiplabels(tip = agTips, pch = 21, col="firebrick4", bg="firebrick", cex=1.5, lwd=2)
 #tip labels not working for some reason
 
-require(diversitree)
+#why cant i load this directly?
 data<-read.csv(file.choose())
 data2<-data.frame(care=data$care, spawning=data$spawning, row.names = data$species)
 
