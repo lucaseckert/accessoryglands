@@ -3,7 +3,7 @@ pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "emdbook", "ramcmc", "corHMM",
              "GGally", "colorspace", "ggmosaic", "targets", "tarchetypes",
              "abind", "cowplot", "patchwork", "ggtree", "ggnewscale",
-             "diagram", "hues")
+             "diagram", "hues", "phytools", "diversitree")
 
 ## install uninstalled pkgs from pkgList
 ## check corHMM version, install from bb repo if necessary
@@ -429,10 +429,10 @@ image_plot <- function(m, xlab="", ylab = "", sub = "") {
 ## how do we incorporate these (elegantly/easily) into the contrasts calculation?
 
 tidy.mle2 <- function (x, conf.int = FALSE, conf.level = 0.95,
-                       conf.method = "spline", ...) 
+                       conf.method = "spline", ...)
 {
     co <- bbmle::coef(bbmle::summary(x))
-    ret <- broom:::as_tidy_tibble(co, new_names = c("estimate", 
+    ret <- broom:::as_tidy_tibble(co, new_names = c("estimate",
         "std.error", "statistic", "p.value"))
     if (conf.int) {
         ci <- bbmle::confint(x, level = conf.level, method = conf.method)

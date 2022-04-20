@@ -12,6 +12,8 @@
 - priors:
    - check lower/upper bounds in `ag_model_tb` (0.1 to 100N) vs `ag_model_pscs_prior` (1 to 10N) ??
    - check/compute implied priors on contrasts ...
+- run full 24-parameter model (how much does this mess things up?)
+- compare fits without gain/loss priors?
 
 ## LE for 2021-07-07
 

@@ -16,6 +16,8 @@ load_pkgs()
 zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
 theme_set(theme_bw())
 library(targets)
+library(phytools)
+library(diversitree)
 ```
 
 The goal is to understand the role of paternal care of offspring (male parental care) and sperm competition in driving the evolution of accessory glands. While male parental care is a fairly unambiguous binary trait, sperm competition is harder to classify.  Here we use spawning context (pair spawning vs. group spawning) as a proxy for sperm competition. (**Note** from John Fitzpatrick: we should be careful how we phrase this, may want to replace "sperm competition" with "spawning behaviour" throughout. Leaving it alone for now, though.)
@@ -331,7 +333,7 @@ print(gg_sum)
    - fishphylo/treeblock results differ very little (treeblock results are *slightly* stronger, especially if we're fixated on significance at the 5% level)
    - gain/loss intercepts differ/are asymmetric because of the priors we used.
 
-```{r}
+```{r rate_diffs}
 tar_load(contr_long_ag_mcmc0)
 tar_load(contr_long_ag_mcmc_tb)
 tar_load(contr_long_ag_priorsamp)
@@ -349,6 +351,7 @@ gg_sum_nice <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colou
     geom_violin(aes(fill = rate), alpha=0.6) +
     stat_summary(fun.data = "median_hilow",
                  geom = "errorbar",
+                 width = 0.1,
                  aes(group=rate),
                  ## width by trial and error; not sure what determines this?
                  position = position_dodge(width=0.875),
@@ -375,7 +378,8 @@ gg_sum_nice <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colou
         axis.title.x = element_text(size = 12))
 print(gg_sum_nice)
 ```
-```{r}
+
+```{r sum_gain}
 tar_load(contr_long_ag_mcmc0)
 tar_load(contr_long_ag_mcmc_tb)
 tar_load(contr_long_ag_priorsamp)
@@ -417,7 +421,7 @@ gg_sum_gain <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast)) +
 print(gg_sum_gain)
 ```
 
-```{r, echo = FALSE, eval = FALSE}
+```{r check, echo = FALSE, eval = FALSE}
 ## double-checking bar width for sc gain/treeblock: visual discrepancy (Hmisc::smedian.hilow) with table below (quantiles)?
 ggb <- ggplot_build(gg_sum)
 ggb$data[[2]] %>% dplyr::select(group, PANEL, x, y, xmin, xmax) %>% mutate(across(where(is.numeric), ~ . * log(10)))
@@ -498,45 +502,48 @@ legend("topright", col = cols, legend=nm, lty = 1, lwd=2)
 
 **fixme**: combine with circplot for tip states? use strong palette distinction between ag/non-ag colours?
 
-```{r, echo=F}
+```{r multistochmap, echo=FALSE, cache=TRUE, eval = FALSE}
+## slow, move this to targets?
 tar_load(ag_model_pcsc)
-require(phytools)
 set.seed(1)
 sm1 <- with(ag_model_pcsc,
             makeSimmap(phy, data, solution, rate.cat, nSim = 100))
-agSims<-lapply(sm1,mergeMappedStates,c(1:4),"ag0")
-agSims<-lapply(agSims,mergeMappedStates,c(5:8),"ag1")
-class(agSims)<-c("multiSimmap","multiPhylo")
+agSims <- lapply(sm1,mergeMappedStates,c(1:4),"ag0")
+agSims <- lapply(agSims,mergeMappedStates,c(5:8),"ag1")
+class(agSims) <- c("multiSimmap","multiPhylo")
 
-obj1<-densityMap(agSims, plot=FALSE)
-n<-length(obj1$cols)
-obj1$cols[1:n]<-colorRampPalette(c("grey60","firebrick"), space="Lab")(n)
+## the very slow part
+## (progress = TRUE only works for my hacked version of phytools (see github),
+##  although I
+obj1 <- densityMap(agSims, plot=FALSE, check = FALSE, progress = TRUE)
+n <- length(obj1$cols)
+obj1$cols[1:n] <- colorRampPalette(c("grey60","firebrick"), space="Lab")(n)
 
-smSum<-summary(sm1)
-nodeProbs<-as.data.frame(smSum$ace)
-nodeProbs$ag1<-rowSums(nodeProbs[,5:8])
-nodeProbs$ag<-as.factor(round(nodeProbs$ag1, digits = 0))
-allAgNodes<-rownames(subset(nodeProbs, ag==1))
+smSum <- summary(sm1)
+nodeProbs <- as.data.frame(smSum$ace)
+nodeProbs$ag1 <- rowSums(nodeProbs[,5:8])
+nodeProbs$ag <- as.factor(round(nodeProbs$ag1, digits = 0))
+allAgNodes  <-  rownames(subset(nodeProbs, ag==1))
 #The node/tips where AGs first evolved: Lepidogalaxias salamandroides, 767, Cheilinus undulatus, 737, 615, 533, Hoplosternum littorale, 850, 845, Rita rita, 839, 836, Pangasius pangasius, 830
 
-agNodes<-c(767,737,615,533,850,845,839,836,830)
-agTips<-c("Lepidogalaxias_salamandroides","Cheilinus_undulatus","Hoplosternum_littorale","Rita_rita","Pangasius_pangasius")
+agNodes <- c(767,737,615,533,850,845,839,836,830)
+agTips <- c("Lepidogalaxias_salamandroides","Cheilinus_undulatus","Hoplosternum_littorale","Rita_rita","Pangasius_pangasius")
 
 plot(obj1,type="fan",ftype="off", lwd=2)
 nodelabels(node = agNodes, pch = 21, col="firebrick4", bg="firebrick", cex=1.5, lwd=2)
 tiplabels(tip = agTips, pch = 21, col="firebrick4", bg="firebrick", cex=1.5, lwd=2)
 #tip labels not working for some reason
 
-require(diversitree)
-data<-read.csv(file.choose())
-data2<-data.frame(care=data$care, spawning=data$spawning, row.names = data$species)
+if (FALSE) {
+  data <- read.csv(file.choose())
+  data2 <- data.frame(care=data$care, spawning=data$spawning, row.names = data$species)
 
-cols1<-list(care=c("#E49BFF","#8F09C0"), spawning=c("#A0D8EE","#3182bd"))
-labs1<-c("Parental Care","Spawning Mode")
-str1<-list(care=c("No Male Care","Male Care"), spawning=c("Pair Spawning", "Group Spawning"))
+  cols1 <- list(care=c("#E49BFF","#8F09C0"), spawning=c("#A0D8EE","#3182bd"))
+  labs1 <- c("Parental Care","Spawning Mode")
+  str1 <- list(care=c("No Male Care","Male Care"), spawning=c("Pair Spawning", "Group Spawning"))
 
-trait.plot(ag_model_pcsc$phy, data2, cols1, cex.lab = 0.2,lab = labs1, str = str1, cex.legend = 0.5)
-
+  trait.plot(ag_model_pcsc$phy, data2, cols1, cex.lab = 0.2,lab = labs1, str = str1, cex.legend = 0.5)
+}
 ```
 
 
@@ -550,10 +557,8 @@ trait.plot(ag_model_pcsc$phy, data2, cols1, cex.lab = 0.2,lab = labs1, str = str
 
 ### technical
 
-- reimplement as [target markdown](https://books.ropensci.org/targets/markdown.html#markdown) ?
 - switch violin plots to pointrange (or 50/90 pointranges)?
 - dot-whisker plot comparing the parameters of the restricted models
-- 
 
 ### statistical
 

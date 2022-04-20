@@ -15,6 +15,9 @@ run_mcmc <- function() {
 ## tar_option_set(debug = "ag_pcsc_pars")
 ## tar_option_set(debug = "ag_compdata")
 
+## to play around interactively:
+## library(targets); for (f in c("utils", "functions", "mcmc")) source(sprintf("R/%s.R", f))
+## tar_load(everything())
 list(
 
     ## trait data file
@@ -52,7 +55,7 @@ list(
         )
     ),
 
-    ## FIXME: target_map() these two
+    ## FIXME: use target_map() to combine these two
     ## read trait file, combine with fishtree phylo / trim
     tar_target(
         ag_compdata,
@@ -68,7 +71,13 @@ list(
     ## set constraints on rate equality
     ## these are derived by staring at the results of corHMM::getStateMat4Dat(ag_compdata$data)
     ## along with state names and figuring out which transitions to constrain
-    ## least-constrained model
+
+    ## NO constraints (all 24 parameters)
+    tar_target(
+        full_pars,
+        list()
+    ),
+    ## least-constrained model (12 params: 24 → collapse 4 sets of 4 to 1 each
     tar_target(
         pcsc_pars,
         list(c(7, 10, 20, 23),  ## all pc_gain rates
@@ -110,9 +119,10 @@ list(
     ## construct state matrices/indices for all models
     tar_map(
         values = tibble(
-            nm = c("pcsc", "pc", "sc", "indep"),
+            nm = c("full", "pcsc", "pc", "sc", "indep"),
             eqstatepars =
-              rlang::syms(c("pcsc_pars",
+              rlang::syms(c("full_pars",
+                            "pcsc_pars",
                             "pc_pars",
                             "sc_pars",
                             "indep_pars"))),
@@ -141,8 +151,9 @@ list(
     ## fit corHMM models for all sets of constraints
     tar_map(
         values = tibble(
-            nm = c("pcsc","pc","sc","indep"),
-            statemat = rlang::syms(c("ag_statemat_pcsc",
+            nm = c("full", "pcsc","pc","sc","indep"),
+            statemat = rlang::syms(c("ag_statemat_full",
+                                     "ag_statemat_pcsc",
                                      "ag_statemat_pc",
                                      "ag_statemat_sc",
                                      "ag_statemat_indep"))),
@@ -231,7 +242,8 @@ list(
         }
     ),
     tar_map(
-        values = tibble(mcmc = rlang::syms(c("ag_mcmc0", "ag_mcmc_tb",
+        values = tibble(mcmc = rlang::syms(c("ag_mcmc0",
+                                             "ag_mcmc_tb",
                                              "ag_priorsamp"))),
         tar_target(contr_long,
            ((as.mcmc(mcmc) %*% contrast_mat)
@@ -274,6 +286,24 @@ list(
     ),
     tar_target(ag_mcmc0,
                corhmm_mcmc(ag_model_pcsc,
+                           p_args=list(nllfun = make_nllfun(ag_model_pcsc),
+                                       ## sum(edge length) scaled to 1
+                                       lb = log(1),
+                                       ub = log(10 * ape::Ntip(ag_compdata$phy)),
+                                       gainloss_pairs = gainloss_priors$pairs,
+                                       lb_gainloss = gainloss_priors$lb,
+                                       ub_gainloss = gainloss_priors$ub),
+                           n_cores = 8,
+                           n_chains = 8,
+                           n_burnin = 4000,
+                           n_iter = 84000,
+                           n_thin = 20,
+                           seed = 101),
+               cue = run_mcmc()
+               ),
+    ## DRY: map with previous rule
+    tar_target(ag_mcmc_full,
+               corhmm_mcmc(ag_model_full,
                            p_args=list(nllfun = make_nllfun(ag_model_pcsc),
                                        ## sum(edge length) scaled to 1
                                        lb = log(1),
