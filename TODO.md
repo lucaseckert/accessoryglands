@@ -2,7 +2,6 @@
 
 - keep writing
 - dig out description of BayesTraits priors?
-- work on figs?
 - write a technical supplement (separate from bayes diag, but more detailed than current ag_model summary; i.e. update `ag_model_tech.rmd` ...
 - review of use of BayesTraits/corHMM/etc. in current literature??
 - cleanup/code stuff
@@ -10,10 +9,11 @@
    - priors should be specified externally to `_targets` file
    - work on occupancy-weighted contrasts or is this a lost cause?
 - priors:
-   - check lower/upper bounds in `ag_model_tb` (0.1 to 100N) vs `ag_model_pscs_prior` (1 to 10N) ??
-   - check/compute implied priors on contrasts ...
+   - describe/check lower/upper bounds in `ag_model_tb` (0.1 to 100N) vs `ag_model_pscs_prior` (1 to 10N) ??
+   - prior predictive sims (already done?) check/compute implied priors on contrasts ...
 - run full 24-parameter model (how much does this mess things up?)
 - compare fits without gain/loss priors?
+- double-check thinning? (supposedly ran burn-in of 4000 + 80000 steps with thinning of 20; how come we have n = 8000 in the resulting chains? thinning arg didn't get passed through)
 
 ## LE for 2021-07-07
 
