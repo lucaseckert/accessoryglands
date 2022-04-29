@@ -5,6 +5,10 @@ pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "abind", "cowplot", "patchwork", "ggtree", "ggnewscale",
              "diagram", "hues", "phytools", "diversitree")
 
+GH_pkgs <- c("bbolker/corHMM",    ## hacked/BMB version
+             "YuLab-SMU/ggtree",
+             "rgriff23/btw"       ## BayesTree interface
+             )
 ## install uninstalled pkgs from pkgList
 ## check corHMM version, install from bb repo if necessary
 ## FIXME: save required version elsewhere/externally?
@@ -12,10 +16,9 @@ install_pkgs <- function() {
     ip <- installed.packages()
     to_install <- setdiff(pkgList, c(rownames(ip), "corHMM"))
     install.packages(to_install)
-    ## since install_github checks hashes, don't bother with a check
-    remotes::install_github("bbolker/corHMM")
-    remotes::install_github("YuLab-SMU/ggtree")
-    return(NULL)
+    ## since install_github checks hashes, don't bother checking whether already installed
+    lapply(GH_pkgs, remotes::install_github)
+    return(invisible(NULL))
 }
 
 load_pkgs <- function() {

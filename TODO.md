@@ -8,6 +8,7 @@
    - use `renv` for package versions?
    - priors should be specified externally to `_targets` file
    - work on occupancy-weighted contrasts or is this a lost cause?
+   - make sure thinning params get passed through to MCMC function (but switch targets to use 10 rather than 20 to match current setup ...)
 - priors:
    - describe/check lower/upper bounds in `ag_model_tb` (0.1 to 100N) vs `ag_model_pscs_prior` (1 to 10N) ??
    - prior predictive sims (already done?) check/compute implied priors on contrasts ...
