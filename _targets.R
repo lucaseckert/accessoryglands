@@ -18,8 +18,9 @@ run_mcmc <- function() {
 ## to play around interactively:
 ## library(targets); for (f in c("utils", "functions", "mcmc")) source(sprintf("R/%s.R", f))
 ## tar_load(everything())
-list(
 
+## tar_plan is from tarchetypes::tar_plan()
+data_input_targets <- tar_plan(
     ## trait data file
     tar_target(
         ag_binary_trait_file,
@@ -66,9 +67,11 @@ list(
     tar_target(
         ag_compdata_tb,
         get_ag_data(full_ag_data, phylo = treeblock[[1]])
-    ),
+    )
+)  ## end data_input_targets
 
-    ## set constraints on rate equality
+parameter_constraint_targets <- tar_plan(
+        ## set constraints on rate equality
     ## these are derived by staring at the results of corHMM::getStateMat4Dat(ag_compdata$data)
     ## along with state names and figuring out which transitions to constrain
 
@@ -114,11 +117,18 @@ list(
                c(3, 6,  9, 12) ## ag_loss
                )
           )
-    ),
+    )
+)
+
+##
+list(data_input_targets,
+     parameter_constraint_targets,
 
     ## construct state matrices/indices for all models
     tar_map(
         values = tibble(
+            ## general trick: pass 'nm' as a column of the values
+            ## so we get ag_statemat_{nm}
             nm = c("full", "pcsc", "pc", "sc", "indep"),
             eqstatepars =
               rlang::syms(c("full_pars",
@@ -190,37 +200,37 @@ list(
         }),
     tar_target(ag_model_pcsc_prior,
     {
-        nll <- make_nllfun(ag_model_pcsc)
-        p <- coef(ag_model_pcsc)
-        cc <- corhmm_logpostfun
-        p[] <- 0
-        parnames(cc) <- names(p)
-        mle2(cc,
-             start = p,
-             trace = TRUE,
-             vecpar = TRUE,
-             data = list(nllfun = nll,
-                         negative = TRUE,
-                         ## sum(edge length) scaled to 1
-                         lb = log(1),
-                         ub = log(10 * ape::Ntip(ag_compdata$phy)),
-                         gainloss_pairs = gainloss_priors$pairs,
-                         lb_gainloss = gainloss_priors$lb,
-                         ub_gainloss = gainloss_priors$ub),
-             control = list(maxit = 1e4, trace = 1),
-             method = "BFGS"
-             )
+      nll <- make_nllfun(ag_model_pcsc)
+      p <- coef(ag_model_pcsc)
+      cc <- corhmm_logpostfun
+      p[] <- 0
+      parnames(cc) <- names(p)
+      mle2(cc,
+           start = p,
+           trace = TRUE,
+           vecpar = TRUE,
+           data = list(nllfun = nll,
+                       negative = TRUE,
+                       ## sum(edge length) scaled to 1
+                       lb = log(1),
+                       ub = log(10 * ape::Ntip(ag_compdata$phy)),
+                       gainloss_pairs = gainloss_priors$pairs,
+                       lb_gainloss = gainloss_priors$lb,
+                       ub_gainloss = gainloss_priors$ub),
+           control = list(maxit = 1e4, trace = 1),
+           method = "BFGS"
+           )
     }),
     tar_target(comp_ci,
-               { list(
-                     wald = tidy(ag_model_pcsc, conf.int = TRUE),
-                     ## profile = tidy(ag_model_pcsc, conf.int = TRUE,
-                     ## conf.method = "profile", profile = ag_profile0),
-                     mcmc = tidy(ag_mcmc0, robust = TRUE, conf.int = TRUE)) %>%
-                   bind_rows(.id = "method")  %>%
-                   rename(lwr = "conf.low", upr = "conf.high")
-               }
-               ),
+    { list(
+          wald = tidy(ag_model_pcsc, conf.int = TRUE),
+          ## profile = tidy(ag_model_pcsc, conf.int = TRUE,
+          ## conf.method = "profile", profile = ag_profile0),
+          mcmc = tidy(ag_mcmc0, robust = TRUE, conf.int = TRUE)) %>%
+        bind_rows(.id = "method")  %>%
+        rename(lwr = "conf.low", upr = "conf.high")
+    }
+    ),
     tar_target(
         gainloss_priors,
         list(pairs = list(c(4,1), c(6,2), c(9,3), c(10,5), c(11, 7), c(12, 8)),
@@ -355,6 +365,12 @@ list(
         values = tibble(mcmc = rlang::syms(c("ag_mcmc0", "ag_mcmc_tb"))),
         tar_target(traceplot, lattice::xyplot(mcmc, aspect="fill", layout=c(2,6)))
     ),
+    tar_map(values = tibble(mcmc = rlang::syms("ag_mcmc0", "ag_mcmc_tb", "ag_mcmc_full"),
+                            nm = c("0", "tb", "full")),
+            names = nm,
+            tar_target(pairsplots,
+                       mk_mcmcpairsplot(mcmc, sprintf("mcmc_pairs_%s.png", nm)))
+            ),
     tar_map(
         values = tibble(mcmc = rlang::syms(c("ag_mcmc0", "ag_mcmc_tb")),
                        fn = "pairs_ag_"),
