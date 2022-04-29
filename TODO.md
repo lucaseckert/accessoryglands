@@ -14,6 +14,9 @@
 - run full 24-parameter model (how much does this mess things up?)
 - compare fits without gain/loss priors?
 - double-check thinning? (supposedly ran burn-in of 4000 + 80000 steps with thinning of 20; how come we have n = 8000 in the resulting chains? thinning arg didn't get passed through)
+- run BayesTraits comparison?
+   - `remotes::install_github("rgriff23/btw")`
+   - See http://www.randigriffin.com/projects/btw
 
 ## LE for 2021-07-07
 

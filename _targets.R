@@ -350,9 +350,15 @@ list(
                            n_thin = 20,
                            seed = 101)
                ),
+    ## what is this actually doing? doesn't save the objects
     tar_map(
         values = tibble(mcmc = rlang::syms(c("ag_mcmc0", "ag_mcmc_tb"))),
         tar_target(traceplot, lattice::xyplot(mcmc, aspect="fill", layout=c(2,6)))
+    ),
+    tar_map(
+        values = tibble(mcmc = rlang::syms(c("ag_mcmc0", "ag_mcmc_tb")),
+                       fn = "pairs_ag_"),
+        tar_target(pairsplot, lattice::xyplot(mcmc, aspect="fill", layout=c(2,6)))
     ),
     tar_target(ag_mcmc1,
                as.mcmc(ag_mcmc0)

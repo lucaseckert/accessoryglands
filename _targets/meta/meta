@@ -20,7 +20,7 @@ ag_model_tech_html|stem||5dbd745b4d0410fa|092525543843cc94|-1652853718||t19090.0
 ag_pc_pars|stem|08f3e24d6d1bc279|7f8d2dc65c188a53|c5384c9db85f2c25|-155240176||t18816.7159233718s|e92536e5890953e5|126|rds|local|vector|||0||
 ag_pcsc_pars|stem|20f7a7df06ca2e70|044741c5d17b6bac|0e7f82db1e6d45a8|-1939590306||t18816.7159205477s|887021b347b02e8f|100|rds|local|vector|||0||
 ag_priorsamp|stem|dbb72525b92ed6b0|631f0179d8c0c45e|f206a37725efef49|1146734896||t19093.9778356874s|4d1bb62f23829f03|5493467|rds|local|vector|||10.873||
-ag_rmd|stem|def98f2023bf1b14|cc6ac95148dab019|07bd04d6e4e3fb56|-742077490|ag_model.html*ag_model.rmd*ag_model_files|t19102.7349283228s|9b293ec630a3aa8d|7307972|file|local|vector|||18.855|Removed 756 rows containing nonfinite values stat_density.. Removed 3 rows containing nonfinite values stat_bin.|
+ag_rmd|stem|def98f2023bf1b14|cc6ac95148dab019|07bd04d6e4e3fb56|-742077490|ag_model.html*ag_model.rmd*ag_model_files|t19102.7349283228s|13f449ed663780b3|2615237|file|local|vector|||18.855|Removed 756 rows containing nonfinite values stat_density.. Removed 3 rows containing nonfinite values stat_bin.|
 ag_sc_pars|stem|1a215e3ec5c4fb0c|d518da54c89b1302|c5384c9db85f2c25|1229033149||t18816.7159234181s|e92536e5890953e5|126|rds|local|vector|||0||
 ag_statemat_full|stem|5fb9f24ce5e31bd5|8d6d59c73a4a6ee6|f4436fb39d12bc98|1215552028||t19102.0310767587s|3c187ffa31a31952|199|rds|local|vector|||0.068||
 ag_statemat_indep|stem|b8a30fd97f5f35d1|ce62fb1ab26bd327|d072413043b1351a|17182435||t19093.9795076254s|37e90c3ecba3a0b1|177|rds|local|vector|||0.062||

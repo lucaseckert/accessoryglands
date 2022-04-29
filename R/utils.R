@@ -445,3 +445,22 @@ tidy.mle2 <- function (x, conf.int = FALSE, conf.level = 0.95,
     }
     as_tibble(ret)
 }
+
+##' save an MCMC diagnostic pairs plot to a file
+##' @param mcmc_obj an mcmc object
+##' @param mc_theme ggplot theme (default is black/white with no between-panel spacing
+##' @param fn file name for saved plot
+##' @param \dots additional arguments to \code{ggsave}
+mk_mcmcpairsplot <- function(mcmc_obj, mc_theme = NULL,
+                             fn, ...) {
+  if (is.null(mc_theme)) {
+    mc_theme <- theme_bw() + theme(panel.spacing = grid::unit(0, "lines"))
+  }
+  theme_set(mc_theme)
+  p <- ggpairs(as.data.frame(lump.mcmc.list(ag_mcmc0)), progress=FALSE,
+        lower=list(continuous=function(...) my_mcmc(..., show_prior=FALSE)),
+        upper=list(continuous=function(...) my_mcmc(..., geom="density",
+                                                    show_prior = FALSE)))
+  ggsave(filename = fn, plot = p, ...)
+  return(NULL)
+}
