@@ -361,7 +361,7 @@ list(data_input_targets,
                            seed = 101)
                ),
     tar_map(
-        values = tibble(mcmc = rlang::syms(glue::glue("ag_mcmc{mcmc_runs}")),
+        values = tibble(mcmc = rlang::syms(glue::glue("ag_mcmc_{mcmc_runs}")),
                         nm = mcmc_runs),
         names = nm,
         tar_target(traceplot, lattice::xyplot(mcmc, aspect="fill", layout=c(2,6)))
