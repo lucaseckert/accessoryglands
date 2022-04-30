@@ -39,11 +39,7 @@ pairs(as.matrix(ag_mcmc0), gap = 0, pch = ".")
 **fixme**: output the PNG file as a target so we don't have to re-render when building this document?
 
 ```{r bayes_pairs2, fig.width=10, fig.height=10, cache=TRUE}
-bp2 <- ggpairs(as.data.frame(lump.mcmc.list(ag_mcmc0)), progress=FALSE,
-        lower=list(continuous=function(...) my_mcmc(..., show_prior=FALSE)),
-        upper=list(continuous=function(...) my_mcmc(..., geom="density", show_prior=FALSE))) +
-  zmargin
-bp2_time <- system.time(print(bp2))
+knitr::include_graphics('pix/mcmc_pairs_0.png')
 ```
 
 Contour levels are: 50%, 80% 90%, 95% (largest) highest posterior density regions.
@@ -65,9 +61,9 @@ monitor(aa2)
 ```
 
 ```{r bayes_pairs_tb, fig.width=10, fig.height=10, cache=TRUE}
-bp3 <- ggpairs(as.data.frame(lump.mcmc.list(ag_mcmc_tb)), progress=FALSE,
-        lower=list(continuous=function(...) my_mcmc(..., show_prior=FALSE)),
-        upper=list(continuous=function(...) my_mcmc(..., geom="density", show_prior=FALSE))) +
-  zmargin
-bp3_time <- system.time(print(bp3))
+knitr::include_graphics('pix/mcmc_pairs_tb.png')
+```
+
+```{r bayes_pairs_full, fig.width=10, fig.height=10, cache=TRUE}
+knitr::include_graphics('pix/mcmc_pairs_full.png')
 ```

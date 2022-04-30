@@ -1,26 +1,30 @@
 pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "ggthemes", "fishtree", "caper", "broom.mixed",
-             "emdbook", "ramcmc", "corHMM",
+             "emdbook", "ramcmc", "corHMM", "latticeExtra",
              "GGally", "colorspace", "ggmosaic", "targets", "tarchetypes",
              "abind", "cowplot", "patchwork", "ggtree", "ggnewscale",
-             "diagram", "hues", "phytools", "diversitree")
+             "glue", "diagram", "hues", "phytools", "diversitree")
 
-GH_pkgs <- c("bbolker/corHMM",    ## hacked/BMB version
-             "YuLab-SMU/ggtree",
-             "rgriff23/btw"       ## BayesTree interface
+## packages to install from GitHub (username, reponame)
+GH_pkgs <- list(c("bbolker","corHMM"),    ## hacked/BMB version
+                c("YuLab-SMU","ggtree"),
+                c("rgriff23","btw")       ## BayesTree interface
              )
-## install uninstalled pkgs from pkgList
-## check corHMM version, install from bb repo if necessary
-## FIXME: save required version elsewhere/externally?
+##' install uninstalled pkgs from pkgList and GH_pkgs
+##' FIXME: use renv() ?
 install_pkgs <- function() {
     ip <- installed.packages()
-    to_install <- setdiff(pkgList, c(rownames(ip), "corHMM"))
+    to_install <- setdiff(pkgList,
+                          ## skip installed packages and GitHub packages
+                          c(rownames(ip),
+                            purrr::map_chr(GH_pkgs, ~.[2])))
     install.packages(to_install)
     ## since install_github checks hashes, don't bother checking whether already installed
-    lapply(GH_pkgs, remotes::install_github)
+    map(GH_pkgs, ~remotes::install_github(paste(.[[1]], .[[2]], sep = "/")))
     return(invisible(NULL))
 }
 
+## redundant with `tar_option_set(packages = pkgList)` ?
 load_pkgs <- function() {
   invisible(lapply(pkgList, library, character.only = TRUE))
 }
@@ -102,6 +106,8 @@ get_hpd2d_levels <- function(x, y, prob=c(0.9,0.95), ...) {
 
 
 #' @param dd trait data (no species names)
+#' @param sep1
+#' @param sep2
 state_names <- function(dd, sep1 = "", sep2 = "_") {
   get_u <- function(x) {
     s <- sort(unique(x))
@@ -121,6 +127,9 @@ mk_idf <- function(index.mat) {
   return(df)
 }
 
+##' utility to plot transition matrix
+##' @param x transition matrix
+##' @param iso aspect ratio
 plot.corhmm <- function(x,
                         aspect="iso",
                         log = TRUE,
@@ -153,8 +162,10 @@ plot.corhmm <- function(x,
 }
 
 
-## wrap corhmm results to create a negative log-likelihood function
-## (faster than calling corHMM(p = exp(log_p))
+##' wrap corhmm results to create a negative log-likelihood function
+##' (faster than calling corHMM(p = exp(log_p))
+##' @param corhmm_fit
+##' @param treeblock sample a random phylogeny from the treeblock when computing?
 make_nllfun <- function(corhmm_fit, treeblock = NULL) {
   require("bbmle")
   f <- function(log_p, treeblock = NULL) {
@@ -454,16 +465,15 @@ tidy.mle2 <- function (x, conf.int = FALSE, conf.level = 0.95,
 ##' @param mc_theme ggplot theme (default is black/white with no between-panel spacing
 ##' @param fn file name for saved plot
 ##' @param \dots additional arguments to \code{ggsave}
-mk_mcmcpairsplot <- function(mcmc_obj, mc_theme = NULL,
-                             fn, ...) {
+mk_mcmcpairsplot <- function(mcmc_obj, fn, mc_theme = NULL, ...) {
   if (is.null(mc_theme)) {
     mc_theme <- theme_bw() + theme(panel.spacing = grid::unit(0, "lines"))
   }
   theme_set(mc_theme)
-  p <- ggpairs(as.data.frame(lump.mcmc.list(ag_mcmc0)), progress=FALSE,
-        lower=list(continuous=function(...) my_mcmc(..., show_prior=FALSE)),
-        upper=list(continuous=function(...) my_mcmc(..., geom="density",
-                                                    show_prior = FALSE)))
+  p <- ggpairs(as.data.frame(lump.mcmc.list(mcmc_obj)), progress=FALSE,
+               lower=list(continuous=function(...) my_mcmc(..., show_prior=FALSE)),
+               upper=list(continuous=function(...) my_mcmc(..., geom="density",
+                                                           show_prior = FALSE)))
   ggsave(filename = fn, plot = p, ...)
   return(NULL)
 }

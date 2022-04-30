@@ -10,7 +10,7 @@ redo_mcmc <- TRUE
 run_mcmc <- function() {
   tar_cue(if (redo_mcmc) "thorough" else "never")
 }
-
+mcmc_runs <- c("0", "tb", "full")
 ## TO DEBUG: set tar_option_set(debug = "target_name"); tar_make(callr_function = NULL)
 ## tar_option_set(debug = "ag_pcsc_pars")
 ## tar_option_set(debug = "ag_compdata")
@@ -226,7 +226,7 @@ list(data_input_targets,
           wald = tidy(ag_model_pcsc, conf.int = TRUE),
           ## profile = tidy(ag_model_pcsc, conf.int = TRUE,
           ## conf.method = "profile", profile = ag_profile0),
-          mcmc = tidy(ag_mcmc0, robust = TRUE, conf.int = TRUE)) %>%
+          mcmc = tidy(ag_mcmc_0, robust = TRUE, conf.int = TRUE)) %>%
         bind_rows(.id = "method")  %>%
         rename(lwr = "conf.low", upr = "conf.high")
     }
@@ -252,7 +252,7 @@ list(data_input_targets,
         }
     ),
     tar_map(
-        values = tibble(mcmc = rlang::syms(c("ag_mcmc0",
+        values = tibble(mcmc = rlang::syms(c("ag_mcmc_0",
                                              "ag_mcmc_tb",
                                              "ag_priorsamp"))),
         tar_target(contr_long,
@@ -277,7 +277,7 @@ list(data_input_targets,
                                 conf.method = "quad"),
               ## profile = tidy(ag_model_pcsc, conf.int = TRUE,
               ## conf.method = "profile", profile = ag_profile0),
-              mcmc = tidy(ag_mcmc0, robust = TRUE, conf.int = TRUE),
+              mcmc = tidy(ag_mcmc_0, robust = TRUE, conf.int = TRUE),
               mcmc_treeblock = tidy(ag_mcmc_tb, robust = TRUE, conf.int = TRUE)
           )
           (bind_rows(t_list, .id = "method")
@@ -294,7 +294,7 @@ list(data_input_targets,
                 %>% tibble::rownames_to_column("term")
             )
     ),
-    tar_target(ag_mcmc0,
+    tar_target(ag_mcmc_0,
                corhmm_mcmc(ag_model_pcsc,
                            p_args=list(nllfun = make_nllfun(ag_model_pcsc),
                                        ## sum(edge length) scaled to 1
@@ -360,26 +360,27 @@ list(data_input_targets,
                            n_thin = 20,
                            seed = 101)
                ),
-    ## what is this actually doing? doesn't save the objects
     tar_map(
-        values = tibble(mcmc = rlang::syms(c("ag_mcmc0", "ag_mcmc_tb"))),
+        values = tibble(mcmc = rlang::syms(glue::glue("ag_mcmc{mcmc_runs}")),
+                        nm = mcmc_runs),
+        names = nm,
         tar_target(traceplot, lattice::xyplot(mcmc, aspect="fill", layout=c(2,6)))
     ),
-    tar_map(values = tibble(mcmc = rlang::syms(c("ag_mcmc0",
+    tar_map(values = tibble(mcmc = rlang::syms(c("ag_mcmc_0",
                                                  "ag_mcmc_tb",
                                                  "ag_mcmc_full")),
-                            nm = c("0", "tb", "full")),
+                            nm = c("0","tb", "full")),
             names = nm,
-            tar_target(pairsplots,
-                       mk_mcmcpairsplot(mcmc, sprintf("mcmc_pairs_%s.png", nm)))
+            tar_target(mc_pairsplots,
+                       mk_mcmcpairsplot(mcmc, fn = sprintf("pix/mcmc_pairs_%s.png", nm)))
             ),
     tar_map(
-        values = tibble(mcmc = rlang::syms(c("ag_mcmc0", "ag_mcmc_tb")),
+        values = tibble(mcmc = rlang::syms(c("ag_mcmc_0", "ag_mcmc_tb")),
                        fn = "pairs_ag_"),
         tar_target(pairsplot, lattice::xyplot(mcmc, aspect="fill", layout=c(2,6)))
     ),
     tar_target(ag_mcmc1,
-               as.mcmc(ag_mcmc0)
+               as.mcmc(ag_mcmc_0)
                ),
     ## SKIP for now
     ## tar_target(ag_profile0,
