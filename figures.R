@@ -10,25 +10,30 @@ library(diversitree)
 
 
 # FIGURE 1 ----------------------------------------------------------------
+#simmap simulations
 tar_load(ag_model_pcsc)
 set.seed(1)
 sm1 <- with(ag_model_pcsc,
             makeSimmap(phy, data, solution, rate.cat, nSim = 100))
-agSims<-lapply(sm1,mergeMappedStates,c(1:4),"ag0")
-agSims<-lapply(agSims,mergeMappedStates,c(5:8),"ag1")
-class(agSims)<-c("multiSimmap","multiPhylo")
 
-obj1<-densityMap(agSims, plot=FALSE)
-n<-length(obj1$cols)
-obj1$cols[1:n]<-colorRampPalette(c("grey60","firebrick"), space="Lab")(n)
-
+#finding AG nodes
 smSum<-summary(sm1)
 nodeProbs<-as.data.frame(smSum$ace)
 nodeProbs$ag1<-rowSums(nodeProbs[,5:8])
 nodeProbs$ag<-as.factor(round(nodeProbs$ag1, digits = 0))
 allAgNodes<-rownames(subset(nodeProbs, ag==1))
-#The node/tips where AGs first evolved: Lepidogalaxias salamandroides, 767, Cheilinus undulatus, 737, 615, 533, Hoplosternum littorale, 850, 845, Rita rita, 839, 836, Pangasius pangasius, 830
 
+#collapsing to AG
+agSims<-lapply(sm1,mergeMappedStates,c(1:4),"ag0")
+agSims<-lapply(agSims,mergeMappedStates,c(5:8),"ag1")
+class(agSims)<-c("multiSimmap","multiPhylo")
+
+#plotting posterior probability
+obj1<-densityMap(agSims, plot=FALSE)
+n<-length(obj1$cols)
+obj1$cols[1:n]<-colorRampPalette(c("grey60","firebrick"), space="Lab")(n)
+
+#The node/tips where AGs first evolved: Lepidogalaxias salamandroides, 767, Cheilinus undulatus, 737, 615, 533, Hoplosternum littorale, 850, 845, Rita rita, 839, 836, Pangasius pangasius, 830
 agNodes<-c(767,737,615,533,850,845,839,836,830)
 agTips<-c("Lepidogalaxias_salamandroides","Cheilinus_undulatus","Hoplosternum_littorale","Rita_rita","Pangasius_pangasius")
 
@@ -41,7 +46,7 @@ tiplabels(tip = agTips, pch = 21, col="firebrick4", bg="firebrick", cex=1.5, lwd
 data<-read.csv(file.choose())
 data2<-data.frame(care=data$care, spawning=data$spawning, row.names = data$species)
 
-cols1<-list(care=c("#bcbddc","#756bb1"), spawning=c("#9ecae1","#3182bd"))
+cols1<-list(care=c("#c7e9c0","#006d2c"), spawning=c("#bdd7e7","#2171b5"))
 labs1<-c("Parental Care","Spawning Mode")
 str1<-list(care=c("No Male Care","Male Care"), spawning=c("Pair Spawning", "Group Spawning"))
 
@@ -96,3 +101,12 @@ gg_sum_nice <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colou
         axis.text = element_text(size = 10, color = "black"),
         axis.title.x = element_text(size = 12))
 print(gg_sum_nice)
+
+# SIMMAPs -----------------------------------------------------------------
+tar_load(ag_model_pcsc)
+tar_load(treeblock)
+set.seed(1)
+root<-c(1,0,0,0,0,0,0,0)
+
+sm1 <- makeSimmap(treeblock[[1]], ag_model_pcsc$data, ag_model_pcsc$solution, ag_model_pcsc$rate.cat, root.p = "yang", nSim = 1)
+
