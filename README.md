@@ -50,3 +50,24 @@ To load existing products (e.g. for debugging):
 tar_load(everything())
 ```
 google drive [link](https://drive.google.com/drive/folders/1S5KwLDQavshwS8i0e9_g1jRiVUw8rnLO?usp=sharing)
+
+## installing BayesTraits
+
+Linux:
+
+```
+git clone https://github.com/josephwb/BayesTraitsV3 btv3
+cd BayesTraitsV3/src
+## sudo apt install libnlopt-dev
+make threaded
+mv BayesTraitsv3_threaded ../../BayesTraitsV3
+```
+
+test:
+
+```r
+library("btw")
+bayestraits(data = primate.discrete1,
+	tree = primate.tree100,
+	command = c("1", "1", "run"))
+```

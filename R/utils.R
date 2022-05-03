@@ -3,7 +3,8 @@ pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "emdbook", "ramcmc", "corHMM", "latticeExtra",
              "GGally", "colorspace", "ggmosaic", "targets", "tarchetypes",
              "abind", "cowplot", "patchwork", "ggtree", "ggnewscale",
-             "glue", "diagram", "hues", "phytools", "diversitree")
+             "glue", "diagram", "hues", "phytools", "diversitree",
+             "remotes")
 
 ## packages to install from GitHub (username, reponame)
 GH_pkgs <- list(c("bbolker","corHMM"),    ## hacked/BMB version
@@ -20,7 +21,7 @@ install_pkgs <- function() {
                             purrr::map_chr(GH_pkgs, ~.[2])))
     install.packages(to_install)
     ## since install_github checks hashes, don't bother checking whether already installed
-    map(GH_pkgs, ~remotes::install_github(paste(.[[1]], .[[2]], sep = "/")))
+    purrr::map(GH_pkgs, ~remotes::install_github(paste(.[[1]], .[[2]], sep = "/")))
     return(invisible(NULL))
 }
 
