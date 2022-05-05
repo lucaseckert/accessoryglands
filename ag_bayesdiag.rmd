@@ -21,8 +21,8 @@ library(targets)
 ## fishphylo
 
 ```{r bayes_traceplot, fig.width=8, fig.height=8}
-tar_load(traceplot_ag_mcmc0)
-print(traceplot_ag_mcmc0)
+tar_load(traceplot_0)
+print(traceplot_0)
 ```
 
 ```{r improved_rhat}
@@ -39,6 +39,7 @@ pairs(as.matrix(ag_mcmc0), gap = 0, pch = ".")
 **fixme**: output the PNG file as a target so we don't have to re-render when building this document?
 
 ```{r bayes_pairs2, fig.width=10, fig.height=10, cache=TRUE}
+tar_load(mc_pairsplots_0)
 knitr::include_graphics('pix/mcmc_pairs_0.png')
 ```
 
@@ -49,8 +50,8 @@ Contour levels are: 50%, 80% 90%, 95% (largest) highest posterior density region
 
 
 ```{r traceplot_tb, fig.width=8, fig.height=8}
-tar_load(traceplot_ag_mcmc_tb)
-print(traceplot_ag_mcmc_tb)
+tar_load(traceplot_tb)
+print(traceplot_tb)
 ```
 
 ```{r improved_rhat_tb}
@@ -61,9 +62,11 @@ monitor(aa2)
 ```
 
 ```{r bayes_pairs_tb, fig.width=10, fig.height=10, cache=TRUE}
+tar_load(mc_pairsplots_tb)
 knitr::include_graphics('pix/mcmc_pairs_tb.png')
 ```
 
 ```{r bayes_pairs_full, fig.width=10, fig.height=10, cache=TRUE}
+tar_load(mc_pairsplots_full)
 knitr::include_graphics('pix/mcmc_pairs_full.png')
 ```

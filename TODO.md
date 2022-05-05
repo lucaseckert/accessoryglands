@@ -1,6 +1,8 @@
-## BMB (13 April 2022)
+## BMB (4 May 2022)
 
-- keep writing
+
+- prior predictive checks, prior sensitivity
+- figure out something about pairs plots (build by hand?)
 - dig out description of BayesTraits priors?
 - write a technical supplement (separate from bayes diag, but more detailed than current ag_model summary; i.e. update `ag_model_tech.rmd` ...
 - review of use of BayesTraits/corHMM/etc. in current literature??

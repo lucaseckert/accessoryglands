@@ -374,11 +374,11 @@ list(data_input_targets,
             tar_target(mc_pairsplots,
                        mk_mcmcpairsplot(mcmc, fn = sprintf("pix/mcmc_pairs_%s.png", nm)))
             ),
-    tar_map(
-        values = tibble(mcmc = rlang::syms(c("ag_mcmc_0", "ag_mcmc_tb")),
-                       fn = "pairs_ag_"),
-        tar_target(pairsplot, lattice::xyplot(mcmc, aspect="fill", layout=c(2,6)))
-    ),
+    ## tar_map(
+    ##     values = tibble(mcmc = rlang::syms(c("ag_mcmc_0", "ag_mcmc_tb")),
+    ##                    fn = "pairs_ag_"),
+    ##     tar_target(pairsplot, lattice::xyplot(mcmc, aspect="fill", layout=c(2,6)))
+    ## ),
     tar_target(ag_mcmc1,
                as.mcmc(ag_mcmc_0)
                ),

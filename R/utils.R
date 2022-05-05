@@ -4,12 +4,12 @@ pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "GGally", "colorspace", "ggmosaic", "targets", "tarchetypes",
              "abind", "cowplot", "patchwork", "ggtree", "ggnewscale",
              "glue", "diagram", "hues", "phytools", "diversitree",
-             "remotes")
+             "remotes", "visNetwork")
 
 ## packages to install from GitHub (username, reponame)
 GH_pkgs <- list(c("bbolker","corHMM"),    ## hacked/BMB version
                 c("YuLab-SMU","ggtree"),
-                c("rgriff23","btw")       ## BayesTree interface
+                c("bbolker","btw")       ## BayesTree interface (hacked/BMB version)
              )
 ##' install uninstalled pkgs from pkgList and GH_pkgs
 ##' FIXME: use renv() ?
@@ -471,7 +471,7 @@ mk_mcmcpairsplot <- function(mcmc_obj, fn, mc_theme = NULL, ...) {
     mc_theme <- theme_bw() + theme(panel.spacing = grid::unit(0, "lines"))
   }
   theme_set(mc_theme)
-  p <- ggpairs(as.data.frame(lump.mcmc.list(mcmc_obj)), progress=FALSE,
+  p <- GGally::ggpairs(as.data.frame(emdbook::lump.mcmc.list(mcmc_obj)), progress=FALSE,
                lower=list(continuous=function(...) my_mcmc(..., show_prior=FALSE)),
                upper=list(continuous=function(...) my_mcmc(..., geom="density",
                                                            show_prior = FALSE)))
