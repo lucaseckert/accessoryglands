@@ -476,5 +476,5 @@ mk_mcmcpairsplot <- function(mcmc_obj, fn, mc_theme = NULL, ...) {
                upper=list(continuous=function(...) my_mcmc(..., geom="density",
                                                            show_prior = FALSE)))
   ggsave(filename = fn, plot = p, ...)
-  return(NULL)
+  return(fn)
 }

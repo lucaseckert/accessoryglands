@@ -66,6 +66,20 @@ tar_load(mc_pairsplots_tb)
 knitr::include_graphics('pix/mcmc_pairs_tb.png')
 ```
 
+## full
+
+```{r traceplot_full, fig.width=8, fig.height=8}
+tar_load(traceplot_full)
+print(traceplot_full)
+```
+
+```{r improved_rhat_full}
+tar_load(ag_mcmc_full)
+aa <- do.call(abind, c(ag_mcmc_full, list(along=3)))
+aa2 <- aperm(aa,c(1,3,2), resize=TRUE)
+monitor(aa2)
+```
+
 ```{r bayes_pairs_full, fig.width=10, fig.height=10, cache=TRUE}
 tar_load(mc_pairsplots_full)
 knitr::include_graphics('pix/mcmc_pairs_full.png')

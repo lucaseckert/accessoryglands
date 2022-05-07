@@ -32,7 +32,8 @@ ag_model_tb|stem|ag_model_tb|0|skipped
 ag_mcmc_tb|stem|ag_mcmc_tb|0|skipped
 ag_model_pcsc_prior|stem|ag_model_pcsc_prior|0|skipped
 all_ci|stem|all_ci|0|skipped
-mc_pairsplots_full|stem|mc_pairsplots_full|0|skipped
+mc_pairsplots_full|stem|mc_pairsplots_full|0|started
+mc_pairsplots_full|stem|mc_pairsplots_full|0|built
 traceplot_tb|stem|traceplot_tb|0|skipped
 ag_model_indep|stem|ag_model_indep|0|skipped
 prior_ci|stem|prior_ci|0|skipped
@@ -40,4 +41,11 @@ states_df|stem|states_df|0|skipped
 mc_pairsplots_tb|stem|mc_pairsplots_tb|0|skipped
 traceplot_0|stem|traceplot_0|0|skipped
 ag_bayes_rmd|stem|ag_bayes_rmd|0|started
-ag_bayes_rmd|stem|ag_bayes_rmd|0|errored
+ag_bayes_rmd|stem|ag_bayes_rmd|0|built
+ag_mcmc1|stem|ag_mcmc1|0|skipped
+contrast_mat|stem|contrast_mat|0|skipped
+contr_long_ag_mcmc_tb|stem|contr_long_ag_mcmc_tb|0|skipped
+contr_long_ag_priorsamp|stem|contr_long_ag_priorsamp|0|skipped
+ag_rmd|stem|ag_rmd|0|skipped
+comp_ci|stem|comp_ci|0|skipped
+contr_long_ag_mcmc_0|stem|contr_long_ag_mcmc_0|0|skipped

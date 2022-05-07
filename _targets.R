@@ -6,7 +6,7 @@ source("R/functions.R")
 source("R/mcmc.R")
 options(tidyverse.quiet = TRUE)
 tar_option_set(packages = pkgList)
-redo_mcmc <- TRUE
+redo_mcmc <- FALSE
 run_mcmc <- function() {
   tar_cue(if (redo_mcmc) "thorough" else "never")
 }
@@ -313,7 +313,11 @@ list(data_input_targets,
                ),
     ## DRY: map with previous rule
     tar_target(ag_mcmc_full,
-               corhmm_mcmc(ag_model_full,
+    {
+        ## https://groups.google.com/g/openblas-users/c/W6ehBvPsKTw
+        Sys.setenv(OPENBLAS_NUM_THREADS="1")
+        Sys.setenv(OMP_NUM_THREADS="1")
+        corhmm_mcmc(ag_model_full,
                            p_args=list(nllfun = make_nllfun(ag_model_pcsc),
                                        ## sum(edge length) scaled to 1
                                        lb = log(1),
@@ -323,11 +327,13 @@ list(data_input_targets,
                                        ub_gainloss = gainloss_priors$ub),
                            n_cores = 8,
                            n_chains = 8,
-                           n_burnin = 4000,
-                           n_iter = 84000,
+                           n_burnin = 8000,
+                           n_iter = 144000,
                            n_thin = 20,
-                           seed = 101),
-               cue = run_mcmc()
+                           seed = 101)
+               },
+                   cue = run_mcmc()
+
                ),
     tar_target(ag_mcmc_tb,
                corhmm_mcmc(ag_model_tb,
@@ -372,7 +378,9 @@ list(data_input_targets,
                             nm = c("0","tb", "full")),
             names = nm,
             tar_target(mc_pairsplots,
-                       mk_mcmcpairsplot(mcmc, fn = sprintf("pix/mcmc_pairs_%s.png", nm)))
+                       mk_mcmcpairsplot(mcmc, fn = sprintf("pix/mcmc_pairs_%s.png", nm)),
+                       format = "file"
+                       )
             ),
     ## tar_map(
     ##     values = tibble(mcmc = rlang::syms(c("ag_mcmc_0", "ag_mcmc_tb")),
