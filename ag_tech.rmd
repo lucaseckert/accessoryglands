@@ -19,8 +19,9 @@ theme_set(theme_bw())
 library(targets)
 ```
 
-**fixme**: get rid of tidyverse msgs?
-```{r visnetwork, message=FALSE}
+<!-- to suppress tidyverse messages, need callr_function = NULL *or* some other shenanigans -->
+
+```{r visnetwork, message=FALSE, echo = FALSE}
 tar_visnetwork(targets_only = TRUE)
 ```
 
@@ -139,6 +140,7 @@ Graphing all CIs: bounds are set to the lower/upper bounds used for corHMM fit. 
 
 
 ```{r ci_plot}
+tar_load(ag_compdata)
 ## order of parameters
 levs <- c(outer(FUN = paste, sep = ".",
       c("loss", "gain"),
@@ -149,7 +151,7 @@ corhmm_bounds <- log(c(lwr=0.1, upper = 100*ape::Ntip(ag_compdata$phy)))
 corhmm_prior <- log(c(lwr=1, upper = 10*ape::Ntip(ag_compdata$phy)))
 corhmm_mid <- mean(corhmm_bounds)
 all_ci <- all_ci %>% replace_na(list(upr = Inf, lwr = -Inf)) %>%
-  mutate(across(term, factor, levels = levs))
+    mutate(across(term, factor, levels = levs))
 ## extend NA confidence interval to limit of graph
 ggplot(
   all_ci,
@@ -180,4 +182,3 @@ mcmc_long <- (ag_mcmc0
   %>% pivot_longer(everything(), names_to = "term")
 )  
 ```
-

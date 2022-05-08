@@ -6,12 +6,19 @@ source("R/functions.R")
 source("R/mcmc.R")
 options(tidyverse.quiet = TRUE)
 tar_option_set(packages = pkgList)
-redo_mcmc <- FALSE
-run_mcmc <- function() {
-  tar_cue(if (redo_mcmc) "thorough" else "never")
+
+Sys.setenv(OPENBLAS_NUM_THREADS="1")
+Sys.setenv(OMP_NUM_THREADS="1")
+
+## this flag enables/disables the really slow steps (MCMC sampling, MCMC pairs plots)
+redo_slow <- FALSE
+run_slow <- function() {
+  tar_cue(if (redo_slow) "thorough" else "never")
 }
+
 mcmc_runs <- c("0", "tb", "full")
-## TO DEBUG: set tar_option_set(debug = "target_name"); tar_make(callr_function = NULL)
+
+## TO DEBUG: set tar_option_set(debug = "target_name"); tar_make(callr_function = NULL), e.g.
 ## tar_option_set(debug = "ag_pcsc_pars")
 ## tar_option_set(debug = "ag_compdata")
 
@@ -279,6 +286,8 @@ list(data_input_targets,
               ## conf.method = "profile", profile = ag_profile0),
               mcmc = tidy(ag_mcmc_0, robust = TRUE, conf.int = TRUE),
               mcmc_treeblock = tidy(ag_mcmc_tb, robust = TRUE, conf.int = TRUE)
+              ## not yet: need to sort out contrasts
+              ##   mcmc_full = tidy(ag_mcmc_full, robust = TRUE, conf.int = TRUE)
           )
           (bind_rows(t_list, .id = "method")
             %>% rename(lwr = "conf.low", upr = "conf.high")
@@ -309,14 +318,12 @@ list(data_input_targets,
                            n_iter = 84000,
                            n_thin = 20,
                            seed = 101),
-               cue = run_mcmc()
+               cue = run_slow()
                ),
     ## DRY: map with previous rule
     tar_target(ag_mcmc_full,
     {
         ## https://groups.google.com/g/openblas-users/c/W6ehBvPsKTw
-        Sys.setenv(OPENBLAS_NUM_THREADS="1")
-        Sys.setenv(OMP_NUM_THREADS="1")
         corhmm_mcmc(ag_model_full,
                            p_args=list(nllfun = make_nllfun(ag_model_pcsc),
                                        ## sum(edge length) scaled to 1
@@ -332,7 +339,7 @@ list(data_input_targets,
                            n_thin = 20,
                            seed = 101)
                },
-                   cue = run_mcmc()
+                   cue = run_slow()
 
                ),
     tar_target(ag_mcmc_tb,
@@ -350,7 +357,21 @@ list(data_input_targets,
                            n_iter =  84000,
                            n_thin = 20,
                            seed = 101),
-               cue = run_mcmc()
+               cue = run_slow()
+               ),
+    tar_target(ag_mcmc_tb_nogainloss,
+               corhmm_mcmc(ag_model_tb,
+                           p_args=list(nllfun = make_nllfun(ag_model_tb, treeblock = treeblock),
+                                       ## sum(edge length) scaled to 1
+                                       lb = log(1),
+                                       ub = log(10 * ape::Ntip(ag_compdata_tb$phy))
+                                       ),
+                           n_cores = 8,
+                           n_chains = 8,
+                           n_burnin =  4000,
+                           n_iter =  84000,
+                           n_thin = 20,
+                           seed = 101),
                ),
     tar_target(ag_priorsamp,
                corhmm_mcmc(ag_model_pcsc,
@@ -397,12 +418,9 @@ list(data_input_targets,
     ##                    trace = TRUE,
     ##                    alpha=0.05) ## less extreme than default (alpha=0.01)
     ##            ),
-    tar_render(ag_rmd,
-               "ag_model.rmd"
-               ),
-    tar_render(ag_bayes_rmd,
-               "ag_bayesdiag.rmd"
-               )
+    tar_render(ag_rmd, "ag_model.rmd"),
+    tar_render(ag_bayes_rmd, "ag_bayesdiag.rmd"),
+    tar_render(ag_tech_rmd, "ag_tech.rmd")
     ## clean up/rescue?
     ## tar_render(ag_model_tech_html,
     ## "ag_model_tech.rmd"
