@@ -71,7 +71,6 @@ order_fun <- function(x) {
     rem <- stringr::str_remove(x,"[[:alpha:]]{4}\\.[[:alpha:]]{2}(_|$)")
     order(1000*tcode + 100*lcode + order(rem))
 }
-image_plot(t(contrast_mat))
 image_plot(t(contrast_mat[
     ## re-order; drop cols 1-4, which aren't involved in contrasts
     ##  (just gain/loss of pc, sc)

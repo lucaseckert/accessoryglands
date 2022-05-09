@@ -34,7 +34,7 @@ ag_statemat_pcsc_pars|stem|34fbff9be0c99a15|fff066302bcbf76b|1113b4d19ed6d0ba|-5
 ag_statemat_sc|stem|748d14caa803f11a|7b9bb0106fd7dcad|b208abfd6a2710f2|-1304596859||t19115.7575556189s|23174e8584d69801|187|rds|local|vector|||0.061||
 ag_statemat_sc_pars|stem|34fbff9be0c99a15|7b9bb0106fd7dcad|c1e82850d1597fed|-249929939||t18816.7419064697s|b2a37e7acd6b186f|188|rds|local|vector|||0.063||
 ag_statemat_unconstr|stem|5fb9f24ce5e31bd5|8d6d59c73a4a6ee6|f4436fb39d12bc98|314703174||t19102.0301363727s|3c187ffa31a31952|199|rds|local|vector|||0.058||
-ag_tech_rmd|stem|b455d4ac63d1693e|1d4a05466bc04a0f|6d3f52ac1bef145b|-1957133094|ag_tech.html*ag_tech.rmd|t19121.7937391131s|eb58bf5d6a2a515a|1277756|file|local|vector|||6.152|Removed 3 rows containing nonfinite values stat_bin.|
+ag_tech_rmd|stem|70b61c4eddfc6c8d|1d4a05466bc04a0f|6d3f52ac1bef145b|-1957133094|ag_tech.html*ag_tech.rmd|t19121.7946937623s|af6d4aee7a768b04|1194994|file|local|vector|||5.998|Removed 3 rows containing nonfinite values stat_bin.|
 all_ci|stem|36612cc2266ab0a5|c11c28505caacf4e|2a4b4f9853132483|-903984374||t19121.7892328627s|8a7c557de32adfd5|2925|rds|local|vector|||0.001||
 as.data.frame.profile.corhmm|function|05bb68e204e5bfd0|||||||||||||||
 as.mcmc.mcmc.list|function|9bdccff5d4708a23|||||||||||||||
