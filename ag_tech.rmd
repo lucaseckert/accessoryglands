@@ -21,7 +21,7 @@ library(targets)
 
 <!-- to suppress tidyverse messages, need callr_function = NULL *or* some other shenanigans -->
 
-```{r visnetwork, message=FALSE, echo = FALSE}
+```{r visnetwork, message=FALSE, echo = FALSE, eval = FALSE}
 tar_visnetwork(targets_only = TRUE)
 ```
 
@@ -35,8 +35,8 @@ tar_visnetwork(targets_only = TRUE)
 
 Use each of these as the basis for a +/- 3 sigma range (on the log scale)
 
-```{r cifun}
-tar_load(ag_model_indep)
+```{r load}
+tar_load(ag_model_pcsc)
 tar_load(ag_mcmc0)
 tar_load(all_ci)
 ```
@@ -44,7 +44,7 @@ tar_load(all_ci)
 ## naming parameters
 
 ```{r image, message=FALSE}
-plot(ag_model_indep)
+plot(ag_model_pcsc)
 ```
 
 ## Contrasts matrix
@@ -59,7 +59,24 @@ This connects the parameters we estimate (e.g. `loss.ag_pc0_sc0`, loss rate of a
 
 ```{r plot_contrast_mat}
 tar_load(contrast_mat)
-image_plot(contrast_mat, xlab = "Contrast", ylab = "Rate parameter")
+## order nicely
+order_fun <- function(x) {
+    trait <- (stringr::str_extract(x,"\\.[[:alpha:]]{2}")
+        |> stringr::str_remove("\\.")
+        )
+    tcode <- match(trait, c("pc", "sc", "ag"))
+    ## loss/gain
+    lossgain <- stringr::str_extract(x, "[[:alpha:]]{4}")
+    lcode <- match(lossgain, c("loss", "gain"))
+    rem <- stringr::str_remove(x,"[[:alpha:]]{4}\\.[[:alpha:]]{2}(_|$)")
+    order(1000*tcode + 100*lcode + order(rem))
+}
+image_plot(t(contrast_mat))
+image_plot(t(contrast_mat[
+    ## re-order; drop cols 1-4, which aren't involved in contrasts
+    ##  (just gain/loss of pc, sc)
+    order_fun(rownames(contrast_mat)),])[,-(1:4)],
+    ylab = "AG contrast", xlab = "Rate parameter")
 ```
 
 Distribution of states in the tree (computed from stochastic character mapping, histograms represent 100 simulations):
@@ -134,12 +151,10 @@ bayes_pval <- function(x, ref=0) {
 
 **Conclusion**: treeblock and fishphylo results are nearly identical, treeblock results are *slightly* clearer.
 
-Graphing all CIs: bounds are set to the lower/upper bounds used for corHMM fit. Vertical lines show the mean and ± 2 SD of the priors.
+Graphing all CIs: bounds are set to the lower/upper bounds used for corHMM fit. 
+Vertical dashed lines show the mean and ± 3 SD of the priors.
 
-**fixme**: reverse legend order? figure out why `loss.sc` decreases under Bayes?
-
-
-```{r ci_plot, fig.width=12, fig.height = 6}
+```{r ci_plot, fig.width=12, fig.height = 6, warning = FALSE, message = FALSE}
 tar_load(ag_compdata)
 ## order of parameters
 levs <- c(outer(FUN = paste, sep = ".",
@@ -150,8 +165,12 @@ levs <- c(outer(FUN = paste, sep = ".",
 corhmm_bounds <- log(c(lwr=0.1, upper = 100*ape::Ntip(ag_compdata$phy)))
 corhmm_prior <- log(c(lwr=1, upper = 10*ape::Ntip(ag_compdata$phy)))
 corhmm_mid <- mean(corhmm_bounds)
-all_ci <- all_ci %>% replace_na(list(upr = Inf, lwr = -Inf)) %>%
-    mutate(across(term, factor, levels = levs))
+all_ci <- (all_ci
+    %>% replace_na(list(upr = Inf, lwr = -Inf))
+    %>%  mutate(across(term, factor, levels = levs),
+                lwr_bound = (estimate <= corhmm_bounds[["lwr"]]))
+)
+
 ## extend NA confidence interval to limit of graph
 gg_ci0 <- ggplot(
   all_ci,
@@ -167,14 +186,26 @@ gg_ci0 <- ggplot(
     theme(legend.position="bottom") +
     ## https://stackoverflow.com/questions/27130610/legend-on-bottom-two-rows-wrapped-in-ggplot2-in-r
     guides(colour = guide_legend(nrow = 2, byrow = TRUE, reverse = TRUE))
-gg_ci1  <- gg_ci0 +
-    scale_y_log10(limits = exp(corhmm_bounds), oob = scales::squish)
-gg_ci_nowald <- gg_ci1 %+% dplyr::filter(all_ci, method != "model_pcsc") +
-    scale_y_log10()
+## would like to make arrows ("<") at lower bounds larger, but manipulating
+##  size aesthetic would also mess up bars (I think). Some hack?
+gg_ci1  <- (gg_ci0
+    + scale_y_log10(limits = exp(corhmm_bounds), oob = scales::squish)
+    + aes(shape = factor(lwr_bound))
+    ## 60 = "<"
+    + scale_shape_manual(values = c(16, 60), guide = "none")
+)
+gg_ci_nowald <- (gg_ci0 %+% dplyr::filter(all_ci, method != "model_pcsc")
+    +  scale_y_log10()
+)
 cowplot::plot_grid(gg_ci1, gg_ci_nowald, nrow = 1)
 ```
 
-- 
+- **prior_only**: 95% CIs implied by priors
+- **model_pcsc**: full (12-parameter) frequentist (corHMM) model, unconstrained/unregularized
+- **model_pcsc_prior**: corHMM model with priors (MAP estimates)
+- **mcmc_0**: Bayesian MCMC fit with fully known phylogeny only (reduced taxa)
+- **mcmc_tb**: Bayesian MCMC, tree block (all taxa, phylogenetic uncertainty)
+- **mcmc_tb_nogainloss**: ditto, but without priors on gain/loss rates
 
 ```{r mcmc_only, eval=FALSE}
 ## mcmc only

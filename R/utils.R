@@ -4,13 +4,16 @@ pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "GGally", "colorspace", "ggmosaic", "targets", "tarchetypes",
              "abind", "cowplot", "patchwork", "ggtree", "ggnewscale",
              "glue", "diagram", "hues", "phytools", "diversitree",
-             "remotes", "visNetwork")
+             "remotes", "visNetwork", "Matrix")
+
 
 ## packages to install from GitHub (username, reponame)
 GH_pkgs <- list(c("bbolker","corHMM"),    ## hacked/BMB version
                 c("YuLab-SMU","ggtree"),
                 c("bbolker","btw")       ## BayesTree interface (hacked/BMB version)
-             )
+                )
+
+base_pkgs <- "Matrix"
 ##' install uninstalled pkgs from pkgList and GH_pkgs
 ##' FIXME: use renv() ?
 install_pkgs <- function() {
@@ -434,11 +437,12 @@ get_state_occ_prop <- function(m) {
 }
 
 image_plot <- function(m, xlab="", ylab = "", sub = "") {
-  image(Matrix(m),
-      scales=list(x=list(at=seq(ncol(m)),labels=colnames(m),
-                         rot=90),
-                  y=list(at=seq(nrow(m)),labels=rownames(m))),
-      xlab = xlab, ylab = ylab, sub = sub)
+    require("Matrix")
+    image(Matrix(m),
+          scales=list(x=list(at=seq(ncol(m)),labels=colnames(m),
+                             rot=90),
+                      y=list(at=seq(nrow(m)),labels=rownames(m))),
+          xlab = xlab, ylab = ylab, sub = sub)
 }
 
 

@@ -14,10 +14,11 @@ Sys.setenv(OMP_NUM_THREADS="1")
 ## this flag enables/disables the really slow steps (MCMC sampling, MCMC pairs plots)
 redo_slow <- FALSE
 run_slow <- function() {
-  tar_cue(if (redo_slow) "thorough" else "never")
+    tar_cue(if (redo_slow) "thorough" else "never")
 }
 
 mcmc_runs <- c("0", "tb", "full", "tb_nogainloss")
+mcmc_runs_12 <- c("0", "tb", "tb_nogainloss")  ## 12-parameter models only
 
 ## TO DEBUG: set tar_option_set(debug = "target_name"); tar_make(callr_function = NULL), e.g.
 ## tar_option_set(debug = "ag_pcsc_pars")
@@ -247,22 +248,22 @@ list(data_input_targets,
              lb = log(c(0.2,    0.1,  rep(1e-3, 4))))
     ),
     tar_target(
-        contrast_mat, {
-          cmat <- (read_csv("contr.csv", col_types = cols())
-            ## arrange in same order as ag_mcmc1 columns!
-            %>% mutate(across(parname, ~factor(., levels=colnames(ag_mcmc1))))
-            %>% arrange(parname)
-            %>% dplyr::select(-parname)  ## drop row name so we have a pure-numeric matrix
-            %>% as.matrix()
-          )
-          rownames(cmat) <- colnames(ag_mcmc1)
-          cmat
+        contrast_mat,
+        {
+            cmat0 <- read_csv("contr.csv", col_types = cols())
+            cmat <- (cmat0
+                ## arrange in same order as ag_mcmc1 columns!
+                %>% mutate(across(parname, ~factor(., levels=colnames(ag_mcmc1))))
+                %>% arrange(parname)
+                %>% dplyr::select(-parname)  ## drop row name so we have a pure-numeric matrix
+                %>% as.matrix()
+            )
+            rownames(cmat) <- colnames(ag_mcmc1)
+            cmat
         }
     ),
     tar_map(
-        values = tibble(mcmc = rlang::syms(c("ag_mcmc_0",
-                                             "ag_mcmc_tb",
-                                             "ag_priorsamp"))),
+        values = tibble(mcmc = rlang::syms(glue::glue("ag_mcmc_{mcmc_runs_12}"))),
         tar_target(contr_long,
            ((as.mcmc(mcmc) %*% contrast_mat)
                %>% as_tibble()
@@ -308,10 +309,10 @@ list(data_input_targets,
     tar_target(
         prior_ci,
             (as.mcmc(ag_priorsamp)
-                %>% apply(MARGIN = 2, quantile, c(0.025, 0.975))
+                %>% apply(MARGIN = 2, quantile, c(0.025, 0.5, 0.975))
                 %>% t()
                 %>% as.data.frame()
-                %>% setNames(c("lwr", "upr"))
+                %>% setNames(c("lwr", "estimate", "upr"))
                 %>% tibble::rownames_to_column("term")
             )
     ),

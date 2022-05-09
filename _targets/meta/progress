@@ -39,12 +39,12 @@ mc_pairsplots_tb|stem|mc_pairsplots_tb|0|skipped
 ag_mcmc1|stem|ag_mcmc1|0|skipped
 contrast_mat|stem|contrast_mat|0|skipped
 contr_long_ag_mcmc_tb|stem|contr_long_ag_mcmc_tb|0|skipped
-contr_long_ag_priorsamp|stem|contr_long_ag_priorsamp|0|skipped
+ag_tech_rmd|stem|ag_tech_rmd|0|started
+ag_tech_rmd|stem|ag_tech_rmd|0|built
 traceplot_tb|stem|traceplot_tb|0|skipped
 ag_statemat_indep|stem|ag_statemat_indep|0|skipped
 ag_model_indep|stem|ag_model_indep|0|skipped
-ag_tech_rmd|stem|ag_tech_rmd|0|started
-ag_tech_rmd|stem|ag_tech_rmd|0|built
+contr_long_ag_mcmc_tb_nogainloss|stem|contr_long_ag_mcmc_tb_nogainloss|0|skipped
 ag_model_full|stem|ag_model_full|0|skipped
 ag_mcmc_full|stem|ag_mcmc_full|0|skipped
 mc_pairsplots_full|stem|mc_pairsplots_full|0|skipped
