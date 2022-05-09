@@ -1,6 +1,8 @@
 ## BMB (4 May 2022)
 
 
+- BLAS parallel thread control: https://github.com/lme4/lme4/issues/492
+- fix contrasts for full model
 - prior predictive checks, prior sensitivity
 - figure out something about pairs plots (build by hand?)
 - dig out description of BayesTraits priors?
@@ -14,7 +16,6 @@
 - priors:
    - describe/check lower/upper bounds in `ag_model_tb` (0.1 to 100N) vs `ag_model_pscs_prior` (1 to 10N) ??
    - prior predictive sims (already done?) check/compute implied priors on contrasts ...
-- run full 24-parameter model (how much does this mess things up?)
 - compare fits without gain/loss priors?
 - double-check thinning? (supposedly ran burn-in of 4000 + 80000 steps with thinning of 20; how come we have n = 8000 in the resulting chains? thinning arg didn't get passed through)
 - run BayesTraits comparison?

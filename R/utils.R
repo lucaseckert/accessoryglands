@@ -30,13 +30,13 @@ load_pkgs <- function() {
   invisible(lapply(pkgList, library, character.only = TRUE))
 }
 
-#' utility function for hexbin panels for MCMC pairs plot
-#' @param data ...
-#' @param mapping ...
-#' @param lb lower bound
-#' @param ub upper bound
-#' @param range distance from center to bound, in SD
-#' @param show_prior include representation of prior (red lines)
+##' utility function for hexbin panels for MCMC pairs plot
+##' @param data ...
+##' @param mapping ...
+##' @param lb lower bound
+##' @param ub upper bound
+##' @param range distance from center to bound, in SD
+##' @param show_prior include representation of prior (red lines)
 my_mcmc <- function(data, mapping, lb=log(1e-9), ub=log(1e2), range=2,
                     show_prior=FALSE, geom=c("hexbin","density"),
                     density_alpha=0.5,
@@ -45,6 +45,7 @@ my_mcmc <- function(data, mapping, lb=log(1e-9), ub=log(1e2), range=2,
   require("emdbook") ## FIXME: not sure why? remove & see what breaks?
   geom <- match.arg(geom)
   gg1 <- ggplot(data = data, mapping=mapping)
+  ## if (geom=="hexbin") browser()
   gg1 <- switch(geom,
                 hexbin = gg1 + geom_hex()  + scale_fill_viridis_c(),
                 ## inefficient because we are computing
@@ -466,7 +467,14 @@ tidy.mle2 <- function (x, conf.int = FALSE, conf.level = 0.95,
 ##' @param mc_theme ggplot theme (default is black/white with no between-panel spacing
 ##' @param fn file name for saved plot
 ##' @param \dots additional arguments to \code{ggsave}
-mk_mcmcpairsplot <- function(mcmc_obj, fn, mc_theme = NULL, ...) {
+## FIXME: precompute/cache densities?
+##' @example
+##' library(ggplot2); library(coda)
+##' m <- replicate(4, as.mcmc(matrix(rnorm(4000), ncol = 4)), simplify = FALSE)
+##' mk_mcmcpairsplot(m, return_val = "plot")
+mk_mcmcpairsplot <- function(mcmc_obj, fn, mc_theme = NULL,
+                             return_val = c("fn", "plot"), ...) {
+  return_val <- match.arg(return_val)
   if (is.null(mc_theme)) {
     mc_theme <- theme_bw() + theme(panel.spacing = grid::unit(0, "lines"))
   }
@@ -475,6 +483,9 @@ mk_mcmcpairsplot <- function(mcmc_obj, fn, mc_theme = NULL, ...) {
                lower=list(continuous=function(...) my_mcmc(..., show_prior=FALSE)),
                upper=list(continuous=function(...) my_mcmc(..., geom="density",
                                                            show_prior = FALSE)))
-  ggsave(filename = fn, plot = p, ...)
-  return(fn)
+  if (return_val == "fn") {
+      ggsave(filename = fn, plot = p, ...)
+      return(fn)
+  }
+  return(p)
 }

@@ -5,6 +5,7 @@ source("R/utils.R")
 source("R/functions.R")
 source("R/mcmc.R")
 options(tidyverse.quiet = TRUE)
+grDevices::X11.options(type = "cairo")
 tar_option_set(packages = pkgList)
 
 Sys.setenv(OPENBLAS_NUM_THREADS="1")
@@ -16,7 +17,7 @@ run_slow <- function() {
   tar_cue(if (redo_slow) "thorough" else "never")
 }
 
-mcmc_runs <- c("0", "tb", "full")
+mcmc_runs <- c("0", "tb", "full", "tb_nogainloss")
 
 ## TO DEBUG: set tar_option_set(debug = "target_name"); tar_make(callr_function = NULL), e.g.
 ## tar_option_set(debug = "ag_pcsc_pars")
@@ -277,22 +278,33 @@ list(data_input_targets,
           purrr::map_dfr(sm, ~ get_state_occ_prop(.[["maps"]])) %>% setNames(state_names(ag_compdata$data[,-1]))
         }),
     tar_target(
-        all_ci, {
-          t_list <- list(
-              wald = tidy(ag_model_pcsc, conf.int = TRUE),
-              wald_prior = tidy(ag_model_pcsc_prior, conf.int = TRUE,
-                                conf.method = "quad"),
-              ## profile = tidy(ag_model_pcsc, conf.int = TRUE,
-              ## conf.method = "profile", profile = ag_profile0),
-              mcmc = tidy(ag_mcmc_0, robust = TRUE, conf.int = TRUE),
-              mcmc_treeblock = tidy(ag_mcmc_tb, robust = TRUE, conf.int = TRUE)
-              ## not yet: need to sort out contrasts
-              ##   mcmc_full = tidy(ag_mcmc_full, robust = TRUE, conf.int = TRUE)
-          )
-          (bind_rows(t_list, .id = "method")
-            %>% rename(lwr = "conf.low", upr = "conf.high")
-          )
+        mod_list,
+        (tibble::lst(ag_model_pcsc, ag_model_pcsc_prior, ag_mcmc_0, ag_mcmc_tb, ag_mcmc_tb_nogainloss)
+            %>% setNames(gsub("ag_", "", names(.)))
+        )
+    ),
+    tar_target(
+        model_ci,
+        {
+            fix_cnms <- function(x) {
+                dplyr::rename(x, lwr = "conf.low", upr = "conf.high")
+            }
+            purrr::map(mod_list,
+                       function(x) {
+                           if (inherits(x, "corhmm")) {
+                               tidy(x, conf.int = TRUE)
+                           } else if (inherits(x, "mle2")) {
+                               tidy(x, conf.int = TRUE, conf.method = "quad")
+                           } else if (inherits(x, "mcmc.list")) {
+                               tidy(x, conf.int = TRUE, robust = TRUE)
+                           } else stop("unknown type ", class(x))
+                       }) %>%
+                purrr::map(fix_cnms)
         }),
+    tar_target(
+        all_ci,
+        bind_rows(c(model_ci, list(prior_only = prior_ci)), .id = "method")
+    ),
     tar_target(
         prior_ci,
             (as.mcmc(ag_priorsamp)
@@ -393,14 +405,13 @@ list(data_input_targets,
         names = nm,
         tar_target(traceplot, lattice::xyplot(mcmc, aspect="fill", layout=c(2,6)))
     ),
-    tar_map(values = tibble(mcmc = rlang::syms(c("ag_mcmc_0",
-                                                 "ag_mcmc_tb",
-                                                 "ag_mcmc_full")),
-                            nm = c("0","tb", "full")),
+    tar_map(values = tibble(mcmc = rlang::syms(glue::glue("ag_mcmc_{mcmc_runs}")),
+                            nm = mcmc_runs),
             names = nm,
             tar_target(mc_pairsplots,
                        mk_mcmcpairsplot(mcmc, fn = sprintf("pix/mcmc_pairs_%s.png", nm)),
-                       format = "file"
+                       format = "file",
+                       cue = run_slow()
                        )
             ),
     ## tar_map(

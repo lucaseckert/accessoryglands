@@ -84,3 +84,22 @@ monitor(aa2)
 tar_load(mc_pairsplots_full)
 knitr::include_graphics('pix/mcmc_pairs_full.png')
 ```
+
+## no_gainloss
+
+```{r traceplot_tb_nogainloss, fig.width=8, fig.height=8}
+tar_load(traceplot_tb_nogainloss)
+print(traceplot_tb_nogainloss)
+```
+
+```{r improved_rhat_tb_nogainloss}
+tar_load(ag_mcmc_tb_nogainloss)
+aa <- do.call(abind, c(ag_mcmc_tb_nogainloss, list(along=3)))
+aa2 <- aperm(aa,c(1,3,2), resize=TRUE)
+monitor(aa2)
+```
+
+```{r bayes_pairs_tb_nogainloss, fig.width=10, fig.height=10, cache=TRUE}
+tar_load(mc_pairsplots_tb_nogainloss)
+knitr::include_graphics('pix/mcmc_pairs_tb_nogainloss.png')
+```

@@ -18,6 +18,7 @@ theme_set(theme_bw())
 library(targets)
 library(phytools)
 library(diversitree)
+grDevices::X11.options(type = "cairo")
 ```
 
 The goal is to understand the role of paternal care of offspring (male parental care) and sperm competition in driving the evolution of accessory glands. While male parental care is a fairly unambiguous binary trait, sperm competition is harder to classify.  Here we use spawning context (pair spawning vs. group spawning) as a proxy for sperm competition. (**Note** from John Fitzpatrick: we should be careful how we phrase this, may want to replace "sperm competition" with "spawning behaviour" throughout. Leaving it alone for now, though.)
@@ -124,7 +125,7 @@ Show all likelihood ratio test comparisons.
 ## want all
 mnames <- gsub("ag_model_","",ag_models)[c(2,4,3,1)]
 anfun <- function(m1, m2) {
-    aa <- anova(m1,m2)
+    aa <- anova(m1, m2)
     sprintf("atop(Delta*dev==%1.1f,p==%1.1g)",
             ## "Δdev=%1.1f\np=%1.1g",
             aa$delta_dev[2], aa$pval[2])
