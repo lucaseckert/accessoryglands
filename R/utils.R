@@ -280,6 +280,9 @@ augment_model <- function(model) {
     return(model)
 }
 
+##' @inheritParams tidy.mle2
+##' @param prof_args arguments to pass to profile.corhmm()
+##' @param contrast_mat contrast matrix (right-multiply by parameters)
 tidy.corhmm <- function(x,
                         conf.int = FALSE,
                         conf.method = "wald",
@@ -293,7 +296,7 @@ tidy.corhmm <- function(x,
   f <- make_nllfun(x)
   p <- x$args.list$p
 
-  if (!is.null(contrasts)) {
+  if (!is.null(contrast_mat)) {
       p <- p %*% contrast_mat
   }
   ## FIXME: augment model here ? or assume already augmented?
@@ -313,7 +316,6 @@ tidy.corhmm <- function(x,
                     statistic = p/sds,
                     conf.low = estimate - qq*std.error,
                     conf.high = estimate + qq*std.error)
-        
     } else if (conf.method == "profile") {
         if (is.null(profile)) {
             profile <- do.call(profile.corhmm, c(list(x), prof_args))
@@ -507,21 +509,32 @@ fix_cnms <- function(x) {
     dplyr::rename(x, lwr = "conf.low", upr = "conf.high")
 }
 
-my_tidy <- function(x, contrasts_mat = NULL) {
+## generic tidying function/wrapper, allows for incorporating contrasts
+my_tidy <- function(x, contrast_mat = NULL, conf.level = 0.95) {
     if (inherits(x, "mcmc.list")) x <- emdbook::lump.mcmc.list(x)
     ## shouldn't have to do this (use method dispatch), but we want
     ##  different arguments for different types:
     if (inherits(x, "mcmc")) {
-        x <- x %*% contrasts_mat
+        x <- x %*% contrast_mat
         res <- tidy(x, conf.int = TRUE, robust = TRUE)
     } else if (inherits(x, "corhmm")) {
-        res <- tidy(x, conf.int = TRUE, contrasts_mat = contrasts_mat)
+        res <- tidy(x, conf.int = TRUE, contrast_mat = contrast_mat)
     } else if (inherits(x, "mle2")) {
-        if (is.null(contrasts_mat)) {
+        if (is.null(contrast_mat)) {
             res <- tidy(x, conf.int = TRUE, conf.method = "quad")
         } else {
+            p <- coef(x) %*% contrast_mat
+            V <- contrast_mat %*% vcov(x) %*% t(contrast_mat)
+            ## copied from tidy.corhmm() above
+            sds <- sqrt(diag(V))
+            qq <- qnorm((1+conf.level)/2)
+            res <- mutate(res,
+                          std.error = sds,
+                          statistic = p/sds,
+                          conf.low = estimate - qq*std.error,
+                          conf.high = estimate + qq*std.error)
         }
     }
-    return(fix_cnms(res)
+    return(fix_cnms(res))
 }
 

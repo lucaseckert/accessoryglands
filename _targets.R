@@ -280,32 +280,14 @@ list(data_input_targets,
         }),
     tar_target(
         mod_list,
-        (tibble::lst(ag_model_pcsc, ag_model_pcsc_prior, ag_mcmc_0, ag_mcmc_tb, ag_mcmc_tb_nogainloss)
+        (tibble::lst(ag_model_pcsc, ag_model_pcsc_prior, ag_mcmc_0, ag_mcmc_tb, ag_mcmc_tb_nogainloss,
+                     ag_priorsamp)
             %>% setNames(gsub("ag_", "", names(.)))
         )
     ),
-    ## compute lower/median/upper values
-    tar_target(
-        prior_ci,
-            (as.mcmc(ag_priorsamp)
-                %>% apply(MARGIN = 2, quantile, c(0.025, 0.5, 0.975))
-                %>% t()
-                %>% as.data.frame()
-                %>% setNames(c("lwr", "estimate", "upr"))
-                %>% tibble::rownames_to_column("term")
-            )
-    ),
-
-    tar_target(
-        model_ci,
-        {
-            purrr::map(mod_list,
-                       }) %>%
-                purrr::map(fix_cnms)
-        }),
     tar_target(
         all_ci,
-        bind_rows(c(model_ci, list(prior_only = prior_ci)), .id = "method")
+        purrr::map_dfr(mod_list, make_tidy, .id = "method")
     ),
     tar_target(ag_mcmc_0,
                corhmm_mcmc(ag_model_pcsc,
