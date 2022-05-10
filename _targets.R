@@ -284,28 +284,7 @@ list(data_input_targets,
             %>% setNames(gsub("ag_", "", names(.)))
         )
     ),
-    tar_target(
-        model_ci,
-        {
-            fix_cnms <- function(x) {
-                dplyr::rename(x, lwr = "conf.low", upr = "conf.high")
-            }
-            purrr::map(mod_list,
-                       function(x) {
-                           if (inherits(x, "corhmm")) {
-                               tidy(x, conf.int = TRUE)
-                           } else if (inherits(x, "mle2")) {
-                               tidy(x, conf.int = TRUE, conf.method = "quad")
-                           } else if (inherits(x, "mcmc.list")) {
-                               tidy(x, conf.int = TRUE, robust = TRUE)
-                           } else stop("unknown type ", class(x))
-                       }) %>%
-                purrr::map(fix_cnms)
-        }),
-    tar_target(
-        all_ci,
-        bind_rows(c(model_ci, list(prior_only = prior_ci)), .id = "method")
-    ),
+    ## compute lower/median/upper values
     tar_target(
         prior_ci,
             (as.mcmc(ag_priorsamp)
@@ -315,6 +294,18 @@ list(data_input_targets,
                 %>% setNames(c("lwr", "estimate", "upr"))
                 %>% tibble::rownames_to_column("term")
             )
+    ),
+
+    tar_target(
+        model_ci,
+        {
+            purrr::map(mod_list,
+                       }) %>%
+                purrr::map(fix_cnms)
+        }),
+    tar_target(
+        all_ci,
+        bind_rows(c(model_ci, list(prior_only = prior_ci)), .id = "method")
     ),
     tar_target(ag_mcmc_0,
                corhmm_mcmc(ag_model_pcsc,

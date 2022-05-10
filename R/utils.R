@@ -288,34 +288,43 @@ tidy.corhmm <- function(x,
                         profile = NULL,
                         exponentiate = FALSE,
                         prof_args = NULL,
+                        contrast_mat = NULL,
                         ...) {
   f <- make_nllfun(x)
   p <- x$args.list$p
 
+  if (!is.null(contrasts)) {
+      p <- p %*% contrast_mat
+  }
   ## FIXME: augment model here ? or assume already augmented?
   res <- tibble(term = names(p),
                 estimate = p)
   if (conf.int) {
     if (conf.method == "wald") {
-      H <- numDeriv::hessian(f, p)
-      sds <- sqrt(diag(solve(H)))
-      qq <- qnorm((1+conf.level)/2)
-      res <- mutate(res,
+        H <- numDeriv::hessian(f, p)
+        V <- solve(H)
+        if (!is.null(contrast_mat)) {
+            V <- contrast_mat %*% V %*% t(contrast_mat)
+        }
+        sds <- sqrt(diag(V))
+        qq <- qnorm((1+conf.level)/2)
+        res <- mutate(res,
                     std.error = sds,
                     statistic = p/sds,
                     conf.low = estimate - qq*std.error,
                     conf.high = estimate + qq*std.error)
+        
     } else if (conf.method == "profile") {
-      if (is.null(profile)) {
-        profile <- do.call(profile.corhmm, c(list(x), prof_args))
-      }
-      cfun <- function(x) {
-        junk <- capture.output(r <- try(confint(x), silent=TRUE))
-        if (inherits(r, "try-error")) return(data.frame(conf.low = NA, conf.high = NA))
-        return(setNames(r, c("conf.low", "conf.high")))
-      }
-      cc <- suppressWarnings(purrr:::map_dfr(profile, cfun, .id="term"))
-      res <- full_join(res, cc, by = "term")
+        if (is.null(profile)) {
+            profile <- do.call(profile.corhmm, c(list(x), prof_args))
+        }
+        cfun <- function(x) {
+            junk <- capture.output(r <- try(confint(x), silent=TRUE))
+            if (inherits(r, "try-error")) return(data.frame(conf.low = NA, conf.high = NA))
+            return(setNames(r, c("conf.low", "conf.high")))
+        }
+        cc <- suppressWarnings(purrr:::map_dfr(profile, cfun, .id="term"))
+        res <- full_join(res, cc, by = "term")
     }
   }
   if (exponentiate) {
@@ -493,3 +502,26 @@ mk_mcmcpairsplot <- function(mcmc_obj, fn, mc_theme = NULL,
   }
   return(p)
 }
+
+fix_cnms <- function(x) {
+    dplyr::rename(x, lwr = "conf.low", upr = "conf.high")
+}
+
+my_tidy <- function(x, contrasts_mat = NULL) {
+    if (inherits(x, "mcmc.list")) x <- emdbook::lump.mcmc.list(x)
+    ## shouldn't have to do this (use method dispatch), but we want
+    ##  different arguments for different types:
+    if (inherits(x, "mcmc")) {
+        x <- x %*% contrasts_mat
+        res <- tidy(x, conf.int = TRUE, robust = TRUE)
+    } else if (inherits(x, "corhmm")) {
+        res <- tidy(x, conf.int = TRUE, contrasts_mat = contrasts_mat)
+    } else if (inherits(x, "mle2")) {
+        if (is.null(contrasts_mat)) {
+            res <- tidy(x, conf.int = TRUE, conf.method = "quad")
+        } else {
+        }
+    }
+    return(fix_cnms(res)
+}
+
