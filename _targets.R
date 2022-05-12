@@ -287,7 +287,12 @@ list(data_input_targets,
     ),
     tar_target(
         all_ci,
-        purrr::map_dfr(mod_list, make_tidy, .id = "method")
+        purrr::map_dfr(mod_list, my_tidy, .id = "method")
+    ),
+    tar_target(
+        all_contr_ci,
+        purrr::map_dfr(mod_list, my_tidy, .id = "method",
+                       contrast_mat = contrast_mat)
     ),
     tar_target(ag_mcmc_0,
                corhmm_mcmc(ag_model_pcsc,
@@ -406,8 +411,4 @@ list(data_input_targets,
     tar_render(ag_rmd, "ag_model.rmd"),
     tar_render(ag_bayes_rmd, "ag_bayesdiag.rmd"),
     tar_render(ag_tech_rmd, "ag_tech.rmd")
-    ## clean up/rescue?
-    ## tar_render(ag_model_tech_html,
-    ## "ag_model_tech.rmd"
-    ## )
 )

@@ -39,6 +39,7 @@ Use each of these as the basis for a +/- 3 sigma range (on the log scale)
 tar_load(ag_model_pcsc)
 tar_load(ag_mcmc0)
 tar_load(all_ci)
+tar_load(all_contr_ci)
 ```
 
 ## naming parameters
@@ -155,6 +156,7 @@ Vertical dashed lines show the mean and ± 3 SD of the priors.
 
 ```{r ci_plot, fig.width=12, fig.height = 6, warning = FALSE, message = FALSE}
 tar_load(ag_compdata)
+tar_load(all_ci)
 ## order of parameters
 levs <- c(outer(FUN = paste, sep = ".",
       c("loss", "gain"),
@@ -164,11 +166,23 @@ levs <- c(outer(FUN = paste, sep = ".",
 corhmm_bounds <- log(c(lwr=0.1, upper = 100*ape::Ntip(ag_compdata$phy)))
 corhmm_prior <- log(c(lwr=1, upper = 10*ape::Ntip(ag_compdata$phy)))
 corhmm_mid <- mean(corhmm_bounds)
-all_ci <- (all_ci
-    %>% replace_na(list(upr = Inf, lwr = -Inf))
-    %>%  mutate(across(term, factor, levels = levs),
-                lwr_bound = (estimate <= corhmm_bounds[["lwr"]]))
-)
+fix_all_ci <- function(x, levels = NULL) {
+    x <- (x
+        ## replace NA values with Inf/-Inf so bars extend full range
+        %>% replace_na(list(upr = Inf, lwr = -Inf))
+        ## utility var for below-bounds estimates
+        %>% mutate(lwr_bound = (estimate <= corhmm_bounds[["lwr"]]))
+    )
+    if (!is.null(levels)) {
+        ## reorder levels as above
+        x <- (x
+            %>%  mutate(across(term, factor, levels = levels))
+        )
+    }
+    return(x)
+}
+
+all_ci <- fix_all_ci(all_ci, levels = levs)
 
 ## extend NA confidence interval to limit of graph
 gg_ci0 <- ggplot(
@@ -177,7 +191,7 @@ gg_ci0 <- ggplot(
 ) +
     geom_linerange(position = position_dodge(width = 0.5), key_glyph = "path") +
     geom_point(position = position_dodge(width = 0.5)) +
-    scale_colour_discrete_qualitative() +
+    colorspace::scale_colour_discrete_qualitative() +
     coord_flip() +
     labs(y="rate", x = "") +
     geom_hline(yintercept =exp(corhmm_mid), lty=2) +
@@ -205,6 +219,18 @@ cowplot::plot_grid(gg_ci1, gg_ci_nowald, nrow = 1)
 - **mcmc_0**: Bayesian MCMC fit with fully known phylogeny only (reduced taxa)
 - **mcmc_tb**: Bayesian MCMC, tree block (all taxa, phylogenetic uncertainty)
 - **mcmc_tb_nogainloss**: ditto, but without priors on gain/loss rates
+
+## with contrasts
+
+**FIXME**. Need to double-check the whole tidy/contrast pipeline. Are the results here consistent with
+the main results (which are derived separately)?
+
+```{r contrast_ci}
+all_contr_ci <- fix_all_ci(all_contr_ci)
+gg_ci1C  <- gg_ci1 %+% all_contr_ci
+gg_ci_nowaldC <- gg_ci_nowald %+% all_contr_ci
+cowplot::plot_grid(gg_ci1C, gg_ci_nowaldC, nrow = 1)
+```
 
 ```{r mcmc_only, eval=FALSE}
 ## mcmc only

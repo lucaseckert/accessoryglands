@@ -293,25 +293,27 @@ tidy.corhmm <- function(x,
                         prof_args = NULL,
                         contrast_mat = NULL,
                         ...) {
-  f <- make_nllfun(x)
-  p <- x$args.list$p
+    f <- make_nllfun(x)
+    ## save *original* p in case we use contrasts
+    p0 <- p <- x$args.list$p
 
-  if (!is.null(contrast_mat)) {
-      p <- p %*% contrast_mat
-  }
-  ## FIXME: augment model here ? or assume already augmented?
-  res <- tibble(term = names(p),
-                estimate = p)
-  if (conf.int) {
-    if (conf.method == "wald") {
-        H <- numDeriv::hessian(f, p)
-        V <- solve(H)
-        if (!is.null(contrast_mat)) {
-            V <- contrast_mat %*% V %*% t(contrast_mat)
-        }
-        sds <- sqrt(diag(V))
-        qq <- qnorm((1+conf.level)/2)
-        res <- mutate(res,
+    if (!is.null(contrast_mat)) {
+        p <- drop(p %*% contrast_mat)
+    }
+    ## FIXME: augment model here ? or assume already augmented?
+    res <- dplyr::tibble(term = names(p),
+                         estimate = p)
+    if (conf.int) {
+        if (conf.method == "wald") {
+          ## FIXME: expensive to compute. Upstream? Cache?
+          H <- numDeriv::hessian(f, p0)
+          V <- solve(H)
+          if (!is.null(contrast_mat)) {
+              V <- contrast_mat %*% V %*% t(contrast_mat)
+          }
+          sds <- sqrt(diag(V))
+          qq <- qnorm((1+conf.level)/2)
+          res <- dplyr::mutate(res,
                     std.error = sds,
                     statistic = p/sds,
                     conf.low = estimate - qq*std.error,
@@ -471,10 +473,10 @@ tidy.mle2 <- function (x, conf.int = FALSE, conf.level = 0.95,
             ci <- matrix(ci, nrow = 1)
         }
         colnames(ci) <- c("conf.low", "conf.high")
-        ci <- as_tibble(ci)
+        ci <- dplyr::as_tibble(ci)
         ret <- dplyr::bind_cols(ret, ci)
     }
-    as_tibble(ret)
+    dplyr::as_tibble(ret)
 }
 
 ##' save an MCMC diagnostic pairs plot to a file
@@ -511,11 +513,13 @@ fix_cnms <- function(x) {
 
 ## generic tidying function/wrapper, allows for incorporating contrasts
 my_tidy <- function(x, contrast_mat = NULL, conf.level = 0.95) {
+    require("broom")
+    require("broom.mixed")
     if (inherits(x, "mcmc.list")) x <- emdbook::lump.mcmc.list(x)
     ## shouldn't have to do this (use method dispatch), but we want
     ##  different arguments for different types:
     if (inherits(x, "mcmc")) {
-        x <- x %*% contrast_mat
+        if (!is.null(contrast_mat)) x <- coda::as.mcmc(x %*% contrast_mat)
         res <- tidy(x, conf.int = TRUE, robust = TRUE)
     } else if (inherits(x, "corhmm")) {
         res <- tidy(x, conf.int = TRUE, contrast_mat = contrast_mat)
@@ -523,12 +527,12 @@ my_tidy <- function(x, contrast_mat = NULL, conf.level = 0.95) {
         if (is.null(contrast_mat)) {
             res <- tidy(x, conf.int = TRUE, conf.method = "quad")
         } else {
-            p <- coef(x) %*% contrast_mat
+            p <- drop(coef(x) %*% contrast_mat)
             V <- contrast_mat %*% vcov(x) %*% t(contrast_mat)
             ## copied from tidy.corhmm() above
             sds <- sqrt(diag(V))
             qq <- qnorm((1+conf.level)/2)
-            res <- mutate(res,
+            res <- dplyr::tibble(estimate = p,
                           std.error = sds,
                           statistic = p/sds,
                           conf.low = estimate - qq*std.error,
