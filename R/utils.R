@@ -4,7 +4,7 @@ pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "GGally", "colorspace", "ggmosaic", "targets", "tarchetypes",
              "abind", "cowplot", "patchwork", "ggtree", "ggnewscale",
              "glue", "diagram", "hues", "phytools", "diversitree",
-             "remotes", "visNetwork", "Matrix")
+             "remotes", "visNetwork", "Matrix", "igraph")
 
 
 ## packages to install from GitHub (username, reponame)
@@ -532,13 +532,22 @@ my_tidy <- function(x, contrast_mat = NULL, conf.level = 0.95) {
             ## copied from tidy.corhmm() above
             sds <- sqrt(diag(V))
             qq <- qnorm((1+conf.level)/2)
-            res <- dplyr::tibble(estimate = p,
-                          std.error = sds,
-                          statistic = p/sds,
-                          conf.low = estimate - qq*std.error,
-                          conf.high = estimate + qq*std.error)
+            res <- dplyr::tibble(
+                              term = names(p),
+                              estimate = p,
+                              std.error = sds,
+                              statistic = p/sds,
+                              conf.low = estimate - qq*std.error,
+                              conf.high = estimate + qq*std.error)
         }
     }
     return(fix_cnms(res))
 }
 
+## beginnings of a function to do a 'simple' static plot
+my_tar_network <- function() {
+    require(igraph)
+    tt <- tar_network()
+    gg <- graph_from_data_frame(tt$edges)
+    gg <- topo_sort(gg)
+}

@@ -185,25 +185,27 @@ fix_all_ci <- function(x, levels = NULL) {
 all_ci <- fix_all_ci(all_ci, levels = levs)
 
 ## extend NA confidence interval to limit of graph
-gg_ci0 <- ggplot(
-  all_ci,
-  aes(term, exp(estimate), ymin = exp(lwr), ymax = exp(upr), colour = method)
-) +
-    geom_linerange(position = position_dodge(width = 0.5), key_glyph = "path") +
-    geom_point(position = position_dodge(width = 0.5)) +
-    colorspace::scale_colour_discrete_qualitative() +
-    coord_flip() +
-    labs(y="rate", x = "") +
-    geom_hline(yintercept =exp(corhmm_mid), lty=2) +
-    geom_hline(yintercept = exp(corhmm_prior), lty=2, col="gray") +
-    theme(legend.position="bottom") +
+gg_ci0 <- (ggplot(
+    all_ci,
+    aes(term, exp(estimate), ymin = exp(lwr), ymax = exp(upr),
+        colour = method)
+)
+    + geom_linerange(position = position_dodge(width = 0.5), key_glyph = "path") 
+ +   geom_point(position = position_dodge(width = 0.5))
+    + colorspace::scale_colour_discrete_qualitative()
+    + coord_flip()
+    +     theme(legend.position="bottom")
     ## https://stackoverflow.com/questions/27130610/legend-on-bottom-two-rows-wrapped-in-ggplot2-in-r
-    guides(colour = guide_legend(nrow = 2, byrow = TRUE, reverse = TRUE))
+    + guides(colour = guide_legend(nrow = 2, byrow = TRUE, reverse = TRUE))
+)
 ## would like to make arrows ("<") at lower bounds larger, but manipulating
 ##  size aesthetic would also mess up bars (I think). Some hack?
 gg_ci1  <- (gg_ci0
     + scale_y_log10(limits = exp(corhmm_bounds), oob = scales::squish)
     + aes(shape = factor(lwr_bound))
+    + labs(y="rate", x = "")
+    + geom_hline(yintercept =exp(corhmm_mid), lty=2)
+    + geom_hline(yintercept = exp(corhmm_prior), lty=2, col="gray")
     ## 60 = "<"
     + scale_shape_manual(values = c(16, 60), guide = "none")
 )
@@ -222,15 +224,59 @@ cowplot::plot_grid(gg_ci1, gg_ci_nowald, nrow = 1)
 
 ## with contrasts
 
-**FIXME**. Need to double-check the whole tidy/contrast pipeline. Are the results here consistent with
-the main results (which are derived separately)?
-
-```{r contrast_ci}
-all_contr_ci <- fix_all_ci(all_contr_ci)
-gg_ci1C  <- gg_ci1 %+% all_contr_ci
-gg_ci_nowaldC <- gg_ci_nowald %+% all_contr_ci
-cowplot::plot_grid(gg_ci1C, gg_ci_nowaldC, nrow = 1)
+```{r contrast_ci, fig.width=12, fig.height = 6, warning = FALSE, message = FALSE}
+all_contr_ci <- (fix_all_ci(all_contr_ci)
+    |> filter(!grepl("net", term))
+)
+gg_ci1C  <- (gg_ci0 %+% all_contr_ci
+    + scale_y_log10(limits=c(1e-2, 1e3),
+                    breaks = 10^seq(-2, 3),
+                    labels = function(x) sprintf("%g", x),
+                    oob = scales::squish,
+                    expand = expansion(0,0))
+    + aes(shape = factor(lwr_bound))
+    + labs(y="contrast", x = "")
+    + geom_hline(yintercept =1, lty=2)
+    ## 60 = "<"
+    + scale_shape_manual(values = c(16, 60), guide = "none")
+)
+gg_ci1_nowaldC <- (gg_ci1C
+    %+% dplyr::filter(all_contr_ci, method != "model_pcsc")
+)
+cowplot::plot_grid(gg_ci1C, gg_ci1_nowaldC, nrow = 1)
 ```
+
+**Conclusions**
+
+- `priorsamp`: the prior distributions on loss and gain are neutral (mean = 1) as promised, with 95% ranges of approximately (1/10, 10) [seems reasonable]. Priors on intercepts are different from 1 (as expected).
+- `model_pcsc` (blue-green): these estimates are all over the place, we can't really practically estimate the parameters/CIs
+- `model_pcsc_prior`: for the most part these likelihood-based fits look similar to the Bayesian solutions (i.e., most of the frequentist vs Bayes distinction lies in the *regularization* step, imposing reasonable priors, rather than in the more sophisticated handling of uncertainty)
+- `mcmc_0` (basic model with single/full phylogeny): slightly harder to see signals (confidence limits overlap 1 more), because we are leaving out information for a chunk of the phylogeny
+- `mcmc_tb`: can see a strong signal of increased AG gain with PC, weak signal (p = 0.06 from above) of *decreased* AG gain with SC
+- `mcmc_tb_nogainloss` (yellow-green): leaving out the gain/loss priors doesn't make a huge difference; it slightly weakens the SC signal and strengthens the PC signal
+- full pc/sc likelihood-based model alone gives us huge CIs, no confidence
+
+## fixme
+
+- figure out what's up with missing CIs for `model_pcsc`, `model_pcsc_prior`
+- profile CIs for ML fits? (probably v. slow/wonky ...)
+- include full 24-parameter fits (need to work out contrasts!)
+
+### cosmetic
+
+- reorder levels
+- partition as in main plots (facet by sc/pc/interaction/intercept?)
+
+
+```{r check_contrasts, eval = FALSE}
+## Check contrast tidier calculations:
+## (Values of estimates not quite identical: mean vs median snuck in somewhere or ??? Not too worried though.)
+tar_load(contr_long_ag_mcmc_tb)
+c1 <- contr_long_ag_mcmc_tb %>% group_by(contrast, rate) %>% summarise(m = median(value), m_lwr = quantile(value, 0.025), m_upr = quantile(value, 0.975), .groups = "drop")
+c2 <- all_contr_ci %>% filter(method == "mcmc_tb") %>% dplyr::select(term, estimate, lwr, upr) %>% separate(term, sep = "_", into = c("contrast", "rate"))
+full_join(c1, c2)
+```
+
 
 ```{r mcmc_only, eval=FALSE}
 ## mcmc only
