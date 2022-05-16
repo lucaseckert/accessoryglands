@@ -551,3 +551,10 @@ my_tar_network <- function() {
     gg <- graph_from_data_frame(tt$edges)
     gg <- topo_sort(gg)
 }
+
+gainloss_ind_prs <- function(x) {
+    imat <- x$index.mat
+    upr <- unique(na.omit(imat[upper.tri(imat)]))
+    lwr <- unique(na.omit(imat[lower.tri(imat)]))
+    Map(c, upr, lwr)
+}

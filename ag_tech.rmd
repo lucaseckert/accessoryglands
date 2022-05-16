@@ -37,6 +37,7 @@ Use each of these as the basis for a +/- 3 sigma range (on the log scale)
 
 ```{r load}
 tar_load(ag_model_pcsc)
+tar_load(ag_model_full)
 tar_load(ag_mcmc0)
 tar_load(all_ci)
 tar_load(all_contr_ci)
@@ -44,8 +45,11 @@ tar_load(all_contr_ci)
 
 ## naming parameters
 
-```{r image, message=FALSE}
-plot(ag_model_pcsc)
+Reduced (12-parameter) and unreduced (24-parameter) models:
+
+```{r image, message=FALSE, fig.width = 12, fig.height = 5}
+cowplot::plot_grid(plot(ag_model_pcsc),
+                   plot(ag_model_full), nrow=1)
 ```
 
 ## Contrasts matrix

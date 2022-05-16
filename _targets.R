@@ -8,6 +8,7 @@ options(tidyverse.quiet = TRUE)
 grDevices::X11.options(type = "cairo")
 tar_option_set(packages = pkgList)
 
+## prevent parallelization from getting out of hand
 Sys.setenv(OPENBLAS_NUM_THREADS="1")
 Sys.setenv(OMP_NUM_THREADS="1")
 
@@ -17,6 +18,7 @@ run_slow <- function() {
     tar_cue(if (redo_slow) "thorough" else "never")
 }
 
+corhmm_models <- c("full", "pcsc", "pc", "sc", "indep")
 mcmc_runs <- c("0", "tb", "full", "tb_nogainloss")
 mcmc_runs_12 <- c("0", "tb", "tb_nogainloss")  ## 12-parameter models only
 
@@ -138,13 +140,10 @@ list(data_input_targets,
         values = tibble(
             ## general trick: pass 'nm' as a column of the values
             ## so we get ag_statemat_{nm}
-            nm = c("full", "pcsc", "pc", "sc", "indep"),
+            nm = corhmm_models,
             eqstatepars =
-              rlang::syms(c("full_pars",
-                            "pcsc_pars",
-                            "pc_pars",
-                            "sc_pars",
-                            "indep_pars"))),
+                rlang::syms(glue::glue("{corhmm_models}_pars"))
+        ),
         names = nm,
         tar_target(ag_statemat, {
           ag_smdat <- corHMM::getStateMat4Dat(ag_compdata$data)
@@ -170,12 +169,9 @@ list(data_input_targets,
     ## fit corHMM models for all sets of constraints
     tar_map(
         values = tibble(
-            nm = c("full", "pcsc","pc","sc","indep"),
-            statemat = rlang::syms(c("ag_statemat_full",
-                                     "ag_statemat_pcsc",
-                                     "ag_statemat_pc",
-                                     "ag_statemat_sc",
-                                     "ag_statemat_indep"))),
+            nm = corhmm_models,
+            statemat = rlang::syms(glue::glue("ag_statemat_{corhmm_models}"))
+            ),
         names = nm,
         tar_target(
             ag_model,
@@ -241,31 +237,66 @@ list(data_input_targets,
     }
     ),
     tar_target(
-        gainloss_priors,
-        list(pairs = list(c(4,1), c(6,2), c(9,3), c(10,5), c(11, 7), c(12, 8)),
-             ##        sc     pc      ag ....
-             ub = log(c(10,    5 ,  rep(10, 4))),
-             lb = log(c(0.2,    0.1,  rep(1e-3, 4))))
+        maxgainloss,
+        log(c(sc = 10, pc = 5, 10))
     ),
     tar_target(
-        contrast_mat,
+        mingainloss,
+        log(c(sc = 1/5, pc = 1/10, 1/1000))
+    ),
+    tar_target(
+        gainloss_priors,
+        list(pairs = gainloss_ind_prs(ag_model_pcsc),
+             ##        sc     pc   ag ....
+             ub = rep(maxgainloss, c(1, 1, 4)),
+             lb = rep(mingainloss, c(1, 1, 4)))
+    ),
+    ## pattern of focal gain/loss trait by elements of full
+    ##  contrast matrix (can be automated??)
+    tar_target(
+        full_pattern,
+        c("sc", "pc", "ag", "pc",
+          "ag", "sc", "ag", "ag",
+          "sc", "pc", "pc", "sc")
+    ),
+    tar_target(
+        gainloss_priors_full,
+        list(pairs = gainloss_ind_prs(ag_model_full),
+             ub = maxgainloss[full_pattern],
+             lb = mingainloss[full_pattern])
+    ),
+    tar_map(
+        values = tibble(mcmc = rlang::syms(c("ag_mcmc_0", "ag_mcmc_full")),
+                        nm = c("0", "full")),
+        names = nm,
+        tar_target(col_order,
+                   colnames(mcmc[[1]]))
+    ),
+    tar_map(
+        values = tibble(fn = c("contr.csv", "contr_full.csv"),
+                        col_order = rlang::syms(c("col_order_0", "col_order_full")),
+                        nm = c("0", "full")
+                       ),
+        names = nm,
+        tar_target(contrast_mat,
         {
-            cmat0 <- read_csv("contr.csv", col_types = cols())
+            cmat0 <- read_csv(fn, col_types = cols())
             cmat <- (cmat0
                 ## arrange in same order as ag_mcmc1 columns!
-                %>% mutate(across(parname, ~factor(., levels=colnames(ag_mcmc1))))
+                %>% mutate(across(parname, ~factor(., levels = col_order)))
                 %>% arrange(parname)
                 %>% dplyr::select(-parname)  ## drop row name so we have a pure-numeric matrix
                 %>% as.matrix()
             )
-            rownames(cmat) <- colnames(ag_mcmc1)
+            rownames(cmat) <- col_order
             cmat
         }
+        )
     ),
     tar_map(
         values = tibble(mcmc = rlang::syms(glue::glue("ag_mcmc_{mcmc_runs_12}"))),
         tar_target(contr_long,
-           ((as.mcmc(mcmc) %*% contrast_mat)
+           ((as.mcmc(mcmc) %*% contrast_mat_0)
                %>% as_tibble()
                %>% pivot_longer(everything(), names_to = "contrast")
                %>% separate(contrast, into=c("contrast", "rate"))
@@ -290,9 +321,15 @@ list(data_input_targets,
         purrr::map_dfr(mod_list, my_tidy, .id = "method")
     ),
     tar_target(
+        full_contr_ci,
+        my_tidy(ag_mcmc_full, contrast_mat = contrast_mat_full) %>% mutate(method = "full", .before = 1)
+    ),
+    tar_target(
         all_contr_ci,
-        purrr::map_dfr(mod_list, my_tidy, .id = "method",
-                       contrast_mat = contrast_mat)
+        (purrr::map_dfr(mod_list, my_tidy, .id = "method",
+                        contrast_mat = contrast_mat_0)
+            %>% bind_rows(full_contr_ci)
+        )
     ),
     tar_target(ag_mcmc_0,
                corhmm_mcmc(ag_model_pcsc,
@@ -320,9 +357,9 @@ list(data_input_targets,
                                        ## sum(edge length) scaled to 1
                                        lb = log(1),
                                        ub = log(10 * ape::Ntip(ag_compdata$phy)),
-                                       gainloss_pairs = gainloss_priors$pairs,
-                                       lb_gainloss = gainloss_priors$lb,
-                                       ub_gainloss = gainloss_priors$ub),
+                                       gainloss_pairs = gainloss_priors_full$pairs,
+                                       lb_gainloss = gainloss_priors_full$lb,
+                                       ub_gainloss = gainloss_priors_full$ub),
                            n_cores = 8,
                            n_chains = 8,
                            n_burnin = 8000,
