@@ -53,14 +53,24 @@ google drive [link](https://drive.google.com/drive/folders/1S5KwLDQavshwS8i0e9_g
 
 ## installing BayesTraits
 
-Linux:
+
+
+Linux (from source, V3)
 
 ```
-git clone https://github.com/josephwb/BayesTraitsV3 btv3
+git clone ://github.com/bbolker/BayesTraitsV3
 cd BayesTraitsV3/src
 ## sudo apt install libnlopt-dev
 make threaded
 mv BayesTraitsv3_threaded ../../BayesTraitsV3
+```
+
+from binary:
+
+```r
+download.file("http://www.evolution.reading.ac.uk/BayesTraitsV4.0.0/Files/BayesTraitsV4.0.0-Linux.tar.gz", destfile = "btv4.tgz")
+untar("btv4.tgz")
+unlink("btv4.tgz")
 ```
 
 test:
@@ -70,4 +80,12 @@ library("btw")
 bayestraits(data = primate.discrete1,
 	tree = primate.tree100,
 	command = c("1", "1", "run"))
+```
+
+##
+
+
+
+```
+git clone git@github.com:bbolker/btw.git
 ```
