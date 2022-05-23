@@ -1,18 +1,14 @@
+remotes::install_github("bbolker/btw")
 library(btw)
 library(targets)
 library(tidyverse)
 
-devtools::load_all("~/R/pkgs/btw")
+## devtools::load_all("~/R/pkgs/btw")
 options(bt_path = "./BayesTraitsV4.0.0-Linux",
         bt_bin = "BayesTraitsV4")
 bayestraits(data = primate.discrete1,
-	tree = primate.tree,
-        100,
+	tree = primate.tree1,
 	command = c("1", "1", "run"))
-
-
-
-
 
 tar_load(treeblock)
 tbmp <- do.call(c, treeblock)
@@ -24,11 +20,14 @@ dd <- (ag_compdata_tb$data
 )
 bayestraits(data  = dd,
             tree = tbmp,
-            command = c("3",
-                "3",
+            command = c(
+                "3", ## dependent
+                "2", ## MCMC
                 "ScaleTrees",
                 "AddTag Root Erpetoichthys_calabaricus Mugil_liza",
                 "Fossil Node01 Root 0",
-                "Iterations 100"
+                "Iterations 100",
+                "Run"
                 ))
+
 
