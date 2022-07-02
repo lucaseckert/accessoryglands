@@ -12,35 +12,44 @@ library(diversitree)
 # FIGURE 1 ----------------------------------------------------------------
 #simmap simulations
 tar_load(ag_model_pcsc)
+tar_load(treeblock)
+tar_load(ag_compdata_tb)
+phy<-treeblock[[1]]
+data<-ag_compdata_tb$data
+model<-ag_model_pcsc$solution
+
 set.seed(1)
-sm1 <- with(ag_model_pcsc,
-            makeSimmap(phy, data, solution, rate.cat, nSim = 100))
+sims<-list()
+sums<-list()
+counts<-matrix(ncol=3, nrow = 0)
+i<-1
+while(i<101){
+  sims[[i]]<-makeSimmap(tree = treeblock[[i]], data = data, model = model, rate.cat = 1, nSim = 10)
+  sims[[i]]<-lapply(sims[[i]],mergeMappedStates,c(1:4),"ag0")
+  sims[[i]]<-lapply(sims[[i]],mergeMappedStates,c(5:8),"ag1")
+  class(sims[[i]])<-c("multiSimmap","multiPhylo")
+  sums[[i]]<-summary(sims[[i]])
+  counts<-rbind(counts,sums[[i]]$count)
+  print(i)
+  i=i+1
+}
+
+#gain and loss CIs
+gain.ci<-quantile(counts[,2], c(0.025,0.975))
+loss.ci<-quantile(counts[,3], c(0.025,0.975))
 
 #finding AG nodes
-smSum<-summary(sm1)
-nodeProbs<-as.data.frame(smSum$ace)
-nodeProbs$ag1<-rowSums(nodeProbs[,5:8])
-nodeProbs$ag<-as.factor(round(nodeProbs$ag1, digits = 0))
+nodeProbs<-as.data.frame(sums[[1]]$ace)
+nodeProbs$ag<-as.factor(round(nodeProbs[,2], digits = 0))
 allAgNodes<-rownames(subset(nodeProbs, ag==1))
 
-#collapsing to AG
-agSims<-lapply(sm1,mergeMappedStates,c(1:4),"ag0")
-agSims<-lapply(agSims,mergeMappedStates,c(5:8),"ag1")
-class(agSims)<-c("multiSimmap","multiPhylo")
-
 #plotting posterior probability
-obj1<-densityMap(agSims, plot=FALSE)
+obj1<-densityMap(sims[[1]], plot=FALSE)
 n<-length(obj1$cols)
 obj1$cols[1:n]<-colorRampPalette(c("grey60","firebrick"), space="Lab")(n)
 
-#The node/tips where AGs first evolved: Lepidogalaxias salamandroides, 767, Cheilinus undulatus, 737, 615, 533, Hoplosternum littorale, 850, 845, Rita rita, 839, 836, Pangasius pangasius, 830
-agNodes<-c(767,737,615,533,850,845,839,836,830)
-agTips<-c("Lepidogalaxias_salamandroides","Cheilinus_undulatus","Hoplosternum_littorale","Rita_rita","Pangasius_pangasius")
-
 plot(obj1,type="fan",ftype="off", lwd=2)
-nodelabels(node = agNodes, pch = 21, col="firebrick4", bg="firebrick", cex=1.5, lwd=2)
-tiplabels(tip = agTips, pch = 21, col="firebrick4", bg="firebrick", cex=1.5, lwd=2)
-#tip labels not working for some reason
+nodelabels(node = allAgNodes, pch = 21, col="firebrick4", bg="firebrick", cex=0.5, lwd=2)
 
 #why cant i load this directly?
 data<-read.csv(file.choose())
@@ -50,8 +59,7 @@ cols1<-list(care=c("#c7e9c0","#006d2c"), spawning=c("#bdd7e7","#2171b5"))
 labs1<-c("Parental Care","Spawning Mode")
 str1<-list(care=c("No Male Care","Male Care"), spawning=c("Pair Spawning", "Group Spawning"))
 
-trait.plot(ag_model_pcsc$phy, data2, cols1, cex.lab = 0.2,lab = labs1, str = str1, cex.legend = 0.5)
-
+trait.plot(treeblock[[1]], data2, cols1, cex.lab = 0.2,lab = labs1, str = str1, cex.legend = 0.5)
 
 # FIGURE 2 ----------------------------------------------------------------
 tar_load(contr_long_ag_mcmc0)
@@ -101,12 +109,3 @@ gg_sum_nice <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colou
         axis.text = element_text(size = 10, color = "black"),
         axis.title.x = element_text(size = 12))
 print(gg_sum_nice)
-
-# SIMMAPs -----------------------------------------------------------------
-tar_load(ag_model_pcsc)
-tar_load(treeblock)
-set.seed(1)
-root<-c(1,0,0,0,0,0,0,0)
-
-sm1 <- makeSimmap(treeblock[[1]], ag_model_pcsc$data, ag_model_pcsc$solution, ag_model_pcsc$rate.cat, root.p = "yang", nSim = 1)
-
