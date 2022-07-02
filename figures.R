@@ -14,7 +14,6 @@ library(diversitree)
 tar_load(ag_model_pcsc)
 tar_load(treeblock)
 tar_load(ag_compdata_tb)
-phy<-treeblock[[1]]
 data<-ag_compdata_tb$data
 model<-ag_model_pcsc$solution
 
@@ -24,7 +23,7 @@ sums<-list()
 counts<-matrix(ncol=3, nrow = 0)
 i<-1
 while(i<101){
-  sims[[i]]<-makeSimmap(tree = treeblock[[i]], data = data, model = model, rate.cat = 1, nSim = 10)
+  sims[[i]]<-makeSimmap(tree = treeblock[[i]], data = data, model = model, rate.cat = 1, nSim = 100)
   sims[[i]]<-lapply(sims[[i]],mergeMappedStates,c(1:4),"ag0")
   sims[[i]]<-lapply(sims[[i]],mergeMappedStates,c(5:8),"ag1")
   class(sims[[i]])<-c("multiSimmap","multiPhylo")
@@ -33,18 +32,28 @@ while(i<101){
   print(i)
   i=i+1
 }
+saveRDS(sims, "sims.rds")
+saveRDS(sums, "sums.rds")
+saveRDS(counts, "counts.rds")
+
+sims<-readRDS("sims.rds")
+sums<-readRDS("sums.rds")
+counts<-readRDS("counts.rds")
 
 #gain and loss CIs
 gain.ci<-quantile(counts[,2], c(0.025,0.975))
 loss.ci<-quantile(counts[,3], c(0.025,0.975))
 
 #finding AG nodes
-nodeProbs<-as.data.frame(sums[[1]]$ace)
+nodeProbs<-as.data.frame(sums[[2]]$ace)
 nodeProbs$ag<-as.factor(round(nodeProbs[,2], digits = 0))
 allAgNodes<-rownames(subset(nodeProbs, ag==1))
 
+#manually finding the nodes to label
+agNodes<-c(779,787,794,798,808,817,876,923,1019,1020,1103)
+
 #plotting posterior probability
-obj1<-densityMap(sims[[1]], plot=FALSE)
+obj1<-densityMap(sims[[2]], plot=FALSE)
 n<-length(obj1$cols)
 obj1$cols[1:n]<-colorRampPalette(c("grey60","firebrick"), space="Lab")(n)
 
