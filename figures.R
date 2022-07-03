@@ -46,17 +46,22 @@ gain.ci<-quantile(counts[,2], c(0.025,0.975))
 loss.ci<-quantile(counts[,3], c(0.025,0.975))
 
 #finding AG nodes
-nodeProbs<-as.data.frame(sums[[3]]$ace)
+nodeProbs<-as.data.frame(sums[[2]]$ace)
 nodeProbs$ag<-as.factor(round(nodeProbs[,2], digits = 0))
 allAgNodes<-rownames(subset(nodeProbs, ag==1))
 
 #plotting posterior probability
-obj1<-densityMap(sims[[3]], plot=FALSE)
+obj1<-densityMap(sims[[2]], plot=FALSE)
 n<-length(obj1$cols)
 obj1$cols[1:n]<-colorRampPalette(c("grey60","firebrick"), space="Lab")(n)
 
 plot(obj1,type="fan",ftype="off", lwd=2)
-nodelabels(node = allAgNodes, pch = 21, col="firebrick4", bg="firebrick", cex=0.5, lwd=2)
+nodelabels(node = agNodes, pch = 21, col="firebrick4", bg="firebrick", cex=1.125, lwd=2)
+tiplabels(tip = agNodes, pch = 21, col="black", bg="firebrick", cex=1, lwd=2)
+
+agNodes<-c(777,784,794,798,808,817,876,923,1018,1020,1103,"Hoplosternum_littorale",
+           "Ompok_siluroides","Pangasius_pangasius","Auchenipterus_nuchalis",
+           "Lepidogalaxias_salamandroides","Cheilinus_undulatus","Radulinopsis_taranetzi")
 
 #why cant i load this directly?
 data<-read.csv(file.choose())
@@ -67,7 +72,7 @@ labs1<-c("Parental Care","Spawning Mode")
 str1<-list(care=c("No Male Care","Male Care"), spawning=c("Pair Spawning", "Group Spawning"))
 
 tar_load(treeblock)
-trait.plot(treeblock[[1]], data2, cols1, cex.lab = 0.2,lab = labs1, str = str1, cex.legend = 0.5)
+trait.plot(treeblock[[2]], data2, cols1, cex.lab = 0.2,lab = labs1, str = str1, cex.legend = 0.5)
 
 # FIGURE 2 ----------------------------------------------------------------
 tar_load(contr_long_ag_mcmc0)
