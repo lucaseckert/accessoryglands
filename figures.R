@@ -88,7 +88,6 @@ ag_contr_gainloss <- (purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
                       ## but we only care about treeblock for the paper
                       %>% filter(phylo == "treeblock")
                       %>% filter(contrast != "intercept")
-                      
 )
 
 ag_contr_gainloss$rate<-factor(ag_contr_gainloss$rate, levels = c("loss","gain"))
@@ -122,3 +121,48 @@ gg_sum_nice <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colou
         axis.text = element_text(size = 10, color = "black"),
         axis.title.x = element_text(size = 12))
 print(gg_sum_nice)
+
+
+### Figures for Presentations ###
+ag_contr_gainloss <- (purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
+                                          treeblock=contr_long_ag_mcmc_tb,
+                                          prior = contr_long_ag_priorsamp),
+                                     filter, rate != "netgain",
+                                     .id = "phylo")
+                      %>% mutate(across(phylo, factor,
+                                        levels=rev(c("prior","treeblock","fishphylo"))))
+                      ## but we only care about treeblock for the paper
+                      %>% filter(phylo == "treeblock")
+                      %>% filter(contrast != "intercept")
+                      %>% filter(rate == "loss")
+                      
+)
+gg_sc <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colour = rate)) +
+  geom_violin(aes(fill = rate), alpha=0.6) +
+  stat_summary(fun.data = "median_hilow",
+               geom = "errorbar",
+               ## width by trial and error; not sure what determines this?
+               position = position_dodge(width=0.875),
+               colour = "black") +
+  stat_summary(fun = median,
+               geom = "crossbar", aes(group=rate),
+               ## width by trial and error; not sure what determines this?
+               position = position_dodge(width=0.875),
+               colour = "black",
+               size = 1) +
+  geom_vline(xintercept = 1, lty = 2) +
+  scale_x_log10(labels = function(x) format(x, scientific = FALSE)) +
+  zmargin +
+  scale_colour_manual(name="", labels = c("Gain","Loss"), values = c("firebrick","gray70"), limits = c("gain", "loss"))+
+  scale_fill_manual(name="", labels = c("Gain","Loss"), values = c("firebrick","gray70"), limits = c("gain", "loss"))+
+  scale_y_discrete(breaks=c("pcxsc","sc","pc"), 
+                   labels=c("Interaction", "Spawning Mode", "Parental Care"),
+                   limits=c("pcxsc","sc","pc"))+
+  labs(x="Proportional Difference in Rates", y="")+
+  theme(panel.grid = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        axis.text = element_text(size = 24, color = "black"),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 24, color = "black"))
+
+print(gg_sc)
