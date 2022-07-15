@@ -14,50 +14,58 @@ library(diversitree)
 tar_load(ag_model_pcsc)
 tar_load(treeblock)
 tar_load(ag_compdata_tb)
-phy<-treeblock[[1]]
-data<-ag_compdata_tb$data
-model<-ag_model_pcsc$solution
+phy <- treeblock[[1]]
+data <- ag_compdata_tb$data
+model <- ag_model_pcsc$solution
 
 set.seed(1)
-sims<-list()
-sums<-list()
-counts<-matrix(ncol=3, nrow = 0)
-i<-1
-while(i<101){
-  sims[[i]]<-makeSimmap(tree = treeblock[[i]], data = data, model = model, rate.cat = 1, nSim = 10)
-  sims[[i]]<-lapply(sims[[i]],mergeMappedStates,c(1:4),"ag0")
-  sims[[i]]<-lapply(sims[[i]],mergeMappedStates,c(5:8),"ag1")
-  class(sims[[i]])<-c("multiSimmap","multiPhylo")
-  sums[[i]]<-summary(sims[[i]])
-  counts<-rbind(counts,sums[[i]]$count)
-  print(i)
-  i=i+1
+sims <- list()
+sums <- list()
+counts <- list()
+i <- 1
+
+nsims <- 10
+## BMB: why 10 sets of 10 sims rather than 100 of 1 or 1 of 100 ... ??
+for (i in 1:10) {
+    cat(".")
+    sims[[i]] <- makeSimmap(tree = treeblock[[i]],
+                            data = data, model = model,
+                            rate.cat = 1, nSim = 10)
+    sims[[i]] <- lapply(sims[[i]], mergeMappedStates, 1:4, "ag0")
+    sims[[i]] <- lapply(sims[[i]], mergeMappedStates, 5:8, "ag1")
+    class(sims[[i]]) <- c("multiSimmap","multiPhylo")
+    sums[[i]] <- summary(sims[[i]])
+    ## dim(sums[[i]]$count)
+    counts[[i]] <- sums[[i]]$count
+    ## counts[i,] <- sums[[i]]$count
 }
+cat("\n")
+counts <- do.call("rbind", counts)
 
 #gain and loss CIs
-gain.ci<-quantile(counts[,2], c(0.025,0.975))
-loss.ci<-quantile(counts[,3], c(0.025,0.975))
+gain.ci <- quantile(counts[,2], c(0.025,0.975))
+loss.ci <- quantile(counts[,3], c(0.025,0.975))
 
 #finding AG nodes
-nodeProbs<-as.data.frame(sums[[1]]$ace)
-nodeProbs$ag<-as.factor(round(nodeProbs[,2], digits = 0))
-allAgNodes<-rownames(subset(nodeProbs, ag==1))
+nodeProbs <- as.data.frame(sums[[1]]$ace)
+nodeProbs$ag <- as.factor(round(nodeProbs[,2], digits = 0))
+allAgNodes <- rownames(subset(nodeProbs, ag==1))
 
 #plotting posterior probability
-obj1<-densityMap(sims[[1]], plot=FALSE)
-n<-length(obj1$cols)
-obj1$cols[1:n]<-colorRampPalette(c("grey60","firebrick"), space="Lab")(n)
+obj1 <- densityMap(sims[[1]], plot=FALSE)
+n <- length(obj1$cols)
+obj1$cols[1:n] <- colorRampPalette(c("grey60","firebrick"), space="Lab")(n)
 
 plot(obj1,type="fan",ftype="off", lwd=2)
 nodelabels(node = allAgNodes, pch = 21, col="firebrick4", bg="firebrick", cex=0.5, lwd=2)
 
 #why cant i load this directly?
-data<-read.csv(file.choose())
-data2<-data.frame(care=data$care, spawning=data$spawning, row.names = data$species)
+data <- read.csv(file.choose())
+data2 <- data.frame(care=data$care, spawning=data$spawning, row.names = data$species)
 
-cols1<-list(care=c("#c7e9c0","#006d2c"), spawning=c("#bdd7e7","#2171b5"))
-labs1<-c("Parental Care","Spawning Mode")
-str1<-list(care=c("No Male Care","Male Care"), spawning=c("Pair Spawning", "Group Spawning"))
+cols1 <- list(care=c("#c7e9c0","#006d2c"), spawning=c("#bdd7e7","#2171b5"))
+labs1 <- c("Parental Care","Spawning Mode")
+str1 <- list(care=c("No Male Care","Male Care"), spawning=c("Pair Spawning", "Group Spawning"))
 
 trait.plot(treeblock[[1]], data2, cols1, cex.lab = 0.2,lab = labs1, str = str1, cex.legend = 0.5)
 
@@ -65,7 +73,7 @@ trait.plot(treeblock[[1]], data2, cols1, cex.lab = 0.2,lab = labs1, str = str1, 
 tar_load(contr_long_ag_mcmc0)
 tar_load(contr_long_ag_mcmc_tb)
 tar_load(contr_long_ag_priorsamp)
-ag_contr_gainloss <- (purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
+ag_contr_gainloss  <-  (purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
                                           treeblock=contr_long_ag_mcmc_tb,
                                           prior = contr_long_ag_priorsamp),
                                      filter, rate != "netgain",
@@ -78,7 +86,7 @@ ag_contr_gainloss <- (purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
                       
 )
 
-ag_contr_gainloss$rate<-factor(ag_contr_gainloss$rate, levels = c("loss","gain"))
+ag_contr_gainloss$rate <- factor(ag_contr_gainloss$rate, levels = c("loss","gain"))
 
 gg_sum_nice <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colour = rate)) +
   geom_violin(aes(fill = rate), alpha=0.6) +
