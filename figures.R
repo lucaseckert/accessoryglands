@@ -24,27 +24,38 @@ sums <- list()
 counts <- list()
 i <- 1
 
-nsims <- 10
-## BMB: why 10 sets of 10 sims rather than 100 of 1 or 1 of 100 ... ??
-for (i in 1:10) {
-    cat(".")
-    sims[[i]] <- makeSimmap(tree = treeblock[[i]],
+sim0 <- makeSimmap(tree = phy,
+                   data = data, model = model,
+                   rate.cat = 1, nSim = 1)[[1]]
+statenames <- rownames(sim0$Q)
+nsims <- 100
+
+if (file.exists("simmap.rda")) {
+    load("simmap.rda")
+} else {
+    for (i in 1:length(treeblock)) {
+        cat(".")
+        sims[[i]] <- makeSimmap(tree = treeblock[[i]],
                             data = data, model = model,
-                            rate.cat = 1, nSim = 10)
-    sims[[i]] <- lapply(sims[[i]], mergeMappedStates, 1:4, "ag0")
-    sims[[i]] <- lapply(sims[[i]], mergeMappedStates, 5:8, "ag1")
-    class(sims[[i]]) <- c("multiSimmap","multiPhylo")
-    sums[[i]] <- summary(sims[[i]])
-    ## dim(sums[[i]]$count)
-    counts[[i]] <- sums[[i]]$count
-    ## counts[i,] <- sums[[i]]$count
+                            rate.cat = 1, nSim = nsims)
+        sims[[i]] <- lapply(sims[[i]], mergeMappedStates, statenames[1:4], "ag0")
+        sims[[i]] <- lapply(sims[[i]], mergeMappedStates, statenames[5:8], "ag1")
+        ## restore state (dropped by lapply())
+        class(sims[[i]]) <- c("multiSimmap","multiPhylo")
+        sums[[i]] <- summary(sims[[i]])
+        dim(sums[[i]]$count)
+        counts[[i]] <- sums[[i]]$count
+    }
+    cat("\n")
+    counts <- do.call("rbind", counts)
+    save(counts, sums, sims, file = "simmap.rda")
 }
-cat("\n")
-counts <- do.call("rbind", counts)
 
 #gain and loss CIs
-gain.ci <- quantile(counts[,2], c(0.025,0.975))
-loss.ci <- quantile(counts[,3], c(0.025,0.975))
+gain.ci <- quantile(counts[,"ag0,ag1"], c(0.025,0.975))
+loss.ci <- quantile(counts[,"ag1,ag0"], c(0.025,0.975))
+
+## BMB: where are these used?
 
 #finding AG nodes
 nodeProbs <- as.data.frame(sums[[1]]$ace)
@@ -60,8 +71,9 @@ plot(obj1,type="fan",ftype="off", lwd=2)
 nodelabels(node = allAgNodes, pch = 21, col="firebrick4", bg="firebrick", cex=0.5, lwd=2)
 
 #why cant i load this directly?
-data <- read.csv(file.choose())
-data2 <- data.frame(care=data$care, spawning=data$spawning, row.names = data$species)
+data <- read.csv("data/binaryTraitData.csv")
+data2 <- data[c("care", "spawning")]
+rownames(data2) <- data$species
 
 cols1 <- list(care=c("#c7e9c0","#006d2c"), spawning=c("#bdd7e7","#2171b5"))
 labs1 <- c("Parental Care","Spawning Mode")
@@ -88,32 +100,47 @@ ag_contr_gainloss  <-  (purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
 
 ag_contr_gainloss$rate <- factor(ag_contr_gainloss$rate, levels = c("loss","gain"))
 
+cvec <- c("firebrick","gray70")
+nvec <- c("Gain", "Loss")
+ylab_pos <- c(2.2, 1.7) ## locations for gain/loss labels
+vw <- 0.5 ## violin width
+pdw <- 0.49  ## dodging (trial and error; depends on violin width)
 gg_sum_nice <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colour = rate)) +
-  geom_violin(aes(fill = rate), alpha=0.6) +
+  geom_violin(aes(fill = rate), alpha=0.6, width = vw) +
   stat_summary(fun.data = "median_hilow",
                geom = "errorbar",
+               width  = 0.1,
                aes(group=rate),
                ## width by trial and error; not sure what determines this?
-               position = position_dodge(width=0.875),
+               position = position_dodge(width=pdw),
                colour = "black") +
-  stat_summary(fun = median,
-               geom = "point", aes(group=rate),
-               ## width by trial and error; not sure what determines this?
-               position = position_dodge(width=0.875),
-               colour = "black",
-               pch = 3,
-               size = 2) + 
-  geom_vline(xintercept = 1, lty = 2) +
-  scale_x_log10(labels = function(x) format(x, scientific = FALSE)) +
-  zmargin +
-  scale_colour_manual(name="", labels = c("Gain","Loss"), values = c("firebrick","gray70"), limits = c("gain", "loss"))+
-  scale_fill_manual(name="", labels = c("Gain","Loss"), values = c("firebrick","gray70"), limits = c("gain", "loss"))+
+    stat_summary(fun = median,
+                 geom = "point", aes(group=rate),
+                 ## width by trial and error; not sure what determines this?
+                 position = position_dodge(width=pdw),
+                 colour = "black",
+                 pch = 3,
+                 size = 2) + 
+    geom_vline(xintercept = 1, lty = 2) +
+    scale_x_log10(labels = function(x) {
+        ## ugly: don't want trailing zeros
+        trimws(gsub("\\.00$", "", format(x, scientific = FALSE)))
+    }) + 
+    zmargin +
+  scale_colour_manual(name="", labels = c("Gain","Loss"), values = cvec, limits = c("gain", "loss"))+
+  scale_fill_manual(name="", labels = c("Gain","Loss"), values = cvec, limits = c("gain", "loss"))+
+  annotate("text", label = nvec, col = cvec, x = 15, y = ylab_pos, size = 8) +
   scale_y_discrete(breaks=c("pcxsc","sc","pc"), 
                    labels=c("Interaction", "Spawning Mode", "Parental Care"),
                    limits=c("pcxsc","sc","pc"))+
   labs(x="Proportional Difference in Rates", y="")+
   theme(panel.grid = element_blank(),
         panel.border = element_rect(colour = "black", fill=NA, size=1),
-        axis.text = element_text(size = 10, color = "black"),
-        axis.title.x = element_text(size = 12))
+        axis.text = element_text(size = 12, color = "black"),
+        axis.title.x = element_text(size = 16),
+        legend.position = "none")
 print(gg_sum_nice)
+ggsave("fig2.png", width = 7, height  = 5)
+
+## 
+system("eog fig2.png & ")
