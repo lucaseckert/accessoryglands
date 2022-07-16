@@ -74,6 +74,26 @@ str1<-list(care=c("No Male Care","Male Care"), spawning=c("Pair Spawning", "Grou
 tar_load(treeblock)
 trait.plot(treeblock[[2]], data2, cols1, cex.lab = 0.2,lab = labs1, str = str1, cex.legend = 0.5)
 
+#distribution of transitions
+transitions<-data.frame(counts[,-1])
+transitions$sim<-1:10000
+transitions<-transitions %>% rename(
+  gains=ag0.ag1,
+  losses=ag1.ag0
+)
+trans<-transitions %>% gather(rate, n, gains,losses)
+
+ggplot(trans, aes(x=n,fill=rate,))+
+  geom_histogram(position = "identity", alpha=0.5, color="black", binwidth = 1)+
+  scale_fill_manual(name="", labels = c("Gains","Losses"), values = c("firebrick","gray70"), limits = c("gains", "losses"))+
+  labs(x="Transitions", y="Frequency")+
+  scale_x_continuous(breaks = c(0,5,10,15,20,25,30))+
+  theme(panel.grid = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        axis.text = element_text(size = 10, color = "black"),
+        axis.title = element_text(size = 14),
+        legend.text = element_text(size=12))
+
 # FIGURE 2 ----------------------------------------------------------------
 tar_load(contr_long_ag_mcmc0)
 tar_load(contr_long_ag_mcmc_tb)
