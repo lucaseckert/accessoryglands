@@ -63,8 +63,7 @@ agNodes<-c(777,784,794,798,808,817,876,923,1018,1020,1103,"Hoplosternum_littoral
            "Ompok_siluroides","Pangasius_pangasius","Auchenipterus_nuchalis",
            "Lepidogalaxias_salamandroides","Cheilinus_undulatus","Radulinopsis_taranetzi")
 
-#why cant i load this directly?
-data<-read.csv(file.choose())
+data<-read.csv("data/binaryTraitData.csv")
 data2<-data.frame(care=data$care, spawning=data$spawning, row.names = data$species)
 
 cols1<-list(care=c("#c7e9c0","#006d2c"), spawning=c("#bdd7e7","#2171b5"))
