@@ -83,7 +83,7 @@ transitions<-transitions %>% rename(
 trans<-transitions %>% gather(rate, n, gains,losses)
 
 ggplot(trans, aes(x=n,fill=rate,))+
-  geom_histogram(position = "identity", alpha=0.5, color="black", binwidth = 1)+
+  geom_histogram(position = "identity", alpha=0.6, color="black", binwidth = 1)+
   scale_fill_manual(name="", labels = c("Gains","Losses"), values = c("firebrick","gray70"), limits = c("gains", "losses"))+
   labs(x="Transitions", y="Frequency")+
   scale_x_continuous(breaks = c(0,5,10,15,20,25,30))+
