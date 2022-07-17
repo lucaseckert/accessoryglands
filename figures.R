@@ -83,7 +83,7 @@ transitions<-transitions %>% rename(
 trans<-transitions %>% gather(rate, n, gains,losses)
 
 ggplot(trans, aes(x=n,fill=rate,))+
-  geom_histogram(position = "identity", alpha=0.6, color="black", binwidth = 1)+
+  geom_histogram(position = "identity", alpha=0.65, color="black", binwidth = 1)+
   scale_fill_manual(name="", labels = c("Gains","Losses"), values = c("firebrick","gray70"), limits = c("gains", "losses"))+
   labs(x="Transitions", y="Frequency")+
   scale_x_continuous(breaks = c(0,5,10,15,20,25,30))+
@@ -185,3 +185,52 @@ gg_sc <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colour = ra
         axis.text.y = element_text(size = 24, color = "black"))
 
 print(gg_sc)
+
+##Proportion Figures##
+data<-read.csv("data/binaryTraitData.csv")
+
+care<-subset(data, care==1)
+noCare<-subset(data, care==0)
+
+AgWithCare<-sum(care$ag)/length(care$ag)
+noAgWithCare<-sum(noCare$ag)/length(noCare$ag)
+
+groups<-subset(data, spawning==1)
+pairs<-subset(data, spawning==0)
+
+AgGroups<-sum(groups$ag)/length(groups$ag)
+AgPairs<-sum(pairs$ag)/length(pairs$ag)
+
+careProps<-c(AgWithCare, noAgWithCare)
+careStates<-c("Male Care", "No Male Care")
+careData<-data.frame(careStates, careProps)
+
+spawnProps<-c(AgGroups, AgPairs)
+spawnStates<-c("Groups", "Pairs")
+spawnData<-data.frame(spawnStates, spawnProps)
+
+ggplot(careData, aes(x=careStates, y=careProps, fill=careStates))+
+  geom_bar(stat = "identity", color="black")+
+  scale_fill_manual(name="", labels = c("care","none"), 
+                    values = c("gray30","gray70"), 
+                    limits = c("Male Care", "No Male Care"))+
+  labs(x="",y="Proportion with Accessory Glands")+
+  theme(panel.grid = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        axis.text = element_text(size = 12, color = "black"),
+        axis.title.y = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        legend.position = "none")
+
+ggplot(spawnData, aes(x=spawnStates, y=spawnProps, fill=spawnStates))+
+  geom_bar(stat = "identity", color="black")+
+  scale_fill_manual(name="", labels = c("groups","pairs"), 
+                    values = c("gray30","gray70"), 
+                    limits = c("Groups", "Pairs"))+
+  labs(x="",y="Proportion with Accessory Glands")+
+  theme(panel.grid = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        axis.text = element_text(size = 12, color = "black"),
+        axis.title.y = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        legend.position = "none")
