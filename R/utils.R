@@ -273,10 +273,16 @@ par_names <- function(model) {
 
 #' give parameters and states more meaningful names
 #' @param model corHMM model
-augment_model <- function(model) {
+augment_model <- function(model, add_hessian = TRUE) {
     sn <- state_names(model$data[, -1])
     dimnames(model$solution) <- dimnames(model$index.mat) <- list(sn, sn)
     names(model$args.list$p) <- par_names(model)
+    if (add_hessian) {
+        f <- make_nllfun(model)
+        p <- model$args.list$p
+        H <- numDeriv::hessian(f, p)
+        attr(model, "hessian") <- H
+    }
     return(model)
 }
 
@@ -305,8 +311,11 @@ tidy.corhmm <- function(x,
                          estimate = p)
     if (conf.int) {
         if (conf.method == "wald") {
-          ## FIXME: expensive to compute. Upstream? Cache?
-          H <- numDeriv::hessian(f, p0)
+            ## FIXME: expensive to compute. Upstream? Cache?
+            H <- attr(x, "hessian")
+            if (is.null(H)) {
+                H <- numDeriv::hessian(f, p0)
+            }
           V <- solve(H)
           if (!is.null(contrast_mat)) {
               V <- contrast_mat %*% V %*% t(contrast_mat)
@@ -557,4 +566,73 @@ gainloss_ind_prs <- function(x) {
     upr <- unique(na.omit(imat[upper.tri(imat)]))
     lwr <- unique(na.omit(imat[lower.tri(imat)]))
     Map(c, upr, lwr)
+}
+
+profile.corhmm <- function(fitted, max_val = 3, delta = 0.1, maxit = 50,
+                           params = NULL,
+                           verbose = FALSE, optControl = list(maxit = 20000),
+                           conv_action = stop, ...) {
+    ## FIXME: allow parameter selection?
+    ## *generic* profiling recipe?
+    f <- make_nllfun(fitted)
+    p0 <- p <- fitted$args.list$p
+    L0 <- -1*c(logLik(fitted))
+    ## FIXME: check for sd problems?
+    sd <- sqrt(diag(solve(attr(fitted, "hessian"))))
+    offset <- sd*delta
+    res <- list()
+    ## can't use 'par' as loop variable, conflicts with optim() argument name
+    if (is.null(params)) params <- seq_along(p0)
+    for (cur_par in params) {
+        if (verbose) cat(sprintf("param %d (%s)\n", cur_par, names(p)[cur_par]))
+        ## construct full parameter vector from restricted parameters
+        mkpar <- function(p, cur_par, cur_parval) {
+            pp <- rep(NA, length(p)+1)
+            pp[-cur_par] <- p
+            pp[cur_par] <- cur_parval
+            names(pp) <- names(p0)
+            pp
+        }
+        ## evaluate negative log-lik over restricted parameters
+        wrapfun <- function(p, cur_par, cur_parval) {
+            f(mkpar(p, cur_par, cur_parval))
+        }
+        ## FIXME: parallel evaluation?
+        for (dir in c(-1, 1)) {
+            if (verbose) cat("dir: ", dir, "\n")
+            cur_parval <- p0[cur_par]
+            p <- p0
+            it <- 0
+            val <- 0
+            while (it < maxit && val < max_val) {
+                cur_parval  <- cur_parval + dir*offset[cur_par]
+                if (verbose) cat(cur_parval, " ")
+                opt <- optim(fn = wrapfun, par = p[-cur_par], cur_par = cur_par, cur_parval = cur_parval,
+                             control = optControl)
+                if (opt$convergence != 0) conv_action("convergence code ", opt$convergence)
+                val <- opt$value - L0
+                p <- mkpar(p, cur_par, cur_parval)
+                if (verbose) cat(val, "\n")
+                res <- c(res, list(
+                                  data.frame(
+                                      .zeta = -2*sqrt(val)*dir,
+                                      .par = names(p0)[[cur_par]],
+                                      .focal = cur_parval,
+                                      rbind(p)
+                                  )  ## data.frame()
+                              )  ## list()
+                         ) ## c()
+                it <- it + 1
+            }  ## while goal not achieved
+        }  ## loop over dir
+    } ## loop over params
+    ##  assemble results
+    do.call("rbind", res)
+}
+## debug(profile.corhmm)
+## profile(fitted, verbose = TRUE)
+
+contrast.corHMM <- function(fitted, contrast) {
+    ## make wrapfun
+    ## fit ...
 }
