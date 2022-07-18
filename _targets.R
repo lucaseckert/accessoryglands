@@ -400,6 +400,7 @@ list(data_input_targets,
                            n_iter =  84000,
                            n_thin = 20,
                            seed = 101),
+               cue = run_slow()
                ),
     tar_target(ag_priorsamp,
                corhmm_mcmc(ag_model_pcsc,
