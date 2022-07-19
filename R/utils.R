@@ -634,6 +634,7 @@ profile.corhmm <- function(fitted, max_val = 3, delta = 0.1, maxit = 50,
 
 fit_contrast.corHMM <- function(fitted, contrast, fixed_vals,
                                 optControl = list(maxit = 20000)) {
+    require("bbmle")
     f <- make_nllfun(fitted)
     p0 <- coef(fitted)
     ## updated contrast matrix (transposed & reordered)
@@ -659,14 +660,15 @@ fit_contrast.corHMM <- function(fitted, contrast, fixed_vals,
     cur_par <- match(names(fixed_vals), names(p0_c))
     if (length(cur_par) == 0) stop("bad param names")
     start <- p0_c[-cur_par]
+    parnames(wrapfun) <- names(start)
     ## wrapfun(start, cur_par = cur_par, cur_parval = fixed_vals)
-    optim(par = start,
-          fn = wrapfun,
-          cur_par = cur_par,
-          cur_parval = fixed_vals,
-          control = optControl)
-    ## make wrapfun
-    ## fit ...
+    ## use bbmle
+    mle2(wrapfun,
+         start = start,
+         method = "Nelder-Mead",
+         data = list(cur_par = cur_par,
+                     cur_parval = fixed_vals),
+         control = optControl)
 }
 
 if (FALSE) {
@@ -683,6 +685,5 @@ if (FALSE) {
     fit_contrast.corHMM(ag_model_pcsc, invcontr,
                         ## zero out interactions
                         fixed_vals = c(pcxsc_loss = 0, pcxsc_gain = 0),
-                        optControl = list(maxit = 20000))
-
+                        optControl = list(maxit = 20000, trace = 2))
 }
