@@ -632,14 +632,57 @@ profile.corhmm <- function(fitted, max_val = 3, delta = 0.1, maxit = 50,
 ## debug(profile.corhmm)
 ## profile(fitted, verbose = TRUE)
 
-fit_contrast.corHMM <- function(fitted, contrast,
-                                raw_vals, fixed_vals) {
-    wrapfun <- function(p) {
+fit_contrast.corHMM <- function(fitted, contrast, fixed_vals,
+                                optControl = list(maxit = 20000)) {
+    f <- make_nllfun(fitted)
+    p0 <- coef(fitted)
+    ## updated contrast matrix (transposed & reordered)
+    c2 <- t(contrast)[,names(p0)]
+    ## reference (starting) values in contrast space
+    p0_c <- drop(c2 %*% p0)
+    ## inverse-contrast matrix 
+    ic <- solve(c2)
+    stopifnot(all.equal(p0, drop(ic %*%  p0_c)))
+    ## DRY?
+    mkpar <- function(p, cur_par, cur_parval) {
+        pp <- rep(NA, length(p)+length(cur_par))
+        pp[-cur_par] <- p
+        pp[cur_par] <- cur_parval
+        names(pp) <- names(p0)
+        pp
     }
+    ## evaluate negative log-lik over restricted parameters
+    wrapfun <- function(p, cur_par, cur_parval) {
+        pp <- mkpar(p, cur_par, cur_parval)
+        f(ic %*% pp)
+    }
+    cur_par <- match(names(fixed_vals), names(p0_c))
+    if (length(cur_par) == 0) stop("bad param names")
+    start <- p0_c[-cur_par]
+    ## wrapfun(start, cur_par = cur_par, cur_parval = fixed_vals)
+    optim(par = start,
+          fn = wrapfun,
+          cur_par = cur_par,
+          cur_parval = fixed_vals,
+          control = optControl)
     ## make wrapfun
     ## fit ...
 }
 
 if (FALSE) {
-    tar_load(contrast_mat)
+    library(corHMM)
+    library(targets)
+    tar_load(ag_model_pcsc)
+    source("R/utils.R")
+    ## read contrast matrix and convert to matrix
+    invcontr <- read.csv("contr_invertible.csv")
+    rn <- invcontr$parname
+    invcontr <- as.matrix(invcontr[,-1])
+    dimnames(invcontr) <- list(rn, colnames(invcontr))
+    ## fit additive model
+    fit_contrast.corHMM(ag_model_pcsc, invcontr,
+                        ## zero out interactions
+                        fixed_vals = c(pcxsc_loss = 0, pcxsc_gain = 0),
+                        optControl = list(maxit = 20000))
+
 }
