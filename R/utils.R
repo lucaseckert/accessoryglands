@@ -632,7 +632,14 @@ profile.corhmm <- function(fitted, max_val = 3, delta = 0.1, maxit = 50,
 ## debug(profile.corhmm)
 ## profile(fitted, verbose = TRUE)
 
-contrast.corHMM <- function(fitted, contrast) {
+fit_contrast.corHMM <- function(fitted, contrast,
+                                raw_vals, fixed_vals) {
+    wrapfun <- function(p) {
+    }
     ## make wrapfun
     ## fit ...
+}
+
+if (FALSE) {
+    tar_load(contrast_mat)
 }
