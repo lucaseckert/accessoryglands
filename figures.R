@@ -33,13 +33,6 @@ library(diversitree)
 #   print(i)
 #   i=i+1
 # }
-# saveRDS(sims, "sims.rds")
-# saveRDS(sums, "sums.rds")
-# saveRDS(counts, "counts.rds")
-
-sims<-readRDS("sims.rds")
-sums<-readRDS("sums.rds")
-counts<-readRDS("counts.rds")
 
 #gain and loss CIs
 gain.ci<-quantile(counts[,2], c(0.025,0.975))
