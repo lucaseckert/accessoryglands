@@ -632,7 +632,7 @@ profile.corhmm <- function(fitted, max_val = 3, delta = 0.1, maxit = 50,
 ## debug(profile.corhmm)
 ## profile(fitted, verbose = TRUE)
 
-fit_contrast.corHMM <- function(fitted, contrast, fixed_vals,
+fit_contrast.corhmm <- function(fitted, contrast, fixed_vals,
                                 optControl = list(maxit = 20000)) {
     require("bbmle")
     f <- make_nllfun(fitted)
@@ -682,7 +682,7 @@ if (FALSE) {
     invcontr <- as.matrix(invcontr[,-1])
     dimnames(invcontr) <- list(rn, colnames(invcontr))
     ## fit additive model
-    fit_contrast.corHMM(ag_model_pcsc, invcontr,
+    fit_contrast.corhmm(ag_model_pcsc, invcontr,
                         ## zero out interactions
                         fixed_vals = c(pcxsc_loss = 0, pcxsc_gain = 0),
                         optControl = list(maxit = 20000, trace = 2))

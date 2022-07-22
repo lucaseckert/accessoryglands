@@ -1,0 +1,13 @@
+parname,intercept_loss,pc_loss,sc_loss,pcxsc_loss,intercept_gain,pc_gain,sc_gain,pcxsc_gain,loss.sc,gain.sc,loss.pc,gain.pc
+gain.sc,0,0,0,0,0,0,0,0,0,1,0,0
+gain.pc,0,0,0,0,0,0,0,0,0,0,0,1
+gain.ag_pc0_sc0,0,0,0,0,0.25,-0.5,-0.5,0.5,0,0,0,0
+loss.sc,0,0,0,0,0,0,0,0,1,0,0,0
+gain.ag_pc0_sc1,0,0,0,0,0.25,-0.5,0.5,-0.5,0,0,0,0
+loss.pc,0,0,0,0,0,0,0,0,0,0,1,0
+gain.ag_pc1_sc0,0,0,0,0,0.25,0.5,-0.5,-0.5,0,0,0,0
+gain.ag_pc1_sc1,0,0,0,0,0.25,0.5,0.5,0.5,0,0,0,0
+loss.ag_pc0_sc0,0.25,-0.5,-0.5,0.5,0,0,0,0,0,0,0,0
+loss.ag_pc0_sc1,0.25,-0.5,0.5,-0.5,0,0,0,0,0,0,0,0
+loss.ag_pc1_sc0,0.25,0.5,-0.5,-0.5,0,0,0,0,0,0,0,0
+loss.ag_pc1_sc1,0.25,0.5,0.5,0.5,0,0,0,0,0,0,0,0

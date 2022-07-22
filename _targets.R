@@ -226,6 +226,13 @@ list(data_input_targets,
            method = "BFGS"
            )
     }),
+    tar_target(ag_model_pcsc_add,
+               fit_contrast.corhmm(ag_model_pcsc,
+                                   contrast_mat_inv,
+                                   ## zero out interactions
+                                   fixed_vals = c(pcxsc_loss = 0, pcxsc_gain = 0),
+                                   optControl = list(maxit = 20000))
+    ),
     tar_target(comp_ci,
     { list(
           wald = tidy(ag_model_pcsc, conf.int = TRUE),
@@ -273,9 +280,9 @@ list(data_input_targets,
                    colnames(mcmc[[1]]))
     ),
     tar_map(
-        values = tibble(fn = c("contr.csv", "contr_full.csv"),
-                        col_order = rlang::syms(c("col_order_0", "col_order_full")),
-                        nm = c("0", "full")
+        values = tibble(fn = c("contr.csv", "contr_full.csv", "contr_invertible.csv"),
+                        col_order = rlang::syms(c("col_order_0", "col_order_full", "col_order_0")),
+                        nm = c("0", "full", "inv")
                        ),
         names = nm,
         tar_target(contrast_mat,

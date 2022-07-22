@@ -101,47 +101,80 @@ The classic "dichotomanic" (= in love with dichotomous/discrete answers) ways to
 
 ```{r likcomp, results="asis"}
 ag_models <- paste0("ag_model_",
-                    c("pcsc","pc","sc","indep"))
+                    c("pcsc_add","pcsc","pc","sc","indep"))
 ## tar_load(all_of(ag_models))
 ## needs to be done explicitly to keep targets pkg happy
 tar_load("ag_model_pcsc")
 tar_load("ag_model_pc")
 tar_load("ag_model_sc")
 tar_load("ag_model_indep")
-atab <- as.data.frame(bbmle::AICtab(ag_model_indep, ag_model_pc, ag_model_sc, ag_model_pcsc,
-                                    logLik = TRUE))
-dtab <- data.frame(desc = c("AG dep on PC, SC & interaction",
+tar_load("ag_model_pcsc_add")
+fake_nobs <- 30 ## ?? something weird about targets evaluation:
+                ## claims fake_nobs not found below ??
+atab <- (bbmle::AICtab(ag_model_indep,
+                      ag_model_pc,
+                      ag_model_sc,
+                      ag_model_pcsc,
+                      ag_model_pcsc_add,
+                      logLik = TRUE)
+    ## keep rownames/don't convert to tibble
+    |> transform(dAICc = (dAIC + 2*(df^2 + df)/(30-df-1)))
+    |> transform(dAICc = dAICc - min(dAICc))
+    |> transform(dBIC = dAIC - 2*df + log(30)*df)
+    |> transform(dBIC = dBIC - min(dBIC))
+)
+dtab <- data.frame(desc = c("AG dep on PC, SC additively",
+                            "AG dep on PC, SC & interaction",
                             "AG dep only on PC",
                             "AG dep only on SC",
                             "AG evol indep of PC, SC"),
                    row.names = ag_models)
-atab2 <- merge(dtab, atab, by = 0) %>% dplyr::select(desc, dAIC, dLogLik, df) %>% arrange(dAIC)
+atab2 <- (merge(dtab, atab, by = 0)
+    |> dplyr::select(desc, dAIC, dAICc, dBIC, dLogLik, df)
+    |> arrange(dAIC)
+)
 knitr::kable(atab2, digits=1)
 ```
 
 Show all likelihood ratio test comparisons.
 
-```{r lrtest, fig.width=8, fig.height=8}
-## want all
-mnames <- gsub("ag_model_","",ag_models)[c(2,4,3,1)]
+```{r lrtest}
+mnames <- c("pcsc", "pcsc_add", "pc", "sc", "indep")
 anfun <- function(m1, m2) {
-    aa <- anova(m1, m2)
-    sprintf("atop(Delta*dev==%1.1f,p==%1.1g)",
-            ## "Δdev=%1.1f\np=%1.1g",
-            aa$delta_dev[2], aa$pval[2])
+    L1 <- logLik(m1)
+    L2 <- logLik(m2)
+    df1 <- attr(L1, "df")
+    df2 <- attr(L2, "df")
+    ddev <- 2*abs(c(L2-L1))
+    ddf <- abs(df1-df2) ## ASSUME nothing pathological is happening
+    pval <- pchisq(ddev, ddf, lower.tail = FALSE)
+    sprintf("atop(Delta*df==%d,atop(Delta*dev==%1.2f,p==%1.1g))",
+            ddf, ddev, pval)
 }
-A <- matrix(NA_character_,4,4,
+A <- matrix(NA_character_, 5, 5,
             dimnames=list(mnames, mnames))
 A["indep","pc"] <- anfun(ag_model_pc, ag_model_indep)
 A["indep","sc"] <- anfun(ag_model_sc, ag_model_indep)
-A["sc","pcsc"] <- anfun(ag_model_pcsc, ag_model_sc)
+A["sc","pcsc_add"] <- anfun(ag_model_pcsc_add, ag_model_sc)
+A["pc","pcsc_add"] <- anfun(ag_model_pcsc_add, ag_model_pc)
+A["indep","pcsc_add"] <- anfun(ag_model_pcsc_add, ag_model_indep)
+A["pcsc_add","pcsc"] <- anfun(ag_model_pcsc_add, ag_model_pcsc)
 A["pc","pcsc"] <- anfun(ag_model_pcsc, ag_model_pc)
-A["indep","pcsc"] <- anfun(ag_model_pcsc, ag_model_indep)
-plotmat(A, curve = 0, box.size = 0.08)
+A["sc","pcsc"] <- anfun(ag_model_pcsc, ag_model_sc)
+C <- matrix(0, nrow=nrow(A), ncol = ncol(A))
+C[!is.na(A)] <- seq(sum(!is.na(A)))
+```
+```{r lrtest_plot, fig.width = 7, fig.height = 10}
+plotmat(A, curve = 0,
+        ## pcsc_add box in second row needs to be wider/larger
+        box.size = c(0.05, 0.1, 0.05, 0.05),
+        box.prop = c(0.5, 0.25, 0.5, 0.5),
+        arr.lcol = C,
+        arr.tcol = C,
+        pos = matrix(c(1,1,2,1)))
 ```
 
 - The likelihood comparisons and the AIC comparisons provide the same general conclusions.
-- It would be interesting to compare an *additive* model (PC and SC independently influence AG evolution rate, but they don't interact) with the current interactive model, but it would require a little bit more machinery that I haven't implemented yet (most generally, creating rate sets as arbitrary linear combinations of parameters)
 
 ##  Priors
 
@@ -393,9 +426,10 @@ ag_contr_gainloss <- (purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
                       levels=rev(c("prior","treeblock","fishphylo"))))
     ## but we only care about treeblock for the paper
     %>% filter(phylo == "treeblock")
-    %>% filter(rate == "gain")
 )
-gg_sum_gain <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast)) +
+gg_sum_gain <- ggplot(
+    filter(ag_contr_gainloss, rate == "gain"),
+    aes(x = exp(value), y = contrast)) +
     geom_violin(color="deeppink3", fill="deeppink3", alpha=0.7) +
     stat_summary(fun.data = "median_hilow",
                  geom = "errorbar",
@@ -431,18 +465,28 @@ filter(ag_contr_gainloss, contrast == "sc", rate == "gain", phylo == "treeblock"
 ```
 
 Only showing treeblock (preferred) results ...
+
 ```{r sum_tab, results="asis"}
 bayes_pval <- function(x, ref=0) {
   x <- mean(x<ref)
   2 * min(x, 1-x)
 }
+bayes_pd <- function(x, ref = 0) {
+    mean(x*sign(median(x))>ref)
+}
 (ag_contr_gainloss
   %>% group_by(phylo,contrast,rate)
-  %>% summarise(median = median(value), lwr = quantile(value, 0.025), upr = quantile(value, 0.975), p = bayes_pval(value), .groups = "drop")
-  %>% filter(phylo == "treeblock")
+    %>% summarise(median = median(value),
+                  lwr = quantile(value, 0.025),
+                  upr = quantile(value, 0.975),
+                  pMCMC = bayes_pval(value),
+                  pd = bayes_pd(value),
+                  .groups = "drop")
+    %>% filter(phylo == "treeblock")
+    %>% arrange(rate, contrast)
   %>% dplyr::select(-phylo)
   %>% mutate(across(c(median, lwr, upr), exp))
-  %>% mutate(across(p, ~ ifelse(contrast=="intercept", NA, .)))
+  %>% mutate(across(c(pMCMC, pd), ~ ifelse(contrast=="intercept", NA, .)))
   %>% knitr::kable(digits = 3)
 )
 ```
