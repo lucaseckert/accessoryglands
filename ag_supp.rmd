@@ -395,32 +395,27 @@ such as AICc, AIC, or BIC. These three criteria differ in the kind and strength 
 
 ```{r ictab}
 ag_models <- paste0("ag_model_",
-                    c("pcsc_add","pcsc","pc","sc","indep"))
+                    mnames)
 fake_nobs <- 30 ## ?? something weird about targets evaluation:
-                ## claims fake_nobs not found below ??
-atab <- (bbmle::AICtab(ag_model_indep,
-                      ag_model_pc,
-                      ag_model_sc,
-                      ag_model_pcsc,
-                      ag_model_pcsc_add,
-                      logLik = TRUE)
-    ## keep rownames/don't convert to tibble
-    |> transform(dAICc = (dAIC + 2*(df^2 + df)/(30-df-1)))
-    |> transform(dAICc = dAICc - min(dAICc))
-    |> transform(dBIC = dAIC - 2*df + log(30)*df)
-    |> transform(dBIC = dBIC - min(dBIC))
+dtab <- tibble(
+    model = mnames,
+    desc = c("AG dep on PC, SC & interaction",
+             "AG dep on PC, SC additively",
+             "AG dep only on PC",
+             "AG dep only on SC",
+             "AG evol indep of PC, SC"))
+atab <- (mget(ag_models)
+    |> setNames(mnames)
+    |> map_dfr(glance, nobs = fake_nobs, .id = "model")
+    |> mutate(negLL = -1*logLik)
+    |> dplyr::select(-logLik)
+    |> mutate(across(c(AIC, BIC, negLL, AICc),  ~ . - min(.)))
+    |> arrange(AICc)
+    |> full_join(dtab, by = "model")
+    |> dplyr::select(desc, df, AICc, AIC, BIC, negLL)
+    |> setNames(c(" ", "df", "ΔAICc", "ΔAIC", "ΔBIC", "ΔnegLL"))
 )
-dtab <- data.frame(desc = c("AG dep on PC, SC additively",
-                            "AG dep on PC, SC & interaction",
-                            "AG dep only on PC",
-                            "AG dep only on SC",
-                            "AG evol indep of PC, SC"),
-                   row.names = ag_models)
-atab2 <- (merge(dtab, atab, by = 0)
-    |> dplyr::select(desc, dAICc, dAIC, dBIC, dLogLik, df)
-    |> arrange(dAICc)
-)
-knitr::kable(atab2, digits=1)
+knitr::kable(atab, digits=2)
 ```
 
 As stated in the main text, we can see that AICc gives similar conclusions to the Bayesian and likelihood-ratio-test analyses: the best model has AG evolution depending on male care only, followed closely by the additive model, and fairly closely by sperm competition only (models with $\Delta$ AICc < 2 are usually interpreted as "roughly equivalent"). In contrast, using AIC selects the additive model as best, and considerably better than the single-factor models. BIC, which like AICc is generally more conservative than AIC, also selects the additive model as best, similar ($\Delta$ BIC < 2) to the male-care-only model.

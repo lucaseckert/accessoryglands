@@ -4,7 +4,8 @@ pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "GGally", "colorspace", "ggmosaic", "targets", "tarchetypes",
              "abind", "cowplot", "patchwork", "ggtree", "ggnewscale",
              "glue", "diagram", "hues", "phytools", "diversitree",
-             "remotes", "visNetwork", "Matrix", "igraph")
+             "remotes", "visNetwork", "Matrix", "igraph",
+             "nloptr")
 
 
 ## packages to install from GitHub (username, reponame)
@@ -350,6 +351,27 @@ tidy.corhmm <- function(x,
   return(res)
 }
 
+glance.corhmm <- function(x, nobs = NULL, ...) {
+    L <- logLik(x)
+    res <-tibble(
+        df = attr(L, "df"),
+        logLik = c(L),
+        AIC = 2*df - 2 * logLik)
+    if (is.null(nobs)) {
+        nobs <- tryCatch(nobs(x),
+                         error = function(e) NULL)
+    }
+    if (!is.null(nobs)) {
+        res <- (res |>
+            mutate(BIC = -2*logLik + log(nobs)*df,
+                   AICc = AIC + 2*(df^2 + df)/(nobs-df-1))
+        )
+    }
+    return(res)
+}
+
+glance.corhmm_contrast <- glance.mle2 <- glance.corhmm
+
 profile.corhmm <- function(model,
                            mlefun = NULL,
                            which = NULL,
@@ -633,7 +655,11 @@ profile.corhmm <- function(fitted, max_val = 3, delta = 0.1, maxit = 50,
 ## profile(fitted, verbose = TRUE)
 
 fit_contrast.corhmm <- function(fitted, contrast, fixed_vals,
-                                optControl = list(maxit = 20000)) {
+                                optControl = list(maxit = 20000),
+                                ## HACK: contrasts won't be on quite the same scale as
+                                ##  the original transitions ...
+                                lower = log(0.001),
+                                upper = log(10000)) {
     require("bbmle")
     f <- make_nllfun(fitted)
     p0 <- coef(fitted)
@@ -662,13 +688,75 @@ fit_contrast.corhmm <- function(fitted, contrast, fixed_vals,
     start <- p0_c[-cur_par]
     parnames(wrapfun) <- names(start)
     ## wrapfun(start, cur_par = cur_par, cur_parval = fixed_vals)
-    ## use bbmle
-    mle2(wrapfun,
-         start = start,
-         method = "Nelder-Mead",
-         data = list(cur_par = cur_par,
-                     cur_parval = fixed_vals),
-         control = optControl)
+    ## maybe not necessary/env?
+    w2 <- function(p) wrapfun(p, cur_par = cur_par, cur_parval = fixed_vals)
+    fit <- nloptwrap(par = start,
+                     fn = w2,
+                     lower = lower,
+                     upper = upper)
+    nm <- setdiff(colnames(contrast), names(fixed_vals))
+    names(fit$par) <- nm
+    ## HACK: create an mle2 object (mle2 doesn't take user-specified optimizers,
+    ##  and I want to use nloptwrap ...)
+    H <- optimHess(fit$par, fn = w2)
+    dimnames(H) <- list(nm, nm)
+    ret <- c(fit, list(hessian = H))
+    class(ret) <- c("corhmm_contrast", "list")
+    return(ret)
+}
+
+logLik.corhmm_contrast <- function(x) {
+    LL <- x$fval
+    df <- length(x$par)
+    attr(LL, "df") <- df
+    class(LL) <- "logLik"
+    return(LL)
+}
+
+tidy.corhmm_contrast <- function(x,
+                        conf.int = FALSE,
+                        conf.method = "wald",
+                        conf.level = 0.95,
+                        p.value = FALSE,
+                        profile = NULL,
+                        exponentiate = FALSE,
+                        prof_args = NULL,
+                        contrast_mat = NULL,
+                        ...) {
+    p <- x$par
+    res <- dplyr::tibble(term = names(p), estimate = p)
+    if (conf.int) {
+        V <- solve(x$hessian)
+        sds <- sqrt(diag(V))
+        qq <- qnorm((1+conf.level)/2)
+        res <- dplyr::mutate(res,
+                             std.error = sds,
+                             statistic = p/sds,
+                             conf.low = estimate - qq*std.error,
+                             conf.high = estimate + qq*std.error)
+    }
+    if (exponentiate) {
+        res <- mutate(res, across(estimate, exp))
+        res <- mutate(res, across(starts_with("conf"), exp))
+        if ("std.error" %in% names(res)) {
+            res <- mutate(res, across(std.error, ~ . * estimate))
+        }
+    }
+    return(res)
+}
+
+nloptwrap <- function (par, fn, lower = -Inf, upper = Inf, control = list(), ...) {
+    defaultControl <- list(algorithm = "NLOPT_LN_BOBYQA", xtol_abs = 1e-08, ftol_abs = 1e-08, 
+                           maxeval = 1e+05)
+    lower <- rep(lower, length.out = length(par))
+    upper <- rep(upper, length.out = length(par))
+    for (n in names(defaultControl)) if (is.null(control[[n]])) 
+                                         control[[n]] <- defaultControl[[n]]
+    res <- nloptr(x0 = par, eval_f = fn, lb = lower, ub = upper, 
+                  opts = control, ...)
+    with(res, list(par = solution, fval = objective, feval = iterations, 
+                   conv = if (status < 0 || status == 5) status else 0, 
+                   message = message))
 }
 
 if (FALSE) {

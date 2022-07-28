@@ -14,8 +14,8 @@ Phylogenetic comparative analysis on the evolution of reproductive accessory gla
 ## documents
 
 - `ag_model.rmd`: mostly obsolete
-- `ag_bayesdiag.rmd`: Bayes diagnostics for MCMC fits
-- `ag_supp.rmd`: supplementary material
+- `ag_bayesdiag.rmd`: Bayes diagnostics for MCMC fits ([link](http://www.math.mcmaster.ca/bolker/AG/ag_bayesdiag.html))
+- `ag_supp.rmd`: supplementary material ([link](http://www.math.mcmaster.ca/bolker/AG/ag_supp.html))
 - `ag_tech.rmd`: tech overview document (????)
 
 ## getting started

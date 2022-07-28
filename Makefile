@@ -3,3 +3,8 @@ setup:
 
 all:
 	Rscript -e "library(targets); library(future); plan('multicore'); tar_make_future()"
+
+## FIXME: avoid re-pushing?
+push: ag_bayesdiag.html ag_supp.html
+	rsync -uav $^ ms.mcmaster.ca:~/public_html/AG
+#	scp $^ ms.mcmaster.ca:~/public_html/AG/

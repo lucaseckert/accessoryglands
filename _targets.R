@@ -181,8 +181,8 @@ list(data_input_targets,
                        rate.cat = 1,
                        rate.mat = statemat,
                        root.p = root.p,
-                       lower = ag_corhmm_bounds[["lower"]],
-                       upper = ag_corhmm_bounds[["upper"]]
+                       lower.bound = ag_corhmm_bounds[["lower"]],
+                       upper.bound = ag_corhmm_bounds[["upper"]]
                        )
                 ))
     ),
@@ -454,7 +454,7 @@ list(data_input_targets,
     ##                    alpha=0.05) ## less extreme than default (alpha=0.01)
     ##            ),
     ## old(ish) technical model info
-    tar_render(ag_rmd, "ag_model.rmd"),
+    tar_render(ag_old_rmd, "ag_model.rmd"),
     ## Bayesian diagnostics (roll into/include in supplementary material?)
     tar_render(ag_bayesdiag_rmd, "ag_bayesdiag.rmd"),
     ## technical note (audience: technical users/computational folks)
