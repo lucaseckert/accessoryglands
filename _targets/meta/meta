@@ -37,7 +37,7 @@ ag_statemat_pcsc_pars|stem|34fbff9be0c99a15|fff066302bcbf76b|1113b4d19ed6d0ba|-5
 ag_statemat_sc|stem|748d14caa803f11a|7b9bb0106fd7dcad|b208abfd6a2710f2|-1304596859||t19115.7575556189s|23174e8584d69801|187|rds|local|vector|||0.061||
 ag_statemat_sc_pars|stem|34fbff9be0c99a15|7b9bb0106fd7dcad|c1e82850d1597fed|-249929939||t18816.7419064697s|b2a37e7acd6b186f|188|rds|local|vector|||0.063||
 ag_statemat_unconstr|stem|5fb9f24ce5e31bd5|8d6d59c73a4a6ee6|f4436fb39d12bc98|314703174||t19102.0301363727s|3c187ffa31a31952|199|rds|local|vector|||0.058||
-ag_supp_rmd|stem|472f1f2c2172e961|4bf7cdf7ca40403e|7772e5f5389bb486|-1318912053|ag_supp.html*ag_supp.rmd|t19201.7753098556s|1bc2b3acb5b7d8d4|1448295|file|local|vector|||7.216||
+ag_supp_rmd|stem|79789a7cd5a9b165|4bf7cdf7ca40403e|7772e5f5389bb486|-1318912053|ag_supp.html*ag_supp.rmd|t19201.8048105388s|ebd80a5340c4ad04|1441131|file|local|vector|||7.022||
 ag_tech_rmd|stem|10f5ae3784ceedf2|f798cfc9e586492b|d285d0362307293b|-1957133094|ag_tech.html*ag_tech.rmd|t19200.8389737301s|befad2b01e80db0e|1351201|file|local|vector|||6.831|Removed 3 rows containing nonfinite values stat_bin.|
 all_ci|stem|f6e1359fcfb6cc70|4e19048f744617c4|c5e8259cdabe695b|-903984374||t19193.6409371746s|5083c4e4a845eb7f|3019|rds|local|vector|||0.716||
 all_contr_ci|stem|a8fe815e47d73ecc|24dd5ceff58e5843|dc860d790bf22010|1367391847||t19193.6409443969s|902b69f08f2559be|3192|rds|local|vector|||0.607||
@@ -87,7 +87,7 @@ indep_pars|stem|cfffec631890bef9|60dc1724789d11e9|46ba7db95427a066|-1841590527||
 install_pkgs|function|81f72779f5d1044a|||||||||||||||
 load_pkgs|function|5ac84e89ebeeeaab|||||||||||||||
 logLik.corhmm|function|a6cbd88aa37d48dd|||||||||||||||
-logLik.corhmm_contrast|function|02b36ab06054617a|||||||||||||||
+logLik.corhmm_contrast|function|04a188eaada215cc|||||||||||||||
 make_nllfun|function|3699401c7c396ec1|||||||||||||||
 maxgainloss|stem|cdba7a74d313d242|eaae6e323ac9da14|ada59a3d40877faa|862046918||t19166.6656906699s|bf160f080fbf1dbb|99|rds|local|vector|||0||
 mc_pairsplots_0|stem|7e51c24775c0f2e7|85a6dd81ab89d151|ca09cab95bc36bec|949988184|pix/mcmc_pairs_0.png|t19117.9593786431s|da78dc1902cc91a4|2424865|file|local|vector|||127.132||

@@ -706,7 +706,7 @@ fit_contrast.corhmm <- function(fitted, contrast, fixed_vals,
 }
 
 logLik.corhmm_contrast <- function(x) {
-    LL <- x$fval
+    LL <- -1*x$fval
     df <- length(x$par)
     attr(LL, "df") <- df
     class(LL) <- "logLik"
