@@ -12,11 +12,11 @@
 
 - Add additive model to MLE comparisons??
 - Work harder on getting reliable CIs for MLE fits
-- Compute Bayes Factors??? (BayesTrait run?)
 - Roll bayesdiag into supplement (or, keep as a separate doc?)
 
 ### Low priority
 
+- Compute Bayes Factors??? (BayesTrait run?)
 - Weight contrasts by state occupancy?
 - dig out/discuss description of BayesTraits priors?
 - run BayesTraits comparison?
