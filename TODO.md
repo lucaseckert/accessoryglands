@@ -1,27 +1,36 @@
-## BMB (4 May 2022)
+## BMB (27 July 2022)
 
+### Main paper
 
-- BLAS parallel thread control: https://github.com/lme4/lme4/issues/492
-- fix contrasts for full model
-- prior predictive checks, prior sensitivity
-- figure out something about pairs plots (build by hand?)
-- dig out description of BayesTraits priors?
-- write a technical supplement (separate from bayes diag, but more detailed than current ag_model summary; i.e. update `ag_model_tech.rmd` ...
-- review of use of BayesTraits/corHMM/etc. in current literature??
-- cleanup/code stuff
-   - use `renv` for package versions?
-   - priors should be specified externally to `_targets` file
-   - work on occupancy-weighted contrasts or is this a lost cause?
-   - make sure thinning params get passed through to MCMC function (but switch targets to use 10 rather than 20 to match current setup ...)
-- priors:
-   - describe/check lower/upper bounds in `ag_model_tb` (0.1 to 100N) vs `ag_model_pscs_prior` (1 to 10N) ??
-   - prior predictive sims (already done?) check/compute implied priors on contrasts ...
-- compare fits without gain/loss priors?
-- double-check thinning? (supposedly ran burn-in of 4000 + 80000 steps with thinning of 20; how come we have n = 8000 in the resulting chains? thinning arg didn't get passed through)
+- Make sure we ref corHMM (Beaulieu et al.)!
+- Fix values in method-comparison section
+- Lit review/sample of how BayesTraits is used?
+   - inference?
+   - default priors/mention of priors?
+
+### Supplement
+
+- Add additive model to MLE comparisons??
+- Work harder on getting reliable CIs for MLE fits
+- Compute Bayes Factors??? (BayesTrait run?)
+- Roll bayesdiag into supplement (or, keep as a separate doc?)
+
+### Low priority
+
+- Weight contrasts by state occupancy?
+- dig out/discuss description of BayesTraits priors?
 - run BayesTraits comparison?
    - `remotes::install_github("rgriff23/btw")`
    - See http://www.randigriffin.com/projects/btw
-
+- Mention that losses are uncertain/less well estimated because AGs are absent in most of the tree?
+- deprecate  `ag_models.rmd` tech supplement??
+- cleanup/code stuff
+   - use `renv` for package versions?
+   - priors should be specified externally to `_targets` file
+   - make sure thinning params get passed through to MCMC function (but switch targets to use 10 rather than 20 to match current setup ...)
+   - describe/check lower/upper bounds in `ag_model_tb` (0.1 to 100N) vs `ag_model_pscs_prior` (1 to 10N) ??
+   - double-check thinning? (supposedly ran burn-in of 4000 + 80000 steps with thinning of 20; how come we have n = 8000 in the resulting chains? thinning arg didn't get passed through)
+   
 ## LE for 2021-07-07
 
 - try all of the following for the two trait model

@@ -10,6 +10,13 @@ Phylogenetic comparative analysis on the evolution of reproductive accessory gla
    - possibly: compute Wald and/or likelihood profile confidence intervals
    - specify priors and do MCMC computation
    - plot/interpret results
+   
+## documents
+
+- `ag_model.rmd`: mostly obsolete
+- `ag_bayesdiag.rmd`: Bayes diagnostics for MCMC fits
+- `ag_supp.rmd`: supplementary material
+- `ag_tech.rmd`: tech overview document (????)
 
 ## getting started
 
@@ -52,8 +59,6 @@ tar_load(everything())
 google drive [link](https://drive.google.com/drive/folders/1S5KwLDQavshwS8i0e9_g1jRiVUw8rnLO?usp=sharing)
 
 ## installing BayesTraits
-
-
 
 Linux (from source, V3)
 

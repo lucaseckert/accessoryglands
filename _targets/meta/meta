@@ -2,6 +2,7 @@ name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iterat
 .Random.seed|object|9d27134e533c0877|||||||||||||||
 ag_0_pars|stem|08f3e24d6d1bc279|cb36b249c1847a7e|c5384c9db85f2c25|1407725726||t18816.7159234181s|e92536e5890953e5|126|rds|local|vector|||0.001||
 ag_bayes_rmd|stem|d592f9315ae983f3|375fa0f7d3babef8|4236d28820985ebe|-691555391|ag_bayesdiag.html*ag_bayesdiag.rmd*ag_bayesdiag_files|t19189.8230301063s|62c33be831dd8815|19153958|file|local|vector|||40.558||
+ag_bayesdiag_rmd|stem|c6f104504068a7a1|375fa0f7d3babef8|4236d28820985ebe|1593022641|ag_bayesdiag.html*ag_bayesdiag.rmd*ag_bayesdiag_files|t19200.8417927683s|62c33be831dd8815|19153958|file|local|vector|||40.465||
 ag_binary_trait_file|stem|b7072a747b5587f3|3a35d8811869c668|ef46db3751d8e999|1100981026|data/binaryTraitData.csv|t19115.7575559892s|991dd566cbd2669a|44147|file|local|vector|||2.027||
 ag_compdata|stem|8009fe1fe53b97c5|70b623ba9668592d|8dfb728e83ecd11b|146790090||t19115.7575549707s|dfcd324855e3b27b|18639|rds|local|vector|||0.018||
 ag_compdata_tb|stem|8643395d1450202c|74e5881cb0a8e7c9|8a7d5c2d1a868eef|1516618377||t19115.7575549707s|94e0d60d92a318c1|21645|rds|local|vector|||1.996||
@@ -24,7 +25,7 @@ ag_model_tech_html|stem||5dbd745b4d0410fa|092525543843cc94|-1652853718||t19090.0
 ag_pc_pars|stem|08f3e24d6d1bc279|7f8d2dc65c188a53|c5384c9db85f2c25|-155240176||t18816.7159233718s|e92536e5890953e5|126|rds|local|vector|||0||
 ag_pcsc_pars|stem|20f7a7df06ca2e70|044741c5d17b6bac|0e7f82db1e6d45a8|-1939590306||t18816.7159205477s|887021b347b02e8f|100|rds|local|vector|||0||
 ag_priorsamp|stem|451d720097276288|631f0179d8c0c45e|dc2b024fa12c0b4d|1146734896||t19190.7763025214s|7139f10b112fbe28|5470960|rds|local|vector|||9.69||
-ag_rmd|stem|4a1cdce3d087cad3|2f2f908eb5890fc5|58eeb24e1ff53d3a|-742077490|ag_model.html*ag_model.rmd*ag_model_files|t19195.6036053126s|3ad6fd5c53fc003f|4375774|file|local|vector|||19.15|Removed 756 rows containing nonfinite values stat_density.. Removed 3 rows containing nonfinite values stat_bin.|
+ag_rmd|stem|0896e8b687540d33|2f2f908eb5890fc5|58eeb24e1ff53d3a|-742077490|ag_model.html*ag_model.rmd*ag_model_files|t19200.8420588384s|d04ed179b53d88f8|2773134|file|local|vector|||16.56|Removed 756 rows containing nonfinite values stat_density.. Removed 3 rows containing nonfinite values stat_bin.|
 ag_sc_pars|stem|1a215e3ec5c4fb0c|d518da54c89b1302|c5384c9db85f2c25|1229033149||t18816.7159234181s|e92536e5890953e5|126|rds|local|vector|||0||
 ag_statemat_full|stem|5fb9f24ce5e31bd5|8d6d59c73a4a6ee6|f4436fb39d12bc98|1215552028||t19115.7575556189s|3c187ffa31a31952|199|rds|local|vector|||0.068||
 ag_statemat_indep|stem|b8a30fd97f5f35d1|ce62fb1ab26bd327|d072413043b1351a|17182435||t19115.7575556189s|37e90c3ecba3a0b1|177|rds|local|vector|||0.062||
@@ -35,7 +36,8 @@ ag_statemat_pcsc_pars|stem|34fbff9be0c99a15|fff066302bcbf76b|1113b4d19ed6d0ba|-5
 ag_statemat_sc|stem|748d14caa803f11a|7b9bb0106fd7dcad|b208abfd6a2710f2|-1304596859||t19115.7575556189s|23174e8584d69801|187|rds|local|vector|||0.061||
 ag_statemat_sc_pars|stem|34fbff9be0c99a15|7b9bb0106fd7dcad|c1e82850d1597fed|-249929939||t18816.7419064697s|b2a37e7acd6b186f|188|rds|local|vector|||0.063||
 ag_statemat_unconstr|stem|5fb9f24ce5e31bd5|8d6d59c73a4a6ee6|f4436fb39d12bc98|314703174||t19102.0301363727s|3c187ffa31a31952|199|rds|local|vector|||0.058||
-ag_tech_rmd|stem|10f5ae3784ceedf2|f798cfc9e586492b|d285d0362307293b|-1957133094|ag_tech.html*ag_tech.rmd|t19190.7800325977s|befad2b01e80db0e|1351201|file|local|vector|||6.831|Removed 3 rows containing nonfinite values stat_bin.|
+ag_supp_rmd|stem|da457460b67f1459|4bf7cdf7ca40403e|9dd59d219b4a63cb|-1318912053|ag_supp.html*ag_supp.rmd|t19201.0489973373s|eb01d2f235720e25|1442614|file|local|vector|||7.039||
+ag_tech_rmd|stem|10f5ae3784ceedf2|f798cfc9e586492b|d285d0362307293b|-1957133094|ag_tech.html*ag_tech.rmd|t19200.8389737301s|befad2b01e80db0e|1351201|file|local|vector|||6.831|Removed 3 rows containing nonfinite values stat_bin.|
 all_ci|stem|f6e1359fcfb6cc70|4e19048f744617c4|c5e8259cdabe695b|-903984374||t19193.6409371746s|5083c4e4a845eb7f|3019|rds|local|vector|||0.716||
 all_contr_ci|stem|a8fe815e47d73ecc|24dd5ceff58e5843|dc860d790bf22010|1367391847||t19193.6409443969s|902b69f08f2559be|3192|rds|local|vector|||0.607||
 as.data.frame.profile.corhmm|function|05bb68e204e5bfd0|||||||||||||||

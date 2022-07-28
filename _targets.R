@@ -453,7 +453,12 @@ list(data_input_targets,
     ##                    trace = TRUE,
     ##                    alpha=0.05) ## less extreme than default (alpha=0.01)
     ##            ),
+    ## old(ish) technical model info
     tar_render(ag_rmd, "ag_model.rmd"),
-    tar_render(ag_bayes_rmd, "ag_bayesdiag.rmd"),
-    tar_render(ag_tech_rmd, "ag_tech.rmd")
+    ## Bayesian diagnostics (roll into/include in supplementary material?)
+    tar_render(ag_bayesdiag_rmd, "ag_bayesdiag.rmd"),
+    ## technical note (audience: technical users/computational folks)
+    tar_render(ag_tech_rmd, "ag_tech.rmd"),
+    ## supplementary material (audience: general, stats enthusiasts)
+    tar_render(ag_supp_rmd, "ag_supp.rmd")
 )

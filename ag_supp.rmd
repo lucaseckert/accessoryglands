@@ -1,0 +1,523 @@
+---
+title: "accessory gland model: supplementary material"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+author: "Ben Bolker and Lucas Eckert"
+bibliography: corHMM.bib
+output:
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_depth: 2
+    number_sections: true	
+---
+
+<!-- **fix me**: reimplement as [target markdown](https://books.ropensci.org/targets/markdown.html#markdown) ? -->
+
+```{r setup, include = FALSE}
+source("R/utils.R")
+source("R/mcmc.R")
+source("R/functions.R")
+load_pkgs()
+zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
+theme_set(theme_bw())
+library(targets)
+```
+
+
+```{r load}
+tar_load(ag_model_pcsc)
+tar_load(ag_model_full)
+tar_load(ag_mcmc0)
+tar_load(all_ci)
+tar_load(all_contr_ci)
+tar_load(ag_compdata)
+```
+
+# Descriptive statistics
+
+## data
+
+Numbers of species with each set of traits  (`0` = absent, `1` = present, `?` = unknown; `pc` = male parental care; `sc` = sperm competition (i.e. group spawning or ARTs); `ag` = accessory glands), depending on whether we use the partial (but fully genetically resolved) tree (`fishphylo`) or the imputed trees from @rabosky_inverse_2018 (`treeblock`).
+	
+```{r mosaic, eval=FALSE, include=FALSE}
+## cool but useless
+(ag_compdata$data
+  %>% mutate(ag = paste0("ag:",ag),
+             pc = paste0("pc:",pc),
+             sc = paste0("sc:",sc))
+  %>% 
+  ggplot() + 
+  geom_mosaic(aes(x = product(pc, sc), fill = ag)) +
+  geom_mosaic_text(aes(x = product(pc, sc), fill = ag), as.label = TRUE) +
+  scale_fill_discrete_qualitative()
+)
+```
+
+```{r barchart}
+tar_load(ag_compdata)
+tar_load(ag_compdata_tb)
+barplot_trans <- (. 
+  %>% mutate(across(c(pc, sc), factor, levels = c(0:1, "?")))
+  %>% mutate(across(ag, factor, levels = 1:0)) ## reverse order to get ag=1 on top of bars
+)
+bar_data <- purrr::map_dfr(list(fishphylo = ag_compdata$data,
+                    treeblock = ag_compdata_tb$data),
+               barplot_trans,
+               .id = "phylo")
+gg1 <- (ggplot(bar_data, aes(x=pc, fill = ag))
+  + geom_bar()
+  + facet_grid(phylo~sc, labeller = label_both)
+  + scale_fill_discrete_qualitative()
+  + zmargin
+)
+print(gg1)
+```                         
+
+# Parameter definitions
+
+## Transition matrices
+
+As described in the main text, a continuous-time stochastic process for three binary traits has a total of 24 possible transitions where a single one of the three states changes. The figure below shows the full and reduced transition matrices. In the axis tick labels, `ag0_pc0_sc1` (for example) refers to the state without AGs (`ag0`), without male care (`pc0`), and with group spawning (`sc1`, loosely "sperm competition present"^[Hereafter we refer to pair spawning as "sperm competition absent" (`sc0`) and group spawning as "sperm competition present" (`sc1`), recognizing that this is an oversimplification.]). Parameter 1 quantifies the log-hazard of a switch to pair spawning in this state (i.e., to `ag0_pc0_sc0`). 
+
+In the right matrix, transitions that are assumed to have equal rates - because we assume that all transitions in spawning mode, and all transitions in male care, are independent of the other states - have the same ID number. Colours denote the estimated log-hazard for each parameter when the 12-parameter model is fitted by maximum likelihood. Below, we denote parameter 1 (in the reduced model, which occupies four different cells in the transition matrix) as `sc_loss`, because it quantifies the loss rate of sperm competition regardless of the states of the other traits; we rerefer to parameter 3 (for example) as `loss.ag_pc0_sc1`, the loss rate of AGs in the absence of male care and presence of sperm competition.
+
+```{r image, message=FALSE, fig.width = 12, fig.height = 5}
+pc <- gray(0.9)
+cowplot::plot_grid(plot(ag_model_full, pnum_col = pc,
+                        main = "full (24-parameter)"),
+                   plot(ag_model_pcsc, pnum_col = pc,
+                        main = "reduced (12-parameter)"),
+                   nrow=1)
+```
+
+## Contrast matrix
+
+The *contrast matrix* connects the parameters we estimate (e.g. `loss.ag_pc0_sc0`, loss rate of accessory glands when parental care and sperm competition are both absent) to the biological effects we are interested in (e.g. `pc_loss`, the effect of parental care on the loss rate of accessory glands). For example, the `intercept_loss` effect is the (unweighted) average of the four different loss terms; the `pc_loss` effect is the difference between the average loss rate when male care is present (second row, red squares) and the average loss rate when male care is absent (second row, blue squares).
+
+```{r plot_contrast_mat}
+tar_load(contrast_mat)
+## order nicely
+order_fun <- function(x) {
+    trait <- (stringr::str_extract(x,"\\.[[:alpha:]]{2}")
+        |> stringr::str_remove("\\.")
+        )
+    tcode <- match(trait, c("pc", "sc", "ag"))
+    ## loss/gain
+    lossgain <- stringr::str_extract(x, "[[:alpha:]]{4}")
+    lcode <- match(lossgain, c("loss", "gain"))
+    rem <- stringr::str_remove(x,"[[:alpha:]]{4}\\.[[:alpha:]]{2}(_|$)")
+    order(1000*tcode + 100*lcode + order(rem))
+}
+image_plot(t(contrast_mat[
+    ## re-order; drop cols 1-4, which aren't involved in contrasts
+    ##  (just gain/loss of pc, sc)
+    ## keep only gain/loss contrast rows,
+    ##  not "netgain" (which we never used and
+    ##  which is a little confusing)
+    order_fun(rownames(contrast_mat)),])[1:8,-(1:4)],
+    ylab = "AG contrast", xlab = "Rate parameter")
+```
+
+# Priors
+
+Here we illustrate our general strategy for constructing priors: pick sensible lower and upper "bounds" (not really bounds, but values we would consider extreme) and use a Normal prior on the log-hazard scale (equivalent to a log-Normal prior on the hazard scale) with a mean halfway between the lower and upper bounds and a standard deviation $\sigma = (\log(\textrm{upper})-\log(\textrm{lower}))/(2 \cdot \textrm{range})$
+In our actual model we use a range of 3 (i.e. the lower and upper bounds are at $\pm 3 \sigma$); in the figure below we use range = 2 so the tails are more clearly visible.
+
+```{r prior_spec, fig.width = 10, fig.height = 5}
+fun <- function(logsc = TRUE, range = 2, xp = 1.15) {
+    DFUN <- if (!logsc) dlnorm else dnorm
+    trans <- if (!logsc) exp else identity
+    xlab <- if (!logsc) "Hazard" else "Log-hazard"
+    ticklabs <- c("lower", "upper")
+    if (logsc) ticklabs <- sprintf("log(%s)", ticklabs)
+    rr <- xp*range
+    minval <- if (!logsc) 0 else trans(-rr)
+    mode <- if (logsc) 0 else -1
+    curve(DFUN(x),
+          from = minval,
+          n = 201,
+          to = trans(rr),
+          axes = FALSE,
+          yaxs = "i",
+          ylim = c(0, DFUN(trans(mode))),
+          xlab = xlab,
+          ylab = "Prior density"
+          )
+    ## UGH, mtext() is not respecting las ??
+    ## mtext(side = 1, line = 2, text = xlab)
+    ## mtext(side = 2, line = 1, text = "Prior density")
+    box()
+    abline(v = c(trans(-range), trans(range)), lty = 2)
+    if (logsc) {
+        xvec <- seq(-rr, -range, length.out = 201)
+    } else {
+        xvec <- seq(0, trans(-range), length.out = 201)
+    }
+    ## fill in tails
+    dd <- DFUN(xvec)
+    polygon(x = c(xvec, rev(xvec)),
+            y = c(rep(0, length(dd)), rev(dd)),
+            col = "gray")
+    xvec <- seq(range, rr, length.out = 51)
+    dd <- DFUN(trans(abs(xvec)))
+    polygon(x = trans(c(abs(xvec), rev(abs(xvec)))),
+            y = c(rep(0, length(dd)), rev(dd)),
+            col = "gray")
+    yval <- DFUN(1)
+    arrows(x0 = trans(-0.5), x1 = trans(-range), y0 = yval, y1 = yval)
+    arrows(x0 = trans(0.5),  x1 = trans(range), y0 = yval, y1 = yval)
+    text(trans(0), yval, bquote("" %+-% .(range)*sigma))
+    axis(side = 1, at = trans(c(-range, range)),
+         labels = ticklabs)
+}
+par(mfrow = c(1,2),
+    las = 1, bty = "l", cex = 1.2, mgp = c(2, 1, 0))
+fun(xp = 2)
+fun(logsc=FALSE)
+```
+
+By sampling directly from the prior and computing contrasts,
+we can confirm that the priors on the contrasts (ratio of AG gain/loss rates depending on male care and sperm competition) are indeed neutral (centered at 1.0) and reasonable (95% confidence intervals extend from 10x slower to 10x faster). The intercept terms for gain and loss represent the *average* evolutionary rates across all states, and are measured in units of expected numbers of events across the entire tree.
+
+```{r utils}
+tar_load(ag_compdata)
+corhmm_bounds <- log(c(lwr=0.1, upper = 100*ape::Ntip(ag_compdata$phy)))
+corhmm_prior <- log(c(lwr=1, upper = 10*ape::Ntip(ag_compdata$phy)))
+corhmm_mid <- mean(corhmm_bounds)
+## order of parameters
+levs <- c(outer(FUN = paste, sep = ".",
+      c("loss", "gain"),
+      c("sc", "pc",
+        paste0("ag_", c(outer(paste0("pc", 0:1), paste0("sc", 0:1), paste, sep = "_"))))
+      ))
+contr_levs <- c(outer(FUN = paste, sep = "_",
+                      c("intercept", "sc", "pc", "pcxsc"),
+                      c("loss", "gain")))
+
+fix_all_ci <- function(x, levels = NULL) {
+    x <- (x
+        ## replace NA values with Inf/-Inf so bars extend full range
+        %>% replace_na(list(upr = Inf, lwr = -Inf))
+        ## utility var for below-bounds estimates
+        %>% mutate(lwr_bound = (estimate <= corhmm_bounds[["lwr"]]))
+    )
+    if (!is.null(levels)) {
+        ## reorder levels as above
+        x <- (x
+            %>%  mutate(across(term, factor, levels = levels))
+        )
+    }
+    return(x)
+}
+```
+
+```{r priorsamp}
+prior_contr_ci <- (fix_all_ci(all_contr_ci, levels = contr_levs)
+    ## netgain/loss terms will be NA after fixing with these levels
+    |> filter(!is.na(term),
+              method == "priorsamp")
+)
+(ggplot(prior_contr_ci)
+    + aes(x = exp(estimate),
+          xmin = exp(lwr),
+          xmax = exp(upr), y = term)
+    + geom_pointrange()
+    + labs(y = "", x = "hazard/hazard ratio")
+    + scale_x_log10()
+    + geom_vline(xintercept = 1, lty = 2)
+)
+```
+
+# Statistical summaries
+
+This section presents the quantitative results in more detail.
+
+## Bayesian
+
+Here are the estimated posterior median and confidence intervals,
+along with $p_\textrm{MCMCM}$ (twice the minimum tail probability)
+and the "probability of direction" ($p_d$), the probability that the
+parameter has the same sign as the median ($p_d$ is an index of
+how clearly the sign of the parameter is known: $p_\textrm{MCMC} = 2(1-p_d)$)
+[@makowski_indices_2019;@shi_reconnecting_2021].
+
+```{r bayes_sum_tab, results="asis"}
+bayes_pval <- function(x, ref=0) {
+  x <- mean(x<ref)
+  2 * min(x, 1-x)
+}
+bayes_pd <- function(x, ref = 0) {
+    mean(x*sign(median(x))>ref)
+}
+tar_load(contr_long_ag_mcmc_tb)
+ag_contr_gainloss <- (contr_long_ag_mcmc_tb
+    |> filter(rate != "netgain")
+)
+(ag_contr_gainloss
+  %>% group_by(contrast,rate)
+    %>% summarise(median = median(value),
+                  lwr = quantile(value, 0.025),
+                  upr = quantile(value, 0.975),
+                  pMCMC = bayes_pval(value),
+                  pd = bayes_pd(value),
+                  .groups = "drop")
+    ## %>% filter(phylo == "treeblock")
+    %>% arrange(rate, contrast)
+    ## %>% dplyr::select(-phylo)
+    %>% mutate(across(c(median, lwr, upr), exp))
+    %>% mutate(across(c(pMCMC, pd), ~ ifelse(contrast=="intercept", NA, .)))
+    %>% knitr::kable(digits = 3)
+)
+```
+
+Here are the marginal posterior distributions for all of the contrasts,
+including fits to both the full tree-block data set and the subset of
+the data that includes only species with genetic data ("fishphylo").
+(The latter is useful for comparison with the MLE results, which cannot
+use the Bayesian method of sampling across treeblock phylogenies.)
+The treeblock estimates are slightly more precise, as expected since
+they can make use of a larger data set. Points show the
+posterior median, Line ranges represent 95%
+credible intervals.
+
+```{r plot_contrasts, fig.height=4, fig.width=10}
+tar_load(contr_long_ag_mcmc0)
+tar_load(contr_long_ag_mcmc_tb)
+ag_contr_gainloss <- purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
+                                         treeblock=contr_long_ag_mcmc_tb),
+                                    filter, rate != "netgain",
+                                    .id = "phylo")
+
+gg_sum <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = rate)) +
+  facet_wrap(~ contrast) +
+  geom_violin(aes(fill = phylo), alpha=0.6) +
+  stat_summary(fun.data = "median_hilow", geom = "pointrange", aes(group=phylo),
+               ## width by trial and error; not sure what determines this?
+               position = position_dodge(width=0.875),
+               colour = "gray30") +
+  geom_vline(xintercept = 1, lty = 2) +
+  scale_x_log10() +
+  zmargin +
+  scale_fill_discrete_qualitative() +
+  scale_colour_discrete_qualitative() +
+  labs(x="expected transitions/proportional difference in rates")
+print(gg_sum)
+```
+
+## Frequentist
+
+### Likelihood ratio tests
+
+For any pair of *nested* models we can do a likelihood ratio test, 
+comparing the model fits and number of parameters. We fit restricted models
+with AG evolution independent of both sperm competition and male care
+(`indep`); dependent on male care but not sperm competion (`pc`);
+on sperm competition only (`sc`); *additively* on both traits (i.e.,
+the effects of the trait status on evolutionary rates are added,
+on the log scale); and with an interaction between traits
+(the full 12-parameter model that is our primary focus).
+
+Testing (most) nested pairs gives this diagram (we omit the
+comparison between `pcsc` and `indep`):
+
+```{r lrtest}
+tar_load("ag_model_pcsc")
+tar_load("ag_model_pc")
+tar_load("ag_model_sc")
+tar_load("ag_model_indep")
+tar_load("ag_model_pcsc_add")
+mnames <- c("pcsc", "pcsc_add", "pc", "sc", "indep")
+anfun <- function(m1, m2, return_val = c("expression", "list")) {
+    return_val <- match.arg(return_val)
+    L1 <- logLik(m1)
+    L2 <- logLik(m2)
+    df1 <- attr(L1, "df")
+    df2 <- attr(L2, "df")
+    ddev <- 2*abs(c(L2-L1))
+    ddf <- abs(df1-df2) ## ASSUME nothing pathological is happening
+    pval <- pchisq(ddev, ddf, lower.tail = FALSE)
+    switch(return_val,
+           expression = sprintf("atop(Delta*df==%d,atop(Delta*dev==%1.2f,p==%1.1g))",
+                                ddf, ddev, pval),
+           list = tibble::lst(ddf, ddev, pval))
+}
+A <- matrix(NA_character_, 5, 5,
+            dimnames=list(mnames, mnames))
+A["indep","pc"] <- anfun(ag_model_pc, ag_model_indep)
+A["indep","sc"] <- anfun(ag_model_sc, ag_model_indep)
+A["sc","pcsc_add"] <- anfun(ag_model_pcsc_add, ag_model_sc)
+A["pc","pcsc_add"] <- anfun(ag_model_pcsc_add, ag_model_pc)
+A["indep","pcsc_add"] <- anfun(ag_model_pcsc_add, ag_model_indep)
+A["pcsc_add","pcsc"] <- anfun(ag_model_pcsc_add, ag_model_pcsc)
+A["pc","pcsc"] <- anfun(ag_model_pcsc, ag_model_pc)
+A["sc","pcsc"] <- anfun(ag_model_pcsc, ag_model_sc)
+C <- matrix(0, nrow=nrow(A), ncol = ncol(A))
+C[!is.na(A)] <- seq(sum(!is.na(A)))
+```
+```{r lrtest_plot, fig.width = 7, fig.height = 10}
+plotmat(A, curve = 0,
+        ## pcsc_add box in second row needs to be wider/larger
+        box.size = c(0.05, 0.1, 0.05, 0.05),
+        box.prop = c(0.5, 0.25, 0.5, 0.5),
+        arr.lcol = C,
+        arr.tcol = C,
+        pos = matrix(c(1,1,2,1)))
+```
+
+The p-values quoted in the paper are from comparing the full model
+with interactions to the `pc` and `sc` models. These comparisons are
+analogous to "type 3" tests in ANOVA [@fox_r_2018], which are the 
+most commonly used approach in the biological literature. "Type 2"
+tests (as implemented in the `car` package for R) instead compare
+the *additive* model to the models with only one main effect:
+these tests suggest that the effects of both sperm competition
+and male care are statistically significant, although the evidence
+for the effect of male care is still stronger.
+
+```{r likcomp_tab}
+res <- list()
+res[["pcsc"]] <- list(desc = "interaction", anfun(ag_model_pcsc_add, ag_model_pcsc, return = "list"))
+res[["sc3"]] <- list(desc = "sc (type III)", anfun(ag_model_pc, ag_model_pcsc, return = "list"))
+res[["sc2"]] <- list(desc = "sc (type II)", anfun(ag_model_pc, ag_model_pcsc_add, return = "list"))
+res[["pc3"]] <- list(desc = "pc (type III)", anfun(ag_model_sc, ag_model_pcsc, return = "list"))
+res[["pc2"]] <- list(desc = "pc (type II)", anfun(ag_model_sc, ag_model_pcsc_add, return = "list"))
+res <- do.call(rbind, lapply(res, as.data.frame))
+knitr::kable(res, digits = 3)
+```
+(`ddf`: difference in number of parameters between models;
+`ddev`: change in deviance ($-2 \log(L)$); `pval`: likelihood ratio
+test p-value)
+
+### Information-theoretic comparisons
+
+Alternatively, we can make comparisons based on information-theoretic criteria
+such as AICc, AIC, or BIC. These three criteria differ in the kind and strength of penalty that they use to avoid overly complex models. AICc is often recommended for analyses where $n<40$. Using AICc presents a challenge: for this data set (a phylogeny of 607 species with approximately 20 independent origins of accessory glands), it is difficult to quantify the *effective* number of observations (the $n$ in the rule of thumb above, and in the formula for the AICc, is based on a simpler data format where we can assume that every observation is independent). We chose $n=30$ for this comparison, as a guess at the effective sample size (larger $n$ will tend to select larger models as better).
+
+```{r ictab}
+ag_models <- paste0("ag_model_",
+                    c("pcsc_add","pcsc","pc","sc","indep"))
+fake_nobs <- 30 ## ?? something weird about targets evaluation:
+                ## claims fake_nobs not found below ??
+atab <- (bbmle::AICtab(ag_model_indep,
+                      ag_model_pc,
+                      ag_model_sc,
+                      ag_model_pcsc,
+                      ag_model_pcsc_add,
+                      logLik = TRUE)
+    ## keep rownames/don't convert to tibble
+    |> transform(dAICc = (dAIC + 2*(df^2 + df)/(30-df-1)))
+    |> transform(dAICc = dAICc - min(dAICc))
+    |> transform(dBIC = dAIC - 2*df + log(30)*df)
+    |> transform(dBIC = dBIC - min(dBIC))
+)
+dtab <- data.frame(desc = c("AG dep on PC, SC additively",
+                            "AG dep on PC, SC & interaction",
+                            "AG dep only on PC",
+                            "AG dep only on SC",
+                            "AG evol indep of PC, SC"),
+                   row.names = ag_models)
+atab2 <- (merge(dtab, atab, by = 0)
+    |> dplyr::select(desc, dAICc, dAIC, dBIC, dLogLik, df)
+    |> arrange(dAICc)
+)
+knitr::kable(atab2, digits=1)
+```
+
+As stated in the main text, we can see that AICc gives similar conclusions to the Bayesian and likelihood-ratio-test analyses: the best model has AG evolution depending on male care only, followed closely by the additive model, and fairly closely by sperm competition only (models with $\Delta$ AICc < 2 are usually interpreted as "roughly equivalent"). In contrast, using AIC selects the additive model as best, and considerably better than the single-factor models. BIC, which like AICc is generally more conservative than AIC, also selects the additive model as best, similar ($\Delta$ BIC < 2) to the male-care-only model.
+
+# Sensitivity analyses
+
+We performed a range of different analyses to test the sensitivity of our conclusions to technical choices, and to explore the difference between frequentist (MLE), constrained frequentist (MAP), and full Bayesian (MCMC) fitting methods.
+
+- `mcmc_tb`: Bayesian MCMC using neutral priors on the transition rates and biologically informed priors on the gain/loss rates; this is the primary model presented in the main text
+- `mcmc_0`: as `mcmc_tb`, but using only the completely resolved phylogeny (i.e., only including species for which genetic data is available)
+- `mcmc_tb_nogainloss`: as `mcmc_tb`, but using only the priors on the transition rates, omitting the priors on the gain/loss rates
+- `full`: a model estimating all 24 transition rates, i.e. allowing for the rates of evolution of male care and sperm competition to depend on each other and on AG
+- `model_pcsc`: MLE fit of the 12-parameter model
+- `model_pcsc_prior`: as `model_pcsc`, but adding the priors used in the Bayesian model (this is a regularized or MAP estimate)
+
+In the plot
+```{r ci_plot0, warning = FALSE, message = FALSE}
+##
+tar_load(ag_compdata)
+tar_load(all_ci)
+
+all_ci <- fix_all_ci(all_ci, levels = levs)
+
+## extend NA confidence interval to limit of graph
+gg_ci0 <- (ggplot(
+    all_ci,
+    aes(term, exp(estimate), ymin = exp(lwr), ymax = exp(upr),
+        colour = method)
+)
+    + geom_linerange(position = position_dodge(width = 0.5), key_glyph = "path") 
+    +   geom_point(position = position_dodge(width = 0.5))
+    + colorspace::scale_colour_discrete_qualitative()
+    + coord_flip()
+    ## +     theme(legend.position="bottom")
+    ## https://stackoverflow.com/questions/27130610/legend-on-bottom-two-rows-wrapped-in-ggplot2-in-r
+    ## this was important when we had side-by-side graphs
+    + guides(colour = guide_legend(reverse = TRUE),
+             shape = guide_legend(reverse = TRUE))
+             ## nrow = 2, byrow = TRUE,
+    ##    reverse = TRUE))
+)
+## would like to make arrows ("<") at lower bounds larger, but manipulating
+##  size aesthetic would also mess up bars (I think). Some hack?
+gg_ci1  <- (gg_ci0
+    + scale_y_log10(limits = exp(corhmm_bounds), oob = scales::squish)
+    + aes(shape = factor(lwr_bound))
+    + labs(y="rate", x = "")
+    + geom_hline(yintercept =exp(corhmm_mid), lty=2)
+    + geom_hline(yintercept = exp(corhmm_prior), lty=2, col="gray")
+    ## 60 = "<"
+    + scale_shape_manual(values = c(16, 60), guide = "none")
+)
+gg_ci_nowald <- (gg_ci0 %+% dplyr::filter(all_ci, method != "model_pcsc")
+    +  scale_y_log10()
+)
+```
+
+```{r contrast_ci, fig.width=8, fig.height = 6, warning = FALSE, message = FALSE}
+method_levs <- c("mcmc_tb", "mcmc_0",
+                 "mcmc_tb_nogainloss",
+                 "full",
+                 "model_pcsc",
+                 "model_pcsc_prior")
+all_contr_ci <- (fix_all_ci(all_contr_ci, levels = contr_levs)
+    |> filter(!grepl("net", term),
+              !grepl("intercept", term),
+              method != "priorsamp",
+              !is.na(term))
+    |> mutate(across(method, factor, levels =rev(method_levs)))
+)
+## reverse order of levels, *and* guide, so that both are top-to-bottom
+
+gg_ci1C  <- (gg_ci0 %+% all_contr_ci
+    + scale_y_log10(limits=c(1e-2, 1e3),
+                    breaks = 10^seq(-2, 3),
+                    labels = function(x) sprintf("%g", x),
+                    oob = scales::squish,
+                    expand = expansion(0,0))
+    + labs(y="hazard ratio", x = "")
+    + geom_hline(yintercept =1, lty=2)
+    + aes(shape = method)
+    + scale_shape()
+)
+print(gg_ci1C)
+```
+
+Missing confidence interval lines indicate that confidence intervals could not be computed; points at the edge of the graph (`sc_gain` and `pcxsc_loss`) indicate that the point estimates fell outside of the plotted range.
+
+Intercepts are excluded (as being less biologically interesting, and using a different scale from the contrasts: hazards rather than hazard ratios).
+
+We can draw a variety of conclusions from these results.
+
+- `mcmc_tb` vs. `mcmc_0`: as illustrated above, the estimates from the full tree-block data set and the reduced ("fishphylo") data set are similar, although the tree-block estimates are slightly more precise.
+- `mcmc_tb` vs. `mcmc_tb_nogainloss`: leaving out the gain/loss priors doesn't make much difference; it slightly weakens the SC estimate and strengthens the PC estimate
+- `mcmc_tb` vs. `full`: although the results from the full model are generally of the same sign as from the reduced (12-parameter) model, they are much less certain. None of the signs of the effects are statistically clear ($p_{\textrm{MCMC}} > 0.05$ for all estimates).
+- `mcmc_tb` vs. `model_pcsc`: the 12-parameter model is too poorly constrained to draw conclusions from the parameter estimates; this agrees with the likelihood ratio and IC tests above, which indicate that the additive model is preferred to the interaction model.
+- `mcmc_tb` vs. `model_pcsc_prior`: when we add the prior information to the MLE fit, we get point estimates that are very close to the primary (`mcmc_tb`) model.
+
+# References
+

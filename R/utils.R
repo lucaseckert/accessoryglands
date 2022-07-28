@@ -195,7 +195,7 @@ make_nllfun <- function(corhmm_fit, treeblock = NULL) {
 #' @param gainloss_pairs
 #' @param lb_gainloss
 #' @param ub_gainloss
-#' @param range_gainloss
+#' @param range_gainloss number of SDs from center to lower/upper bounds
 #' @param nllfun \emph{negative} log-likelihood function
 #' @param negative return negative log posterior?
 corhmm_logpostfun <- function(p,
