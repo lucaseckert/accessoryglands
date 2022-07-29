@@ -13,10 +13,10 @@ Phylogenetic comparative analysis on the evolution of reproductive accessory gla
    
 ## documents
 
-- `ag_model.rmd`: mostly obsolete
 - `ag_bayesdiag.rmd`: Bayes diagnostics for MCMC fits ([link](http://www.math.mcmaster.ca/bolker/AG/ag_bayesdiag.html))
 - `ag_supp.rmd`: supplementary material ([link](http://www.math.mcmaster.ca/bolker/AG/ag_supp.html))
 - `ag_tech.rmd`: tech overview document (????)
+- `ag_model.rmd`: mostly obsolete
 
 ## getting started
 
@@ -57,6 +57,10 @@ To load existing products (e.g. for debugging):
 tar_load(everything())
 ```
 google drive [link](https://drive.google.com/drive/folders/1S5KwLDQavshwS8i0e9_g1jRiVUw8rnLO?usp=sharing)
+
+## BayesTraits review
+
+`BTrefs.xls` has all articles from 2020-2022 referencing Pagel & Meade (99 articles)
 
 ## installing BayesTraits
 
