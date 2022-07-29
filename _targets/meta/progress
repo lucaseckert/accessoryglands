@@ -7,6 +7,7 @@ pcsc_pars|stem|pcsc_pars|0|skipped
 indep_pars|stem|indep_pars|0|skipped
 treeblock|stem|treeblock|0|skipped
 sc_pars|stem|sc_pars|0|skipped
+ag_tech_rmd|stem|ag_tech_rmd|0|skipped
 full_pars|stem|full_pars|0|skipped
 treeblock_file|stem|treeblock_file|0|skipped
 ag_binary_trait_file|stem|ag_binary_trait_file|0|skipped
@@ -62,5 +63,4 @@ all_contr_ci|stem|all_contr_ci|0|skipped
 ag_supp_rmd|stem|ag_supp_rmd|0|started
 ag_supp_rmd|stem|ag_supp_rmd|0|built
 ag_old_rmd|stem|ag_old_rmd|0|skipped
-ag_tech_rmd|stem|ag_tech_rmd|0|skipped
 comp_ci|stem|comp_ci|0|skipped

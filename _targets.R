@@ -334,8 +334,12 @@ list(data_input_targets,
     tar_target(
         all_contr_ci,
         (purrr::map_dfr(mod_list, my_tidy, .id = "method",
-                        contrast_mat = contrast_mat_0)
+                        contrast_mat = contrast_mat_inv)
             %>% bind_rows(full_contr_ci)
+            %>% bind_rows((tidy(ag_model_pcsc_add, conf.int = TRUE)
+                |> mutate(method = "model_pcsc_add")
+                |> rename(lwr = "conf.low", upr = "conf.high")))
+            ## FIXME: gsub("model", "corhmm" OR "mle", method) ...
         )
     ),
     tar_target(ag_mcmc_0,

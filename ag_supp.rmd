@@ -389,6 +389,35 @@ knitr::kable(res, digits = 3)
 `ddev`: change in deviance ($-2 \log(L)$); `pval`: likelihood ratio
 test p-value)
 
+### Parameter estimates/CIs
+
+We can look at the parameter estimates from MLE/MAP fits, although
+most of the confidence intervals of the unregularized fits 
+are undetermined because of the failure
+of the Wald estimates. All confidence intervals more extreme than $\exp(\pm 20)$ are
+set to 0 or $\infty$.
+
+Profile confidence intervals could give slightly better results, but 
+these turds may be not worth polishing very much ...
+
+```{r ptab}
+tar_load(all_contr_ci)
+rclamp <- function(x, maxlog = 20) {
+    ifelse(abs(x)>maxlog, sign(x)*Inf, x)
+}
+ptab <- (all_contr_ci
+    |> dplyr::filter(grepl("pcsc", method),
+                     !grepl("intercept", term),
+                     !grepl("\\.", term))
+    |> dplyr::select(method, term, estimate, lwr, upr)
+    |> mutate(across(method, ~gsub("model_", "", .)))
+    |> mutate(across(c(estimate, lwr, upr),
+                     ~ exp(rclamp(.))))
+
+)
+knitr::kable(ptab, digits = 3)
+```
+
 ### Information-theoretic comparisons
 
 Alternatively, we can make comparisons based on information-theoretic criteria
@@ -430,9 +459,9 @@ We performed a range of different analyses to test the sensitivity of our conclu
 - `mcmc_tb_nogainloss`: as `mcmc_tb`, but using only the priors on the transition rates, omitting the priors on the gain/loss rates
 - `full`: a model estimating all 24 transition rates, i.e. allowing for the rates of evolution of male care and sperm competition to depend on each other and on AG
 - `model_pcsc`: MLE fit of the 12-parameter model
+- `model_pcsc_add`: MLE fit of the additive (10-parameter) model
 - `model_pcsc_prior`: as `model_pcsc`, but adding the priors used in the Bayesian model (this is a regularized or MAP estimate)
 
-In the plot
 ```{r ci_plot0, warning = FALSE, message = FALSE}
 ##
 tar_load(ag_compdata)
@@ -479,6 +508,7 @@ method_levs <- c("mcmc_tb", "mcmc_0",
                  "mcmc_tb_nogainloss",
                  "full",
                  "model_pcsc",
+                 "model_pcsc_add",
                  "model_pcsc_prior")
 all_contr_ci <- (fix_all_ci(all_contr_ci, levels = contr_levs)
     |> filter(!grepl("net", term),
@@ -498,14 +528,14 @@ gg_ci1C  <- (gg_ci0 %+% all_contr_ci
     + labs(y="hazard ratio", x = "")
     + geom_hline(yintercept =1, lty=2)
     + aes(shape = method)
-    + scale_shape()
+    + scale_shape_manual(values = c(scales::shape_pal(solid=TRUE)(6),9,10))
 )
 print(gg_ci1C)
 ```
 
-Missing confidence interval lines indicate that confidence intervals could not be computed; points at the edge of the graph (`sc_gain` and `pcxsc_loss`) indicate that the point estimates fell outside of the plotted range.
+Missing confidence interval lines indicate that confidence intervals could not be computed; points at the edge of the graph (`sc_gain`, `pc_loss`, `pcxsc_loss`) indicate that the point estimates fell outside of the plotted range.
 
-Intercepts are excluded (as being less biologically interesting, and using a different scale from the contrasts: hazards rather than hazard ratios).
+Intercepts are excluded (as being less biologically interesting, and using a different scale from the contrasts: hazards rather than hazard ratios), as are the estimates of the rates of gain and loss of the non-focal traits (spawning mode and male care).
 
 We can draw a variety of conclusions from these results.
 
@@ -513,6 +543,7 @@ We can draw a variety of conclusions from these results.
 - `mcmc_tb` vs. `mcmc_tb_nogainloss`: leaving out the gain/loss priors doesn't make much difference; it slightly weakens the SC estimate and strengthens the PC estimate
 - `mcmc_tb` vs. `full`: although the results from the full model are generally of the same sign as from the reduced (12-parameter) model, they are much less certain. None of the signs of the effects are statistically clear ($p_{\textrm{MCMC}} > 0.05$ for all estimates).
 - `mcmc_tb` vs. `model_pcsc`: the 12-parameter model is too poorly constrained to draw conclusions from the parameter estimates; this agrees with the likelihood ratio and IC tests above, which indicate that the additive model is preferred to the interaction model.
+- `model_pcsc` vs. `model_pcsc_add`: constraining the model slightly by removing the interaction terms helps a little bit - now we get a point estimate and confidence intervals for the `pc_gain` parameter that agrees reasonably well with the full Bayesian fits - but most of the other parameters of interest are still unidentifiable (large confidence intervals/failure of the Wald approximation). The estimates of the rates of gain and loss of the non-focal traits are well identified, but not of interest.
 - `mcmc_tb` vs. `model_pcsc_prior`: when we add the prior information to the MLE fit, we get point estimates that are very close to the primary (`mcmc_tb`) model.
 
 # References

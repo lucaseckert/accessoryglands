@@ -319,7 +319,7 @@ tidy.corhmm <- function(x,
             }
           V <- solve(H)
           if (!is.null(contrast_mat)) {
-              V <- contrast_mat %*% V %*% t(contrast_mat)
+              V <- t(contrast_mat) %*% V %*% contrast_mat
           }
           sds <- sqrt(diag(V))
           qq <- qnorm((1+conf.level)/2)
@@ -559,7 +559,7 @@ my_tidy <- function(x, contrast_mat = NULL, conf.level = 0.95) {
             res <- tidy(x, conf.int = TRUE, conf.method = "quad")
         } else {
             p <- drop(coef(x) %*% contrast_mat)
-            V <- contrast_mat %*% vcov(x) %*% t(contrast_mat)
+            V <- t(contrast_mat) %*% vcov(x) %*% contrast_mat
             ## copied from tidy.corhmm() above
             sds <- sqrt(diag(V))
             qq <- qnorm((1+conf.level)/2)

@@ -2,18 +2,18 @@
 
 ### Main paper
 
-- Make sure we ref corHMM (Beaulieu et al.)!
-- Fix values in method-comparison section
+- check with Beaulieu et al. about preferred ref
 - Lit review/sample of how BayesTraits is used?
    - inference?
    - default priors/mention of priors?
 
 ### Supplement
 
-- Add additive model to MLE comparisons??
 - Work harder on getting reliable CIs for MLE fits
 - Roll bayesdiag into supplement (or, keep as a separate doc?)
-
+- tech supp
+   - static picture of `targets` flow?
+   
 ### Low priority
 
 - Compute Bayes Factors??? (BayesTrait run?)
@@ -23,7 +23,6 @@
    - `remotes::install_github("rgriff23/btw")`
    - See http://www.randigriffin.com/projects/btw
 - Mention that losses are uncertain/less well estimated because AGs are absent in most of the tree?
-- deprecate  `ag_models.rmd` tech supplement??
 - cleanup/code stuff
    - use `renv` for package versions?
    - priors should be specified externally to `_targets` file
