@@ -6,6 +6,7 @@
 - Lit review/sample of how BayesTraits is used?
    - inference?
    - default priors/mention of priors?
+- caveats para (hard-coded root; 12 vs 24 parameters)? Comment on (lack of) sensitivity?
 
 ### Supplement
 
