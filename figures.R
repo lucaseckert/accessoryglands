@@ -51,13 +51,38 @@ if (file.exists("simmap.rda")) {
     save(counts, sums, sims, file = "simmap.rda")
 }
 
+### old code for simulations 
+### I just saved the output as rds since I'm not sure how to work the targets
+# tar_load(ag_model_pcsc)
+# tar_load(treeblock)
+# tar_load(ag_compdata_tb)
+# data<-ag_compdata_tb$data
+# model<-ag_model_pcsc$solution
+
+# set.seed(1)
+# sims<-list()
+# sums<-list()
+# counts<-matrix(ncol=3, nrow = 0)
+# i<-1
+# while(i<101){
+#   sims[[i]]<-makeSimmap(tree = treeblock[[i]], data = data, model = model, rate.cat = 1, nSim = 100)
+#   sims[[i]]<-lapply(sims[[i]],mergeMappedStates,c(1:4),"ag0")
+#   sims[[i]]<-lapply(sims[[i]],mergeMappedStates,c(5:8),"ag1")
+#   class(sims[[i]])<-c("multiSimmap","multiPhylo")
+#   sums[[i]]<-summary(sims[[i]])
+#   counts<-rbind(counts,sums[[i]]$count)
+#   print(i)
+#   i=i+1
+# }
+
 #gain and loss CIs
 gain.ci <- quantile(counts[,"ag0,ag1"], c(0.025,0.975))
 loss.ci <- quantile(counts[,"ag1,ag0"], c(0.025,0.975))
 
 ## BMB: where are these used?
 
-#finding AG nodes
+##finding AG nodes
+## plot stuff from sim 2, closer to 'typical'
 nodeProbs <- as.data.frame(sums[[1]]$ace)
 nodeProbs$ag <- as.factor(round(nodeProbs[,2], digits = 0))
 allAgNodes <- rownames(subset(nodeProbs, ag==1))
@@ -68,18 +93,49 @@ n <- length(obj1$cols)
 obj1$cols[1:n] <- colorRampPalette(c("grey60","firebrick"), space="Lab")(n)
 
 plot(obj1,type="fan",ftype="off", lwd=2)
-nodelabels(node = allAgNodes, pch = 21, col="firebrick4", bg="firebrick", cex=0.5, lwd=2)
+nodelabels(node = agNodes, pch = 21, col="firebrick4", bg="firebrick", cex=1.125, lwd=2)
+tiplabels(tip = agNodes, pch = 21, col="black", bg="firebrick", cex=1, lwd=2)
 
 #why cant i load this directly?
-data <- read.csv("data/binaryTraitData.csv")
-data2 <- data[c("care", "spawning")]
-rownames(data2) <- data$species
+## data <- read.csv("data/binaryTraitData.csv")
+## data2 <- data[c("care", "spawning")]
+## rownames(data2) <- data$species
+
+## BMB: what's going on here??
+## agNodes<-c(777,784,794,798,808,817,876,923,1018,1020,1103,"Hoplosternum_littorale",
+##            "Ompok_siluroides","Pangasius_pangasius","Auchenipterus_nuchalis",
+##            "Lepidogalaxias_salamandroides","Cheilinus_undulatus","Radulinopsis_taranetzi")
+
+data<-read.csv("data/binaryTraitData.csv")
+data2<-data.frame(care=data$care, spawning=data$spawning, row.names = data$species)
+
 
 cols1 <- list(care=c("#c7e9c0","#006d2c"), spawning=c("#bdd7e7","#2171b5"))
 labs1 <- c("Parental Care","Spawning Mode")
 str1 <- list(care=c("No Male Care","Male Care"), spawning=c("Pair Spawning", "Group Spawning"))
 
-trait.plot(treeblock[[1]], data2, cols1, cex.lab = 0.2,lab = labs1, str = str1, cex.legend = 0.5)
+tar_load(treeblock)
+trait.plot(treeblock[[2]], data2, cols1, cex.lab = 0.2,lab = labs1, str = str1, cex.legend = 0.5)
+
+#distribution of transitions
+transitions<-data.frame(counts[,-1])
+transitions$sim<-1:10000
+transitions<-transitions %>% rename(
+  gains=ag0.ag1,
+  losses=ag1.ag0
+)
+trans<-transitions %>% gather(rate, n, gains,losses)
+
+ggplot(trans, aes(x=n,fill=rate,))+
+  geom_histogram(position = "identity", alpha=0.65, color="black", binwidth = 1)+
+  scale_fill_manual(name="", labels = c("Gains","Losses"), values = c("firebrick","gray70"), limits = c("gains", "losses"))+
+  labs(x="Transitions", y="Frequency")+
+  scale_x_continuous(breaks = c(0,5,10,15,20,25,30))+
+  theme(panel.grid = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        axis.text = element_text(size = 10, color = "black"),
+        axis.title = element_text(size = 14),
+        legend.text = element_text(size=12))
 
 # FIGURE 2 ----------------------------------------------------------------
 tar_load(contr_long_ag_mcmc0)
@@ -95,7 +151,6 @@ ag_contr_gainloss  <-  (purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
                       ## but we only care about treeblock for the paper
                       %>% filter(phylo == "treeblock")
                       %>% filter(contrast != "intercept")
-                      
 )
 
 ag_contr_gainloss$rate <- factor(ag_contr_gainloss$rate, levels = c("loss","gain"))
@@ -143,4 +198,97 @@ print(gg_sum_nice)
 ggsave("fig2.png", width = 7, height  = 5)
 
 ## 
-system("eog fig2.png & ")
+## system("eog fig2.png & ")
+
+### Figures for Presentations ###
+ag_contr_gainloss <- (purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
+                                          treeblock=contr_long_ag_mcmc_tb,
+                                          prior = contr_long_ag_priorsamp),
+                                     filter, rate != "netgain",
+                                     .id = "phylo")
+                      %>% mutate(across(phylo, factor,
+                                        levels=rev(c("prior","treeblock","fishphylo"))))
+                      ## but we only care about treeblock for the paper
+                      %>% filter(phylo == "treeblock")
+                      %>% filter(contrast != "intercept")
+                      %>% filter(rate == "loss")
+                      
+)
+gg_sc <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colour = rate)) +
+  geom_violin(aes(fill = rate), alpha=0.6) +
+  stat_summary(fun.data = "median_hilow",
+               geom = "errorbar",
+               ## width by trial and error; not sure what determines this?
+               position = position_dodge(width=0.875),
+               colour = "black") +
+  stat_summary(fun = median,
+               geom = "crossbar", aes(group=rate),
+               ## width by trial and error; not sure what determines this?
+               position = position_dodge(width=0.875),
+               colour = "black",
+               size = 1) +
+  geom_vline(xintercept = 1, lty = 2) +
+  scale_x_log10(labels = function(x) format(x, scientific = FALSE)) +
+  zmargin +
+  scale_colour_manual(name="", labels = c("Gain","Loss"), values = c("firebrick","gray70"), limits = c("gain", "loss"))+
+  scale_fill_manual(name="", labels = c("Gain","Loss"), values = c("firebrick","gray70"), limits = c("gain", "loss"))+
+  scale_y_discrete(breaks=c("pcxsc","sc","pc"), 
+                   labels=c("Interaction", "Spawning Mode", "Parental Care"),
+                   limits=c("pcxsc","sc","pc"))+
+  labs(x="Proportional Difference in Rates", y="")+
+  theme(panel.grid = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        axis.text = element_text(size = 24, color = "black"),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 24, color = "black"))
+
+print(gg_sc)
+
+##Proportion Figures##
+data<-read.csv("data/binaryTraitData.csv")
+
+care<-subset(data, care==1)
+noCare<-subset(data, care==0)
+
+AgWithCare<-sum(care$ag)/length(care$ag)
+noAgWithCare<-sum(noCare$ag)/length(noCare$ag)
+
+groups<-subset(data, spawning==1)
+pairs<-subset(data, spawning==0)
+
+AgGroups<-sum(groups$ag)/length(groups$ag)
+AgPairs<-sum(pairs$ag)/length(pairs$ag)
+
+careProps<-c(AgWithCare, noAgWithCare)
+careStates<-c("Male Care", "No Male Care")
+careData<-data.frame(careStates, careProps)
+
+spawnProps<-c(AgGroups, AgPairs)
+spawnStates<-c("Groups", "Pairs")
+spawnData<-data.frame(spawnStates, spawnProps)
+
+ggplot(careData, aes(x=careStates, y=careProps, fill=careStates))+
+  geom_bar(stat = "identity", color="black")+
+  scale_fill_manual(name="", labels = c("care","none"), 
+                    values = c("gray30","gray70"), 
+                    limits = c("Male Care", "No Male Care"))+
+  labs(x="",y="Proportion with Accessory Glands")+
+  theme(panel.grid = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        axis.text = element_text(size = 12, color = "black"),
+        axis.title.y = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        legend.position = "none")
+
+ggplot(spawnData, aes(x=spawnStates, y=spawnProps, fill=spawnStates))+
+  geom_bar(stat = "identity", color="black")+
+  scale_fill_manual(name="", labels = c("groups","pairs"), 
+                    values = c("gray30","gray70"), 
+                    limits = c("Groups", "Pairs"))+
+  labs(x="",y="Proportion with Accessory Glands")+
+  theme(panel.grid = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        axis.text = element_text(size = 12, color = "black"),
+        axis.title.y = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        legend.position = "none")

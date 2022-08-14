@@ -2,9 +2,14 @@
 title: "accessory gland model: technical details"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
 author: "Ben Bolker and Lucas Eckert"
+bibliography: corHMM.bib
 output:
   html_document:
     code_folding: hide
+    toc: true
+    toc_depth: 2
+    number_sections: true	
+
 ---
 
 <!-- **fix me**: reimplement as [target markdown](https://books.ropensci.org/targets/markdown.html#markdown) ? -->
@@ -21,280 +26,31 @@ library(targets)
 
 <!-- to suppress tidyverse messages, need callr_function = NULL *or* some other shenanigans -->
 
+# Workflow
+
+using `targets` package
+
 ```{r visnetwork, message=FALSE, echo = FALSE, eval = FALSE}
 tar_visnetwork(targets_only = TRUE)
 ```
 
-##  priors
+# Maximum likelihood estimation
 
-- all rates: from 1 (1 transition per tree) to 10*ntips (10 trans per species)
-- `pc`: gain/loss ratio from 0.1 to 5
-- `sc`: gain/loss ratio from 5 to 10
-- `ag`: gain/loss ratio from 0.001 to 10
+Uses an enhanced version of the `corHMM` package. Additions:
 
+- accessor methods, for convenience
+   - `coef()` (coefficients)
+   - blah
 
-Use each of these as the basis for a +/- 3 sigma range (on the log scale)
+# Contrasts
 
-```{r load}
-tar_load(ag_model_pcsc)
-tar_load(ag_model_full)
-tar_load(ag_mcmc0)
-tar_load(all_ci)
-tar_load(all_contr_ci)
-```
+\[
+\begin{split}
+p_c & = C p \\
+\Sigma(p_c) & = C_p^{\top} \Sigma(p) C_p
+\end{split}
+\]
 
-## naming parameters
+# Markov chain Monte Carlo
 
-Reduced (12-parameter) and unreduced (24-parameter) models:
-
-```{r image, message=FALSE, fig.width = 12, fig.height = 5}
-cowplot::plot_grid(plot(ag_model_pcsc),
-                   plot(ag_model_full), nrow=1)
-```
-
-## Contrasts matrix
-
-This connects the parameters we estimate (e.g. `loss.ag_pc0_sc0`, loss rate of accessory glands when parental care and sperm competition are both absent) to the values we are interested in (e.g. `pc_loss`, effect of parental care on loss rate of accessory glands).
-
-**fixme**: 
-
-- reorder matrix for visualization?
-- include weights by (imputed) state occupancy?
-
-
-```{r plot_contrast_mat}
-tar_load(contrast_mat)
-## order nicely
-order_fun <- function(x) {
-    trait <- (stringr::str_extract(x,"\\.[[:alpha:]]{2}")
-        |> stringr::str_remove("\\.")
-        )
-    tcode <- match(trait, c("pc", "sc", "ag"))
-    ## loss/gain
-    lossgain <- stringr::str_extract(x, "[[:alpha:]]{4}")
-    lcode <- match(lossgain, c("loss", "gain"))
-    rem <- stringr::str_remove(x,"[[:alpha:]]{4}\\.[[:alpha:]]{2}(_|$)")
-    order(1000*tcode + 100*lcode + order(rem))
-}
-image_plot(t(contrast_mat[
-    ## re-order; drop cols 1-4, which aren't involved in contrasts
-    ##  (just gain/loss of pc, sc)
-    order_fun(rownames(contrast_mat)),])[,-(1:4)],
-    ylab = "AG contrast", xlab = "Rate parameter")
-```
-
-Distribution of states in the tree (computed from stochastic character mapping, histograms represent 100 simulations):
-
-```{r states, warning=FALSE}
-tar_load(states_df)
-pivot_longer(states_df, everything(), names_to = "state") %>%
-  ggplot(aes(x=value)) + geom_histogram(bins=25) + facet_wrap(~state) + zmargin
-## sum columns then divide by total to get sum == 1
-avg_states <- apply(states_df, 2, sum, na.rm = TRUE) / sum(states_df, na.rm = TRUE)
-```
-
-Need to figure out weights e.g. if we want the intercept for `loss.ag` it should be  something like:
-
-```{r wts, eval=FALSE}
-intercept_loss <- sum(occ.ag0_pc{i}_sc{j} * loss.ag_pc{i}_sc{j})
-pc_loss <- (sum(occ.ag0_pc1_sc{i} * loss.ag_pc1_sc{i}) - sum(occ.ag0_pc0_sc{i} * loss.ag_pc0_sc{i})) /
-  sum(occ.ag0_pc{i}_sc{j})
-```
-
-etc. ...
-
-**FIXME**: think more about net gain and how to characterize it.
-Certainly should *not* be exponentiated, so leave it out here ...
-
-```{r contr, eval=FALSE}
-## playing with contrasts definitions/scaling
-dd <- expand.grid(f1=letters[1:2], f2 = LETTERS[1:2])
-m <- model.matrix(~f1*f2, data=dd, contrasts = list(f1=contr.sum, f2=contr.sum))
-t(solve(m))
-## cols 2 and 3 have magnitude 1/4 but we want 1/2 (diff between treatments, not dev between
-## ttt and mean)
-```
-
-```{r plot_contrasts, fig.height=4, fig.width=10}
-tar_load(contr_long_ag_mcmc0)
-tar_load(contr_long_ag_mcmc_tb)
-ag_contr_gainloss <- purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
-                                         treeblock=contr_long_ag_mcmc_tb),
-                                    filter, rate != "netgain",
-                                    .id = "phylo")
-
-gg_sum <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = rate)) +
-  facet_wrap(~ contrast) +
-  geom_violin(aes(fill = phylo), alpha=0.6) +
-  stat_summary(fun.data = "median_hilow", geom = "pointrange", aes(group=phylo),
-               ## width by trial and error; not sure what determines this?
-               position = position_dodge(width=0.875),
-               colour = "gray30") +
-  geom_vline(xintercept = 1, lty = 2) +
-  scale_x_log10() +
-  zmargin +
-  scale_fill_discrete_qualitative() +
-  scale_colour_discrete_qualitative() +
-  labs(x="expected transitions/proportional difference in rates")
-print(gg_sum)
-```
-
-Note: values below are still on log scale ...
-
-```{r sum_tab, results="asis"}
-bayes_pval <- function(x, ref=0) {
-  x <- mean(x<ref)
-  2 * min(x, 1-x)
-}
-(ag_contr_gainloss
-  %>% group_by(phylo,contrast,rate)
-  %>% summarise(median = median(value), lwr = quantile(value, 0.025), upr = quantile(value, 0.975), p = bayes_pval(value), .groups = "drop")
-  %>% knitr::kable(digits = 3)
-)
-```
-
-**Conclusion**: treeblock and fishphylo results are nearly identical, treeblock results are *slightly* clearer.
-
-Graphing all CIs: bounds are set to the lower/upper bounds used for corHMM fit. 
-Vertical dashed lines show the mean and ± 3 SD of the priors.
-
-```{r ci_plot, fig.width=12, fig.height = 6, warning = FALSE, message = FALSE}
-tar_load(ag_compdata)
-tar_load(all_ci)
-## order of parameters
-levs <- c(outer(FUN = paste, sep = ".",
-      c("loss", "gain"),
-      c("sc", "pc",
-        paste0("ag_", c(outer(paste0("pc", 0:1), paste0("sc", 0:1), paste, sep = "_"))))
-      ))
-corhmm_bounds <- log(c(lwr=0.1, upper = 100*ape::Ntip(ag_compdata$phy)))
-corhmm_prior <- log(c(lwr=1, upper = 10*ape::Ntip(ag_compdata$phy)))
-corhmm_mid <- mean(corhmm_bounds)
-fix_all_ci <- function(x, levels = NULL) {
-    x <- (x
-        ## replace NA values with Inf/-Inf so bars extend full range
-        %>% replace_na(list(upr = Inf, lwr = -Inf))
-        ## utility var for below-bounds estimates
-        %>% mutate(lwr_bound = (estimate <= corhmm_bounds[["lwr"]]))
-    )
-    if (!is.null(levels)) {
-        ## reorder levels as above
-        x <- (x
-            %>%  mutate(across(term, factor, levels = levels))
-        )
-    }
-    return(x)
-}
-
-all_ci <- fix_all_ci(all_ci, levels = levs)
-
-## extend NA confidence interval to limit of graph
-gg_ci0 <- (ggplot(
-    all_ci,
-    aes(term, exp(estimate), ymin = exp(lwr), ymax = exp(upr),
-        colour = method)
-)
-    + geom_linerange(position = position_dodge(width = 0.5), key_glyph = "path") 
- +   geom_point(position = position_dodge(width = 0.5))
-    + colorspace::scale_colour_discrete_qualitative()
-    + coord_flip()
-    +     theme(legend.position="bottom")
-    ## https://stackoverflow.com/questions/27130610/legend-on-bottom-two-rows-wrapped-in-ggplot2-in-r
-    + guides(colour = guide_legend(nrow = 2, byrow = TRUE, reverse = TRUE))
-)
-## would like to make arrows ("<") at lower bounds larger, but manipulating
-##  size aesthetic would also mess up bars (I think). Some hack?
-gg_ci1  <- (gg_ci0
-    + scale_y_log10(limits = exp(corhmm_bounds), oob = scales::squish)
-    + aes(shape = factor(lwr_bound))
-    + labs(y="rate", x = "")
-    + geom_hline(yintercept =exp(corhmm_mid), lty=2)
-    + geom_hline(yintercept = exp(corhmm_prior), lty=2, col="gray")
-    ## 60 = "<"
-    + scale_shape_manual(values = c(16, 60), guide = "none")
-)
-gg_ci_nowald <- (gg_ci0 %+% dplyr::filter(all_ci, method != "model_pcsc")
-    +  scale_y_log10()
-)
-cowplot::plot_grid(gg_ci1, gg_ci_nowald, nrow = 1)
-```
-
-- **prior_only**: 95% CIs implied by priors
-- **model_pcsc**: full (12-parameter) frequentist (corHMM) model, unconstrained/unregularized
-- **model_pcsc_prior**: corHMM model with priors (MAP estimates)
-- **mcmc_0**: Bayesian MCMC fit with fully known phylogeny only (reduced taxa)
-- **mcmc_tb**: Bayesian MCMC, tree block (all taxa, phylogenetic uncertainty)
-- **mcmc_tb_nogainloss**: ditto, but without priors on gain/loss rates
-
-## with contrasts
-
-```{r contrast_ci, fig.width=12, fig.height = 6, warning = FALSE, message = FALSE}
-all_contr_ci <- (fix_all_ci(all_contr_ci)
-    |> filter(!grepl("net", term))
-)
-gg_ci1C  <- (gg_ci0 %+% all_contr_ci
-    + scale_y_log10(limits=c(1e-2, 1e3),
-                    breaks = 10^seq(-2, 3),
-                    labels = function(x) sprintf("%g", x),
-                    oob = scales::squish,
-                    expand = expansion(0,0))
-    + aes(shape = factor(lwr_bound))
-    + labs(y="contrast", x = "")
-    + geom_hline(yintercept =1, lty=2)
-    ## 60 = "<"
-    + scale_shape_manual(values = c(16, 60), guide = "none")
-)
-gg_ci1_nowaldC <- (gg_ci1C
-    %+% dplyr::filter(all_contr_ci, method != "model_pcsc")
-)
-cowplot::plot_grid(gg_ci1C, gg_ci1_nowaldC, nrow = 1)
-```
-
-**Conclusions**
-
-- `priorsamp`: the prior distributions on loss and gain are neutral (mean = 1) as promised, with 95% ranges of approximately (1/10, 10) [seems reasonable]. Priors on intercepts are different from 1 (as expected).
-- `model_pcsc` (blue-green): these estimates are all over the place, we can't really practically estimate the parameters/CIs
-- `model_pcsc_prior`: for the most part these likelihood-based fits look similar to the Bayesian solutions (i.e., most of the frequentist vs Bayes distinction lies in the *regularization* step, imposing reasonable priors, rather than in the more sophisticated handling of uncertainty)
-- `mcmc_0` (basic model with single/full phylogeny): slightly harder to see signals (confidence limits overlap 1 more), because we are leaving out information for a chunk of the phylogeny
-- `mcmc_tb`: can see a strong signal of increased AG gain with PC, weak signal (p = 0.06 from above) of *decreased* AG gain with SC
-- `mcmc_tb_nogainloss` (yellow-green): leaving out the gain/loss priors doesn't make a huge difference; it slightly weakens the SC signal and strengthens the PC signal
-- full pc/sc likelihood-based model alone gives us huge CIs, no confidence
-
-## fixme
-
-- figure out what's up with missing CIs for `model_pcsc`, `model_pcsc_prior`
-- profile CIs for ML fits? (probably v. slow/wonky ...)
-- include full 24-parameter fits (need to work out contrasts!)
-
-### cosmetic
-
-- reorder levels
-- partition as in main plots (facet by sc/pc/interaction/intercept?)
-
-
-```{r check_contrasts, eval = FALSE}
-## Check contrast tidier calculations:
-## (Values of estimates not quite identical: mean vs median snuck in somewhere or ??? Not too worried though.)
-tar_load(contr_long_ag_mcmc_tb)
-c1 <- contr_long_ag_mcmc_tb %>% group_by(contrast, rate) %>% summarise(m = median(value), m_lwr = quantile(value, 0.025), m_upr = quantile(value, 0.975), .groups = "drop")
-c2 <- all_contr_ci %>% filter(method == "mcmc_tb") %>% dplyr::select(term, estimate, lwr, upr) %>% separate(term, sep = "_", into = c("contrast", "rate"))
-full_join(c1, c2)
-```
-
-
-```{r mcmc_only, eval=FALSE}
-## mcmc only
-ggplot(
-  all_ci %>% filter(method=="mcmc"),
-  aes(y=term, x=exp(estimate), xmin = exp(lwr), xmax = exp(upr))) +
-  geom_pointrange() +
-  scale_x_log10()
-```
-
-```{r bayes_violin}
-mcmc_long <- (ag_mcmc0
-  %>% as.mcmc()
-  %>% as_tibble()
-  %>% pivot_longer(everything(), names_to = "term")
-)  
-```
+- Trace plots and pair plots of posterior distributions

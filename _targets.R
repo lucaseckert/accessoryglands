@@ -181,8 +181,8 @@ list(data_input_targets,
                        rate.cat = 1,
                        rate.mat = statemat,
                        root.p = root.p,
-                       lower = ag_corhmm_bounds[["lower"]],
-                       upper = ag_corhmm_bounds[["upper"]]
+                       lower.bound = ag_corhmm_bounds[["lower"]],
+                       upper.bound = ag_corhmm_bounds[["upper"]]
                        )
                 ))
     ),
@@ -226,6 +226,13 @@ list(data_input_targets,
            method = "BFGS"
            )
     }),
+    tar_target(ag_model_pcsc_add,
+               fit_contrast.corhmm(ag_model_pcsc,
+                                   contrast_mat_inv,
+                                   ## zero out interactions
+                                   fixed_vals = c(pcxsc_loss = 0, pcxsc_gain = 0),
+                                   optControl = list(maxit = 20000))
+    ),
     tar_target(comp_ci,
     { list(
           wald = tidy(ag_model_pcsc, conf.int = TRUE),
@@ -273,9 +280,9 @@ list(data_input_targets,
                    colnames(mcmc[[1]]))
     ),
     tar_map(
-        values = tibble(fn = c("contr.csv", "contr_full.csv"),
-                        col_order = rlang::syms(c("col_order_0", "col_order_full")),
-                        nm = c("0", "full")
+        values = tibble(fn = c("contr.csv", "contr_full.csv", "contr_invertible.csv"),
+                        col_order = rlang::syms(c("col_order_0", "col_order_full", "col_order_0")),
+                        nm = c("0", "full", "inv")
                        ),
         names = nm,
         tar_target(contrast_mat,
@@ -327,8 +334,12 @@ list(data_input_targets,
     tar_target(
         all_contr_ci,
         (purrr::map_dfr(mod_list, my_tidy, .id = "method",
-                        contrast_mat = contrast_mat_0)
+                        contrast_mat = contrast_mat_inv)
             %>% bind_rows(full_contr_ci)
+            %>% bind_rows((tidy(ag_model_pcsc_add, conf.int = TRUE)
+                |> mutate(method = "model_pcsc_add")
+                |> rename(lwr = "conf.low", upr = "conf.high")))
+            ## FIXME: gsub("model", "corhmm" OR "mle", method) ...
         )
     ),
     tar_target(ag_mcmc_0,
@@ -400,6 +411,7 @@ list(data_input_targets,
                            n_iter =  84000,
                            n_thin = 20,
                            seed = 101),
+               cue = run_slow()
                ),
     tar_target(ag_priorsamp,
                corhmm_mcmc(ag_model_pcsc,
@@ -445,7 +457,12 @@ list(data_input_targets,
     ##                    trace = TRUE,
     ##                    alpha=0.05) ## less extreme than default (alpha=0.01)
     ##            ),
-    tar_render(ag_rmd, "ag_model.rmd"),
-    tar_render(ag_bayes_rmd, "ag_bayesdiag.rmd"),
-    tar_render(ag_tech_rmd, "ag_tech.rmd")
+    ## old(ish) technical model info
+    tar_render(ag_old_rmd, "ag_model.rmd"),
+    ## Bayesian diagnostics (roll into/include in supplementary material?)
+    tar_render(ag_bayesdiag_rmd, "ag_bayesdiag.rmd"),
+    ## technical note (audience: technical users/computational folks)
+    tar_render(ag_tech_rmd, "ag_tech.rmd"),
+    ## supplementary material (audience: general, stats enthusiasts)
+    tar_render(ag_supp_rmd, "ag_supp.rmd")
 )

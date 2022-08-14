@@ -4,7 +4,8 @@ pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "GGally", "colorspace", "ggmosaic", "targets", "tarchetypes",
              "abind", "cowplot", "patchwork", "ggtree", "ggnewscale",
              "glue", "diagram", "hues", "phytools", "diversitree",
-             "remotes", "visNetwork", "Matrix", "igraph")
+             "remotes", "visNetwork", "Matrix", "igraph",
+             "nloptr")
 
 
 ## packages to install from GitHub (username, reponame)
@@ -195,7 +196,7 @@ make_nllfun <- function(corhmm_fit, treeblock = NULL) {
 #' @param gainloss_pairs
 #' @param lb_gainloss
 #' @param ub_gainloss
-#' @param range_gainloss
+#' @param range_gainloss number of SDs from center to lower/upper bounds
 #' @param nllfun \emph{negative} log-likelihood function
 #' @param negative return negative log posterior?
 corhmm_logpostfun <- function(p,
@@ -273,10 +274,16 @@ par_names <- function(model) {
 
 #' give parameters and states more meaningful names
 #' @param model corHMM model
-augment_model <- function(model) {
+augment_model <- function(model, add_hessian = TRUE) {
     sn <- state_names(model$data[, -1])
     dimnames(model$solution) <- dimnames(model$index.mat) <- list(sn, sn)
     names(model$args.list$p) <- par_names(model)
+    if (add_hessian) {
+        f <- make_nllfun(model)
+        p <- model$args.list$p
+        H <- numDeriv::hessian(f, p)
+        attr(model, "hessian") <- H
+    }
     return(model)
 }
 
@@ -305,11 +312,14 @@ tidy.corhmm <- function(x,
                          estimate = p)
     if (conf.int) {
         if (conf.method == "wald") {
-          ## FIXME: expensive to compute. Upstream? Cache?
-          H <- numDeriv::hessian(f, p0)
+            ## FIXME: expensive to compute. Upstream? Cache?
+            H <- attr(x, "hessian")
+            if (is.null(H)) {
+                H <- numDeriv::hessian(f, p0)
+            }
           V <- solve(H)
           if (!is.null(contrast_mat)) {
-              V <- contrast_mat %*% V %*% t(contrast_mat)
+              V <- t(contrast_mat) %*% V %*% contrast_mat
           }
           sds <- sqrt(diag(V))
           qq <- qnorm((1+conf.level)/2)
@@ -340,6 +350,27 @@ tidy.corhmm <- function(x,
   }
   return(res)
 }
+
+glance.corhmm <- function(x, nobs = NULL, ...) {
+    L <- logLik(x)
+    res <-tibble(
+        df = attr(L, "df"),
+        logLik = c(L),
+        AIC = 2*df - 2 * logLik)
+    if (is.null(nobs)) {
+        nobs <- tryCatch(nobs(x),
+                         error = function(e) NULL)
+    }
+    if (!is.null(nobs)) {
+        res <- (res |>
+            mutate(BIC = -2*logLik + log(nobs)*df,
+                   AICc = AIC + 2*(df^2 + df)/(nobs-df-1))
+        )
+    }
+    return(res)
+}
+
+glance.corhmm_contrast <- glance.mle2 <- glance.corhmm
 
 profile.corhmm <- function(model,
                            mlefun = NULL,
@@ -528,7 +559,7 @@ my_tidy <- function(x, contrast_mat = NULL, conf.level = 0.95) {
             res <- tidy(x, conf.int = TRUE, conf.method = "quad")
         } else {
             p <- drop(coef(x) %*% contrast_mat)
-            V <- contrast_mat %*% vcov(x) %*% t(contrast_mat)
+            V <- t(contrast_mat) %*% vcov(x) %*% contrast_mat
             ## copied from tidy.corhmm() above
             sds <- sqrt(diag(V))
             qq <- qnorm((1+conf.level)/2)
@@ -557,4 +588,190 @@ gainloss_ind_prs <- function(x) {
     upr <- unique(na.omit(imat[upper.tri(imat)]))
     lwr <- unique(na.omit(imat[lower.tri(imat)]))
     Map(c, upr, lwr)
+}
+
+profile.corhmm <- function(fitted, max_val = 3, delta = 0.1, maxit = 50,
+                           params = NULL,
+                           verbose = FALSE, optControl = list(maxit = 20000),
+                           conv_action = stop, ...) {
+    ## FIXME: allow parameter selection?
+    ## *generic* profiling recipe?
+    f <- make_nllfun(fitted)
+    p0 <- p <- fitted$args.list$p
+    L0 <- -1*c(logLik(fitted))
+    ## FIXME: check for sd problems?
+    sd <- sqrt(diag(solve(attr(fitted, "hessian"))))
+    offset <- sd*delta
+    res <- list()
+    ## can't use 'par' as loop variable, conflicts with optim() argument name
+    if (is.null(params)) params <- seq_along(p0)
+    for (cur_par in params) {
+        if (verbose) cat(sprintf("param %d (%s)\n", cur_par, names(p)[cur_par]))
+        ## construct full parameter vector from restricted parameters
+        mkpar <- function(p, cur_par, cur_parval) {
+            pp <- rep(NA, length(p)+1)
+            pp[-cur_par] <- p
+            pp[cur_par] <- cur_parval
+            names(pp) <- names(p0)
+            pp
+        }
+        ## evaluate negative log-lik over restricted parameters
+        wrapfun <- function(p, cur_par, cur_parval) {
+            f(mkpar(p, cur_par, cur_parval))
+        }
+        ## FIXME: parallel evaluation?
+        for (dir in c(-1, 1)) {
+            if (verbose) cat("dir: ", dir, "\n")
+            cur_parval <- p0[cur_par]
+            p <- p0
+            it <- 0
+            val <- 0
+            while (it < maxit && val < max_val) {
+                cur_parval  <- cur_parval + dir*offset[cur_par]
+                if (verbose) cat(cur_parval, " ")
+                opt <- optim(fn = wrapfun, par = p[-cur_par], cur_par = cur_par, cur_parval = cur_parval,
+                             control = optControl)
+                if (opt$convergence != 0) conv_action("convergence code ", opt$convergence)
+                val <- opt$value - L0
+                p <- mkpar(p, cur_par, cur_parval)
+                if (verbose) cat(val, "\n")
+                res <- c(res, list(
+                                  data.frame(
+                                      .zeta = -2*sqrt(val)*dir,
+                                      .par = names(p0)[[cur_par]],
+                                      .focal = cur_parval,
+                                      rbind(p)
+                                  )  ## data.frame()
+                              )  ## list()
+                         ) ## c()
+                it <- it + 1
+            }  ## while goal not achieved
+        }  ## loop over dir
+    } ## loop over params
+    ##  assemble results
+    do.call("rbind", res)
+}
+## debug(profile.corhmm)
+## profile(fitted, verbose = TRUE)
+
+fit_contrast.corhmm <- function(fitted, contrast, fixed_vals,
+                                optControl = list(maxit = 20000),
+                                ## HACK: contrasts won't be on quite the same scale as
+                                ##  the original transitions ...
+                                lower = log(0.001),
+                                upper = log(10000)) {
+    require("bbmle")
+    f <- make_nllfun(fitted)
+    p0 <- coef(fitted)
+    ## updated contrast matrix (transposed & reordered)
+    c2 <- t(contrast)[,names(p0)]
+    ## reference (starting) values in contrast space
+    p0_c <- drop(c2 %*% p0)
+    ## inverse-contrast matrix 
+    ic <- solve(c2)
+    stopifnot(all.equal(p0, drop(ic %*%  p0_c)))
+    ## DRY?
+    mkpar <- function(p, cur_par, cur_parval) {
+        pp <- rep(NA, length(p)+length(cur_par))
+        pp[-cur_par] <- p
+        pp[cur_par] <- cur_parval
+        names(pp) <- names(p0)
+        pp
+    }
+    ## evaluate negative log-lik over restricted parameters
+    wrapfun <- function(p, cur_par, cur_parval) {
+        pp <- mkpar(p, cur_par, cur_parval)
+        f(ic %*% pp)
+    }
+    cur_par <- match(names(fixed_vals), names(p0_c))
+    if (length(cur_par) == 0) stop("bad param names")
+    start <- p0_c[-cur_par]
+    parnames(wrapfun) <- names(start)
+    ## wrapfun(start, cur_par = cur_par, cur_parval = fixed_vals)
+    ## maybe not necessary/env?
+    w2 <- function(p) wrapfun(p, cur_par = cur_par, cur_parval = fixed_vals)
+    fit <- nloptwrap(par = start,
+                     fn = w2,
+                     lower = lower,
+                     upper = upper)
+    nm <- setdiff(colnames(contrast), names(fixed_vals))
+    names(fit$par) <- nm
+    ## HACK: create an mle2 object (mle2 doesn't take user-specified optimizers,
+    ##  and I want to use nloptwrap ...)
+    H <- optimHess(fit$par, fn = w2)
+    dimnames(H) <- list(nm, nm)
+    ret <- c(fit, list(hessian = H))
+    class(ret) <- c("corhmm_contrast", "list")
+    return(ret)
+}
+
+logLik.corhmm_contrast <- function(x) {
+    LL <- -1*x$fval
+    df <- length(x$par)
+    attr(LL, "df") <- df
+    class(LL) <- "logLik"
+    return(LL)
+}
+
+tidy.corhmm_contrast <- function(x,
+                        conf.int = FALSE,
+                        conf.method = "wald",
+                        conf.level = 0.95,
+                        p.value = FALSE,
+                        profile = NULL,
+                        exponentiate = FALSE,
+                        prof_args = NULL,
+                        contrast_mat = NULL,
+                        ...) {
+    p <- x$par
+    res <- dplyr::tibble(term = names(p), estimate = p)
+    if (conf.int) {
+        V <- solve(x$hessian)
+        sds <- sqrt(diag(V))
+        qq <- qnorm((1+conf.level)/2)
+        res <- dplyr::mutate(res,
+                             std.error = sds,
+                             statistic = p/sds,
+                             conf.low = estimate - qq*std.error,
+                             conf.high = estimate + qq*std.error)
+    }
+    if (exponentiate) {
+        res <- mutate(res, across(estimate, exp))
+        res <- mutate(res, across(starts_with("conf"), exp))
+        if ("std.error" %in% names(res)) {
+            res <- mutate(res, across(std.error, ~ . * estimate))
+        }
+    }
+    return(res)
+}
+
+nloptwrap <- function (par, fn, lower = -Inf, upper = Inf, control = list(), ...) {
+    defaultControl <- list(algorithm = "NLOPT_LN_BOBYQA", xtol_abs = 1e-08, ftol_abs = 1e-08, 
+                           maxeval = 1e+05)
+    lower <- rep(lower, length.out = length(par))
+    upper <- rep(upper, length.out = length(par))
+    for (n in names(defaultControl)) if (is.null(control[[n]])) 
+                                         control[[n]] <- defaultControl[[n]]
+    res <- nloptr(x0 = par, eval_f = fn, lb = lower, ub = upper, 
+                  opts = control, ...)
+    with(res, list(par = solution, fval = objective, feval = iterations, 
+                   conv = if (status < 0 || status == 5) status else 0, 
+                   message = message))
+}
+
+if (FALSE) {
+    library(corHMM)
+    library(targets)
+    tar_load(ag_model_pcsc)
+    source("R/utils.R")
+    ## read contrast matrix and convert to matrix
+    invcontr <- read.csv("contr_invertible.csv")
+    rn <- invcontr$parname
+    invcontr <- as.matrix(invcontr[,-1])
+    dimnames(invcontr) <- list(rn, colnames(invcontr))
+    ## fit additive model
+    fit_contrast.corhmm(ag_model_pcsc, invcontr,
+                        ## zero out interactions
+                        fixed_vals = c(pcxsc_loss = 0, pcxsc_gain = 0),
+                        optControl = list(maxit = 20000, trace = 2))
 }

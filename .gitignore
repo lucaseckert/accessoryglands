@@ -15,4 +15,6 @@ btv3/
 refs/
 BayesTraitsV4.0.0-Linux/
 btv4.tgz
-
+sums.rds
+sims.rds
+counts.rds
