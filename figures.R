@@ -9,6 +9,8 @@ library(phytools)
 library(diversitree)
 
 
+## save sim 2, most "typical"
+sims_save <- c(2)
 ### code for simulations 
 ### I just saved the output as rds since I'm not sure how to work the targets
 # tar_load(ag_model_pcsc)
@@ -56,8 +58,9 @@ nsims <- 100
 if (file.exists("simmap.rda")) {
     load("simmap.rda")
 } else {
+    pb <- txtProgressBar(max = nsims, style = 3)
     for (i in 1:length(treeblock)) {
-        cat(".")
+        setTxtProgressBar(pb, i)
         sims[[i]] <- makeSimmap(tree = treeblock[[i]],
                             data = data, model = model,
                             rate.cat = 1, nSim = nsims)
@@ -69,8 +72,11 @@ if (file.exists("simmap.rda")) {
         dim(sums[[i]]$count)
         counts[[i]] <- sums[[i]]$count
     }
-    cat("\n")
+    close(pb)
     counts <- do.call("rbind", counts)
+    ## simplify:
+    sims <- sims[sims_save]
+    sums <- sums[sims_save]
     save(counts, sums, sims, file = "simmap.rda")
 }
 
@@ -82,7 +88,7 @@ loss.ci <- quantile(counts[,"ag1,ag0"], c(0.025,0.975))
 
 #finding AG nodes
 
-which_sim <- 2 ## use sim 2, more 'typical'
+which_sim <- 1 ## this is indexed based on *which sims were saved* (not original 1:100)
 nodeProbs <- as.data.frame(sums[[which_sim]]$ace) 
 nodeProbs$ag <- as.factor(round(nodeProbs[,2], digits = 0))
 allAgNodes <- rownames(subset(nodeProbs, ag==1))
@@ -92,18 +98,20 @@ obj1 <- densityMap(sims[[which_sim]], plot=FALSE)
 n <- length(obj1$cols)
 obj1$cols[1:n] <- colorRampPalette(c("grey60","firebrick"), space="Lab")(n)
 
+agNodes<-c(778,784,794,798,808,817,876,923,1018,1020,1103,"Hoplosternum_littorale",
+           "Ompok_siluroides","Pangasius_pangasius","Auchenipterus_nuchalis",
+           "Lepidogalaxias_salamandroides","Cheilinus_undulatus","Radulinopsis_taranetzi")
+
 plot(obj1,type="fan",ftype="off", lwd=2)
 nodelabels(node = agNodes, pch = 21, col="firebrick4", bg="firebrick", cex=1.125, lwd=2)
 tiplabels(tip = agNodes, pch = 21, col="black", bg="firebrick", cex=1, lwd=2)
 
 
-## agNodes<-c(777,784,794,798,808,817,876,923,1018,1020,1103,"Hoplosternum_littorale",
-##           "Ompok_siluroides","Pangasius_pangasius","Auchenipterus_nuchalis",
-##           "Lepidogalaxias_salamandroides","Cheilinus_undulatus","Radulinopsis_taranetzi")
 
 ## why cant i load this directly from targets?
 data <- read.csv("data/binaryTraitData.csv")
-data2 <- data[c("care", "spawning"), row.names = data$species]
+data2 <- data[c("care", "spawning")]
+rownames(data2) <- data$species
 
 cols1 <- list(care=c("#c7e9c0","#006d2c"), spawning=c("#bdd7e7","#2171b5"))
 labs1 <- c("Parental Care","Spawning Mode")
