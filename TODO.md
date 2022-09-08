@@ -6,6 +6,7 @@
 - Lit review/sample of how BayesTraits is used?
    - inference?
    - default priors/mention of priors?
+- Mention that BayesTraits/DISCRETE only does 2x2 models?
 
 ### Supplement
 
@@ -16,12 +17,14 @@
    
 ### Low priority
 
-- Compute Bayes Factors??? (BayesTrait run?)
+- Compute Bayes Factors???
+    - Stepping-stone algorithm??? see Baele and Vansteelandt 2013
+		
+Baele, Guy, Philippe Lemey, and Stijn Vansteelandt. “Make the Most of Your Samples: Bayes Factor Estimators for High-Dimensional Models of Sequence Evolution.” BMC Bioinformatics 14, no. 1 (March 6, 2013): 85. https://doi.org/10.1186/1471-2105-14-85.
+
+
 - Weight contrasts by state occupancy?
 - dig out/discuss description of BayesTraits priors?
-- run BayesTraits comparison?
-   - `remotes::install_github("rgriff23/btw")`
-   - See http://www.randigriffin.com/projects/btw
 - Mention that losses are uncertain/less well estimated because AGs are absent in most of the tree?
 - cleanup/code stuff
    - use `renv` for package versions?
