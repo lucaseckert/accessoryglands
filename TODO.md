@@ -7,6 +7,8 @@
    - inference?
    - default priors/mention of priors?
 - Mention that BayesTraits/DISCRETE only does 2x2 models?
+- caveats para (hard-coded root; 12 vs 24 parameters)? Comment on (lack of) sensitivity?
+
 
 ### Supplement
 
