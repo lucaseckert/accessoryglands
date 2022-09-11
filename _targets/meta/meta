@@ -2,6 +2,7 @@ name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iterat
 .Random.seed|object|9d27134e533c0877|||||||||||||||
 ag_0_pars|stem|08f3e24d6d1bc279|cb36b249c1847a7e|c5384c9db85f2c25|1407725726||t18816.7159234181s|e92536e5890953e5|126|rds|local|vector|||0.001||
 ag_bayes_rmd|stem|d592f9315ae983f3|375fa0f7d3babef8|4236d28820985ebe|-691555391|ag_bayesdiag.html*ag_bayesdiag.rmd*ag_bayesdiag_files|t19189.8230301063s|62c33be831dd8815|19153958|file|local|vector|||40.558||
+ag_bayesdiag_html|stem|0df50fac6191bcce|375fa0f7d3babef8|4236d28820985ebe|1145352833|ag_bayesdiag.html*ag_bayesdiag.rmd*ag_bayesdiag_files|t19246.7422903411s|31f7729384111c81|21746685|file|local|vector|||40.31||
 ag_bayesdiag_rmd|stem|c6f104504068a7a1|375fa0f7d3babef8|4236d28820985ebe|1593022641|ag_bayesdiag.html*ag_bayesdiag.rmd*ag_bayesdiag_files|t19200.8417927683s|62c33be831dd8815|19153958|file|local|vector|||40.465||
 ag_binary_trait_file|stem|b7072a747b5587f3|3a35d8811869c668|ef46db3751d8e999|1100981026|data/binaryTraitData.csv|t19115.7575559892s|991dd566cbd2669a|44147|file|local|vector|||2.027||
 ag_compdata|stem|8009fe1fe53b97c5|70b623ba9668592d|8dfb728e83ecd11b|146790090||t19115.7575549707s|dfcd324855e3b27b|18639|rds|local|vector|||0.018||
@@ -37,7 +38,10 @@ ag_statemat_pcsc_pars|stem|34fbff9be0c99a15|fff066302bcbf76b|1113b4d19ed6d0ba|-5
 ag_statemat_sc|stem|748d14caa803f11a|7b9bb0106fd7dcad|b208abfd6a2710f2|-1304596859||t19115.7575556189s|23174e8584d69801|187|rds|local|vector|||0.061||
 ag_statemat_sc_pars|stem|34fbff9be0c99a15|7b9bb0106fd7dcad|c1e82850d1597fed|-249929939||t18816.7419064697s|b2a37e7acd6b186f|188|rds|local|vector|||0.063||
 ag_statemat_unconstr|stem|5fb9f24ce5e31bd5|8d6d59c73a4a6ee6|f4436fb39d12bc98|314703174||t19102.0301363727s|3c187ffa31a31952|199|rds|local|vector|||0.058||
+ag_supp_docx|stem|52de8463ebbe20b7|f324a97a25839e19|a0129e1931d39b1d|415328625|ag_supp.docx*ag_supp.rmd|t19246.7418092566s|772a4bbb76659d8d|280048|file|local|vector|||6.851||
+ag_supp_html|stem|8dbe4527a1382f9e|4bf7cdf7ca40403e|a0129e1931d39b1d|-543642045|ag_supp.html*ag_supp.rmd|t19246.742356779s|7c4ad28dbbb5b882|1458792|file|local|vector|||5.472||
 ag_supp_rmd|stem|92728eed56d3628a|4bf7cdf7ca40403e|a0129e1931d39b1d|-1318912053|ag_supp.html*ag_supp.rmd|t19201.9967383033s|960260d207d5d9d8|1458903|file|local|vector|||7.173||
+ag_tech_html|stem|3b087a3eda6b3345|dede67e97ccf29b3|4745aa592080ea1d|1769758597|ag_tech.html*ag_tech.rmd|t19246.7423619181s|879084ede35612b7|630018|file|local|vector|||0.423||
 ag_tech_rmd|stem|8bec6d4d2d548e44|dede67e97ccf29b3|4745aa592080ea1d|-1957133094|ag_tech.html*ag_tech.rmd|t19243.9150826106s|879084ede35612b7|630018|file|local|vector|||0.455||
 all_ci|stem|f6e1359fcfb6cc70|4e19048f744617c4|4f413d7cf614d8fc|-903984374||t19201.9183937751s|5083c4e4a845eb7f|3019|rds|local|vector|||0.49||
 all_contr_ci|stem|91c1f35ac90255fe|ac3a3d1a0ece394b|1c893112d5138807|1367391847||t19201.9816487766s|db6b9cb05600dc44|3734|rds|local|vector|||0.896||

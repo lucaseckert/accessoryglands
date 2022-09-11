@@ -12,6 +12,7 @@
 
 ### Supplement
 
+- PDF/docx output? (code folding only in HTML ...)
 - Work harder on getting reliable CIs for MLE fits
 - Roll bayesdiag into supplement (or, keep as a separate doc?)
 - tech supp

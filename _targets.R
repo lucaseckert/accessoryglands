@@ -460,9 +460,10 @@ list(data_input_targets,
     ## old(ish) technical model info
     tar_render(ag_old_rmd, "ag_model.rmd"),
     ## Bayesian diagnostics (roll into/include in supplementary material?)
-    tar_render(ag_bayesdiag_rmd, "ag_bayesdiag.rmd"),
+    tar_render(ag_bayesdiag_html, "ag_bayesdiag.rmd"),
     ## technical note (audience: technical users/computational folks)
-    tar_render(ag_tech_rmd, "ag_tech.rmd"),
+    tar_render(ag_tech_html, "ag_tech.rmd"),
     ## supplementary material (audience: general, stats enthusiasts)
-    tar_render(ag_supp_rmd, "ag_supp.rmd")
+    tar_render(ag_supp_html, "ag_supp.rmd"),
+    tar_render(ag_supp_docx, "ag_supp.rmd", output_format = "word_document")
 )
