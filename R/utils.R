@@ -5,7 +5,7 @@ pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
              "abind", "cowplot", "patchwork", "ggtree", "ggnewscale",
              "glue", "diagram", "hues", "phytools", "diversitree",
              "remotes", "visNetwork", "Matrix", "igraph",
-             "nloptr")
+             "nloptr", "bookdown")
 
 
 ## packages to install from GitHub (username, reponame)
