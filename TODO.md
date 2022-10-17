@@ -1,5 +1,11 @@
 ## BMB (27 July 2022)
 
+https://docs.google.com/document/d/1caLrGnvanUawtSbiyjJ8PkL6JkecZX5f/edit?usp=sharing&ouid=115557938223853461511&rtpof=true&sd=true
+
+* expand/justify assumption of independence for 12-parameter model?
+* diagram of transitions? (is figure from Supp good enough?  Note each 4x4 diagonal block has the same structure as the Pagel 4x4 model). Cube diagram? Pictures from https://stats.stackexchange.com/questions/139384/random-walk-on-the-edges-of-a-cube ?
+* address comment at section 4.2 (say more about stats approaches up front?)
+
 ### Main paper
 
 - check with Beaulieu et al. about preferred ref
