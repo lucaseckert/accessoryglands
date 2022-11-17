@@ -8,3 +8,9 @@ all:
 push: ag_bayesdiag.html ag_supp.html
 	rsync -uav $^ ms.mcmaster.ca:~/public_html/AG
 #	scp $^ ms.mcmaster.ca:~/public_html/AG/
+
+## FIXME: should be in targets file!
+figures: flowfig.R R/plotmat.R figures.R
+	R CMD BATCH --vanilla figures.R
+	R CMD BATCH --vanilla flowfig.R
+
