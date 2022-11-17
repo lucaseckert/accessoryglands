@@ -62,7 +62,6 @@ all_contr_ci|stem|all_contr_ci|0|skipped
 ag_supp_docx|stem|ag_supp_docx|0|started
 ag_supp_docx|stem|ag_supp_docx|0|built
 ag_bayesdiag_html|stem|ag_bayesdiag_html|0|skipped
-ag_supp_html|stem|ag_supp_html|0|started
-ag_supp_html|stem|ag_supp_html|0|built
+ag_supp_html|stem|ag_supp_html|0|skipped
 ag_tech_html|stem|ag_tech_html|0|skipped
 ag_mcmc1|stem|ag_mcmc1|0|skipped

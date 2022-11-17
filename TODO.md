@@ -2,9 +2,7 @@
 
 https://docs.google.com/document/d/1caLrGnvanUawtSbiyjJ8PkL6JkecZX5f/edit?usp=sharing&ouid=115557938223853461511&rtpof=true&sd=true
 
-* expand/justify assumption of independence for 12-parameter model?
-* diagram of transitions? (is figure from Supp good enough?  Note each 4x4 diagonal block has the same structure as the Pagel 4x4 model). Cube diagram? Pictures from https://stats.stackexchange.com/questions/139384/random-walk-on-the-edges-of-a-cube ?
-* address comment at section 4.2 (say more about stats approaches up front?)
+* improve diagram of transitions? (is figure from Supp good enough?  Note each 4x4 diagonal block has the same structure as the Pagel 4x4 model). Cube diagram? Pictures from https://stats.stackexchange.com/questions/139384/random-walk-on-the-edges-of-a-cube ?
 
 ### Main paper
 
@@ -12,7 +10,6 @@ https://docs.google.com/document/d/1caLrGnvanUawtSbiyjJ8PkL6JkecZX5f/edit?usp=sh
 - Lit review/sample of how BayesTraits is used?
    - inference?
    - default priors/mention of priors?
-- Mention that BayesTraits/DISCRETE only does 2x2 models?
 - caveats para (hard-coded root; 12 vs 24 parameters)? Comment on (lack of) sensitivity?
 
 
@@ -26,6 +23,7 @@ https://docs.google.com/document/d/1caLrGnvanUawtSbiyjJ8PkL6JkecZX5f/edit?usp=sh
    
 ### Low priority
 
+- rerun with prior on root rather than hard value?
 - Compute Bayes Factors???
     - Stepping-stone algorithm??? see Baele and Vansteelandt 2013
 		

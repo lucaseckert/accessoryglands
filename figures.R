@@ -8,6 +8,7 @@ library(targets)
 library(phytools)
 library(diversitree)
 
+## FIXME: reconcile themes/DRY?
 
 ## save sim 2, most "typical"
 sims_save <- c(2)
@@ -114,7 +115,7 @@ data2 <- data[c("care", "spawning")]
 rownames(data2) <- data$species
 
 cols1 <- list(care=c("#c7e9c0","#006d2c"), spawning=c("#bdd7e7","#2171b5"))
-labs1 <- c("Parental Care","Spawning Mode")
+labs1 <- c("Male Care","Spawning Mode")
 str1 <- list(care=c("No Male Care","Male Care"), spawning=c("Pair Spawning", "Group Spawning"))
 
 tar_load(treeblock)
@@ -135,7 +136,7 @@ ggplot(trans, aes(x=n,fill=rate,))+
   labs(x="Transitions", y="Frequency")+
   scale_x_continuous(breaks = c(0,5,10,15,20,25,30))+
   theme(panel.grid = element_blank(),
-        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        panel.border = element_rect(colour = "black", fill=NA, linewidth=1),
         axis.text = element_text(size = 10, color = "black"),
         axis.title = element_text(size = 14),
         legend.text = element_text(size=12))
@@ -189,11 +190,11 @@ gg_sum_nice <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colou
   scale_fill_manual(name="", labels = c("Gain","Loss"), values = cvec, limits = c("gain", "loss"))+
   annotate("text", label = nvec, col = cvec, x = 15, y = ylab_pos, size = 8) +
   scale_y_discrete(breaks=c("pcxsc","sc","pc"), 
-                   labels=c("Interaction", "Spawning Mode", "Parental Care"),
+                   labels=c("Interaction", "Group Spawning", "Male Care"),
                    limits=c("pcxsc","sc","pc"))+
   labs(x="Proportional Difference in Rates", y="")+
   theme(panel.grid = element_blank(),
-        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        panel.border = element_rect(colour = "black", fill=NA, linewidth=1),
         axis.text = element_text(size = 12, color = "black"),
         axis.title.x = element_text(size = 16),
         legend.position = "none")
