@@ -14,3 +14,6 @@ figures: flowfig.R R/plotmat.R figures.R
 	R CMD BATCH --vanilla figures.R
 	R CMD BATCH --vanilla flowfig.R
 
+flowfig: flowfig.R R/plotmat.R figures.R
+	R CMD BATCH --vanilla flowfig.R
+

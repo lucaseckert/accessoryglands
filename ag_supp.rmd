@@ -90,6 +90,12 @@ cowplot::plot_grid(plot(ag_model_full, pnum_col = pc,
                    nrow=1)
 ```
 
+## Contrasts
+
+![](flowfig2.png)
+
+The transitions denoted A-D all represent gains of accessory glands, under different combinations of male care/spawning mode. Arrows A and B both represent AG gains in states with pair spawning (`sc0`); C and D both represent states in states with group spawning (`sc1`). Thus rate(pair) = (rate(A) + rate(B))/2 is the average rate of AG gain under pair spawning; rate(group) = (rate(C) + rate(D))/2 is the average rate under group spawning; and rate(group)-rate(pair) is the *contrast*, which we can think of as "the effect of group vs pair spawning on the rate of AG gain". We can similarly compute other combinations such as rate(no male care) (`pc0`) = (rate(B) + rate(D))/2; rate(male care)  (`pc1`)  = (rate(A) + rate(C))/2; and contrast(male care) = rate(male care) - rate(no male care).
+
 ## Contrast matrix
 
 The *contrast matrix* connects the parameters we estimate (e.g. `loss.ag_pc0_sc0`, loss rate of accessory glands when parental care and sperm competition are both absent) to the biological effects we are interested in (e.g. `pc_loss`, the effect of parental care on the loss rate of accessory glands). For example, the `intercept_loss` effect is the (unweighted) average of the four different loss terms; the `pc_loss` effect is the difference between the average loss rate when male care is present (second row, red squares) and the average loss rate when male care is absent (second row, blue squares).

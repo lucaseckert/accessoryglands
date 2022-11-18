@@ -67,14 +67,36 @@ yval <- with(vals, (pc-0.5)*box_mag)
 pos <- cbind(xval, yval)
 pos2 <- (pos-min(pos) + shift[1])/(diff(range(pos))*(1+shift[2]))
 
-mkplot <- function()
+R2 <- R
+from <- sprintf("ag0_pc%d_sc%d", rep(0:1,2), rep(0:1, each=2))
+to <-   sprintf("ag1_pc%d_sc%d", rep(0:1,2), rep(0:1, each=2))
+R2[cbind(from, to)] <- LETTERS[1:4]
+
+mkplot <- function(R) {
     plotmat(R, pos = pos2, xlim = c(-3,3),
             ## arr.lwd = sqrt(M/50),
             box.type = "ellipse", box.prop = 0.5,
             arr.lcol = C, arr.col = C,
             arr.nudge.x = Nx,
             arr.nudge.y = Ny)
+}
 
-pdf("flowfig.pdf"); mkplot(); dev.off()
-svg("flowfig.svg"); mkplot(); dev.off()
-png("flowfig.png"); mkplot(); dev.off()
+
+## with labels, for supp/contrast explanation
+
+mkplot2 <- function() {
+    pp <- mkplot(R2)
+    w <- nzchar(na.omit(c(R2)))
+    ## not quite sure why this fussing is required
+    nx <- 0.015*c(0.75,0.75,-0.75,-1)
+    ny <- 0.015*c(-0.9,0.9,0.9,0)
+    with(pp$arr, mapply(plotrix::draw.circle, TextX[w]+nx, TextY[w]+ny,
+                        MoreArgs=list(radius=0.025)))
+    invisible(NULL)
+}
+
+for (o in c("pdf", "svg", "png")) {
+    f <- get(o)
+    f(sprintf("flowfig.%s", o)); mkplot(R); dev.off()
+    f(sprintf("flowfig2.%s", o)); mkplot2(); dev.off()
+}
