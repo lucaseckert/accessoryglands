@@ -1,13 +1,12 @@
 get_ag_data <- function(full_data, species_name = "species", trait_names = c("ag", "care", "spawning"), phylo) {
-  full_data <- full_data[c(species_name, trait_names)]
+    full_data <- full_data[c(species_name, trait_names)]
+    na_list <- setNames(as.list(rep("?", length(trait_names))), trait_names)
   ## prepare binary trait data for corHMM missing convention
   full_data <- (full_data
     ## make sure data are character ("0"/"1"/NA, not 0/1/NA)
     %>% mutate(across(where(is.numeric), as.character))
     ## corHMM wants NA as ?
-    %>% tidyr::replace_na(list(ag = "?",
-                               care = "?",
-                               spawning = "?"))
+    %>% tidyr::replace_na(na_list)
   )
   cc <- caper::comparative.data(phy = phylo,
                                 data = as.data.frame(full_data), ## f'n works REALLY BADLY with tibbles!

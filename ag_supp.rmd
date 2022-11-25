@@ -53,6 +53,11 @@ tar_load(ag_compdata)
 )
 ```
 
+```{r barchart_test}
+tar_load(full_ag_data)
+tar_load(treeblock)
+ff <- full_ag_data |> get_ag_data(trait_names = c("ag", "care", "pairs.groups", "pairs.arts"), phylo = treeblock[[1]])
+
 ```{r barchart, fig.cap = "Numbers of species with each set of traits  (`0` = absent, `1` = present, `?` = unknown; `pc` = male parental care; `sc` = sperm competition (i.e. group spawning or ARTs); `ag` = accessory glands), depending on whether we use the partial (but fully genetically resolved) tree (`fishphylo`) or the imputed trees from @rabosky_inverse_2018 (`treeblock`)."}
 tar_load(ag_compdata)
 tar_load(ag_compdata_tb)
