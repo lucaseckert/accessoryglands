@@ -2,7 +2,12 @@
 
 https://docs.google.com/document/d/1caLrGnvanUawtSbiyjJ8PkL6JkecZX5f/edit?usp=sharing&ouid=115557938223853461511&rtpof=true&sd=true
 
-* improve diagram of transitions? (is figure from Supp good enough?  Note each 4x4 diagonal block has the same structure as the Pagel 4x4 model). Cube diagram? Pictures from https://stats.stackexchange.com/questions/139384/random-walk-on-the-edges-of-a-cube ?
+* integrate figures in targets?
+
+* comment on uncertainty when going from 24 to 12 parameter figure (don't take colours in 24 too seriously: example?)
+* replace beautiful contrast matrix image with fractions
+* troubleshoot figure numbers
+* add a sentence to the last clause in prior descriptions
 
 ### Main paper
 
