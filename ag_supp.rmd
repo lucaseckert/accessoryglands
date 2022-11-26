@@ -73,6 +73,13 @@ gg1 <- (ggplot(bar_data, aes(x=pc, fill = ag))
 print(gg1)
 ```                         
 
+```{r barchart_test, include = FALSE}
+## bar chart that distinguishes group from ART?
+tar_load(full_ag_data)
+tar_load(treeblock)
+ff <- full_ag_data |> get_ag_data(trait_names = c("ag", "care", "pairs.groups", "pairs.arts"), phylo = treeblock[[1]])
+```
+
 # Parameter definitions
 
 ## Transition matrices

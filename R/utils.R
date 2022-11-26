@@ -1,12 +1,9 @@
-pkgList <- c("tidyverse", "bbmle", "coda", "numDeriv",
-             "ggthemes", "fishtree", "caper", "broom.mixed",
-             "emdbook", "ramcmc", "corHMM", "latticeExtra",
-             "GGally", "colorspace", "ggmosaic", "targets", "tarchetypes",
-             "abind", "cowplot", "patchwork", "ggtree", "ggnewscale",
-             "glue", "diagram", "hues", "phytools", "diversitree",
-             "remotes", "visNetwork", "Matrix", "igraph",
-             "nloptr", "bookdown")
-
+pkgList <- c("abind", "bbmle", "bookdown", "broom.mixed", "caper", "coda", 
+             "colorspace", "corHMM", "cowplot", "diagram", "diagram", "diversitree", 
+             "emdbook", "fishtree", "GGally", "ggmosaic", "ggnewscale", "ggthemes", 
+             "ggtree", "glue", "hues", "igraph", "latticeExtra", "Matrix", 
+             "nloptr", "numDeriv", "patchwork", "phytools", "ramcmc", "remotes", 
+             "tarchetypes", "targets", "tidyverse", "visNetwork")
 
 ## packages to install from GitHub (username, reponame)
 GH_pkgs <- list(c("bbolker","corHMM"),    ## hacked/BMB version
@@ -167,6 +164,17 @@ plot.corhmm <- function(x,
   return(p)
 }
 
+
+iplot <- function(M, rlabs = rownames(M), clabs = colnames(M), aspect = "iso") {
+    Matrix::image(Matrix(M),
+                  scales=list(x=list(at=seq(nrow(M)),labels=rlabs,
+                                     rot=90),
+                              y=list(at=seq(ncol(M)),labels=clabs)),
+                  xlab="to",
+                  ylab="from",
+                  sub="",
+                  aspect=aspect)
+}
 
 ##' wrap corhmm results to create a negative log-likelihood function
 ##' (faster than calling corHMM(p = exp(log_p))
