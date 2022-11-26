@@ -464,6 +464,6 @@ list(data_input_targets,
     ## technical note (audience: technical users/computational folks)
     tar_render(ag_tech_html, "ag_tech.rmd"),
     ## supplementary material (audience: general, stats enthusiasts)
-    tar_render(ag_supp_html, "ag_supp.rmd"),
-    tar_render(ag_supp_docx, "ag_supp.rmd", output_format = "word_document")
+    tar_render(ag_supp_html, "ag_supp.rmd")
+    ## tar_render(ag_supp_docx, "ag_supp.rmd", output_format = "word_document")
 )

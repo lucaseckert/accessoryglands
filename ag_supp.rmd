@@ -5,7 +5,6 @@ author: "Ben Bolker and Lucas Eckert"
 bibliography: corHMM.bib
 output:
   bookdown::html_document2:
-    code_folding: hide
     toc: true
     toc_depth: 2
     number_sections: true	
@@ -22,6 +21,7 @@ load_pkgs()
 zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
 theme_set(theme_bw())
 library(targets)
+knitr::opts_chunk$set(echo = FALSE)
 ```
 
 
@@ -86,9 +86,9 @@ ff <- full_ag_data |> get_ag_data(trait_names = c("ag", "care", "pairs.groups", 
 
 As described in the main text, a continuous-time stochastic process for three binary traits has a total of 24 possible transitions where a single one of the three states changes. The figure below shows the full and reduced transition matrices. In the axis tick labels, `ag0_pc0_sc1` (for example) refers to the state without AGs (`ag0`), without male care (`pc0`), and with group spawning (`sc1`, loosely "sperm competition present"^[Hereafter we refer to pair spawning as "sperm competition absent" (`sc0`) and group spawning as "sperm competition present" (`sc1`), recognizing that this is an oversimplification.]). Parameter 1 quantifies the log-hazard of a switch to pair spawning in this state (i.e., to `ag0_pc0_sc0`). 
 
-In the right matrix, transitions that are assumed to have equal rates - because we assume that all transitions in spawning mode, and all transitions in male care, are independent of the other states - have the same ID number. Colours denote the estimated log-hazard for each parameter when the 12-parameter model is fitted by maximum likelihood. Below, we denote parameter 1 (in the reduced model, which occupies four different cells in the transition matrix) as `sc_loss`, because it quantifies the loss rate of sperm competition regardless of the states of the other traits; we rerefer to parameter 3 (for example) as `loss.ag_pc0_sc1`, the loss rate of AGs in the absence of male care and presence of sperm competition.
+In the right matrix, transitions that are assumed to have equal rates - because we assume that all transitions in spawning mode, and all transitions in male care, are independent of the other states - have the same ID number. Colours denote the estimated log-hazard for each parameter when the 12-parameter model is fitted by maximum likelihood. Below, we denote parameter 1 (in the reduced model, which occupies four different cells in the transition matrix) as `sc_loss`, because it quantifies the loss rate of sperm competition regardless of the states of the other traits; we refer to parameter 3 (for example) as `loss.ag_pc0_sc1`, the loss rate of AGs in the absence of male care and presence of sperm competition.
 
-```{r image, message=FALSE, fig.width = 12, fig.height = 5, fig.cap = "Transition matrix for full and reduced (independent evolution of spawning mode and male care) models"}
+```{r image, message=FALSE, fig.width = 12, fig.height = 5, fig.cap = "Transition matrix for full and reduced (independent evolution of spawning mode and male care) models. Note that estimated rates (represented by grid square colours) for 24-parameter model are extremely uncertain; see sensitivity analysis (last section)."}
 pc <- gray(0.9)
 cowplot::plot_grid(plot(ag_model_full, pnum_col = pc,
                         main = "full (24-parameter)"),
@@ -99,7 +99,9 @@ cowplot::plot_grid(plot(ag_model_full, pnum_col = pc,
 
 ## Contrasts
 
-![](flowfig2.png)
+```{r contrast-diag, echo = FALSE, out.width = 500, out.height = 500}
+knitr::include_graphics("flowfig2.png")
+```
 
 The transitions denoted A-D all represent gains of accessory glands, under different combinations of male care/spawning mode. Arrows A and B both represent AG gains in states with pair spawning (`sc0`); C and D both represent states in states with group spawning (`sc1`). Thus rate(pair) = (rate(A) + rate(B))/2 is the average rate of AG gain under pair spawning; rate(group) = (rate(C) + rate(D))/2 is the average rate under group spawning; and rate(group)-rate(pair) is the *contrast*, which we can think of as "the effect of group vs pair spawning on the rate of AG gain". We can similarly compute other combinations such as rate(no male care) (`pc0`) = (rate(B) + rate(D))/2; rate(male care)  (`pc1`)  = (rate(A) + rate(C))/2; and contrast(male care) = rate(male care) - rate(no male care).
 
@@ -107,7 +109,7 @@ The transitions denoted A-D all represent gains of accessory glands, under diffe
 
 The *contrast matrix* connects the parameters we estimate (e.g. `loss.ag_pc0_sc0`, loss rate of accessory glands when parental care and sperm competition are both absent) to the biological effects we are interested in (e.g. `pc_loss`, the effect of parental care on the loss rate of accessory glands). For example, the `intercept_loss` effect is the (unweighted) average of the four different loss terms; the `pc_loss` effect is the difference between the average loss rate when male care is present (second row, red squares) and the average loss rate when male care is absent (second row, blue squares).
 
-```{r plot_contrast_mat, fig.width = 6, fig.width = 6, fig.cap = "Contrast matrix defining translation from internal rate parameters (columns, corresponding to transition rates in Figure 1.3) to meaningful contrasts (see figures below). Gain and loss terms for group spawning and male care not shown, as these are not translated into contrasts."}
+```{r plot-contrast-mat, fig.width = 6, fig.width = 6, fig.cap = "Contrast matrix defining translation from internal rate parameters (columns, corresponding to transition rates in Figure 1.3) to meaningful contrasts (see figures below). Gain and loss terms for group spawning and male care not shown, as these are not translated into contrasts."}
 tar_load(contrast_mat)
 ## order nicely
 order_fun <- function(x) {
@@ -121,22 +123,47 @@ order_fun <- function(x) {
     rem <- stringr::str_remove(x,"[[:alpha:]]{4}\\.[[:alpha:]]{2}(_|$)")
     order(1000*tcode + 100*lcode + order(rem))
 }
-image_plot(t(contrast_mat[
+ccm <- t(contrast_mat[
     ## re-order; drop cols 1-4, which aren't involved in contrasts
     ##  (just gain/loss of pc, sc)
     ## keep only gain/loss contrast rows,
     ##  not "netgain" (which we never used and
     ##  which is a little confusing)
-    order_fun(rownames(contrast_mat)),])[1:8,-(1:4)],
+    order_fun(rownames(contrast_mat)),])[1:8,-(1:4)]
+image_plot(ccm, 
     ylab = "AG contrast", xlab = "Rate parameter")
 ```
+
+
+```{r hux, eval = FALSE}
+m <- MASS::fractions(ccm)
+mm <- matrix(attr(m, "fracs"),
+             nrow = nrow(m),
+             dimnames = dimnames(m))
+mm[mm == "0"] <- "."
+if (exists("latexstr")) rm("latexstr")
+texconn <- textConnection("latexstr", "w")
+cc <- function(x, ...) cat(x, file = texconn, append = TRUE, ...)
+cc("$$\n")
+cc("\\left(\n")
+cc("\\begin{array}{cccccccc}\n")
+for (i in 1:nrow(mm)) {
+    cc(mm[i,], sep = " & ")
+    cc("\\\\\n")
+}
+cc("\\end{array}\n")
+cc("\\right)\n")
+cc("$$")
+cat(knitr::raw_latex(latexstr))
+```
+
 
 # Priors
 
 Here we illustrate our general strategy for constructing priors: pick sensible lower and upper "bounds" (not really bounds, but values we would consider extreme) and use a Normal prior on the log-hazard scale (equivalent to a log-Normal prior on the hazard scale) with a mean halfway between the lower and upper bounds and a standard deviation $\sigma = (\log(\textrm{upper})-\log(\textrm{lower}))/(2 \cdot \textrm{range})$
 In our actual model we use a range of 3 (i.e. the lower and upper bounds are at $\pm 3 \sigma$); in the figure below we use range = 2 so the tails are more clearly visible.
 
-```{r prior_spec, fig.width = 10, fig.height = 5, fig.cap = "Schematic of prior definition in terms of lower and upper tails of a Gaussian distribution. Left, linear scale; right, log scale"}
+```{r prior-spec, fig.width = 10, fig.height = 5, fig.cap = "Schematic of prior definition in terms of lower and upper tails of a Gaussian distribution. Left, linear scale; right, log scale"}
 fun <- function(logsc = TRUE, range = 2, xp = 1.15) {
     DFUN <- if (!logsc) dlnorm else dnorm
     trans <- if (!logsc) exp else identity
@@ -189,9 +216,6 @@ fun(xp = 2)
 fun(logsc=FALSE)
 ```
 
-By sampling directly from the prior and computing contrasts,
-we can confirm that the priors on the contrasts (ratio of AG gain/loss rates depending on male care and sperm competition) are indeed neutral (centered at 1.0) and reasonable (95% confidence intervals extend from 10x slower to 10x faster). The intercept terms for gain and loss represent the *average* evolutionary rates across all states, and are measured in units of expected numbers of events across the entire tree.
-
 ```{r utils}
 tar_load(ag_compdata)
 corhmm_bounds <- log(c(lwr=0.1, upper = 100*ape::Ntip(ag_compdata$phy)))
@@ -224,18 +248,33 @@ fix_all_ci <- function(x, levels = NULL) {
 }
 ```
 
-```{r priorsamp, fig.cap = "95% CIs for prior distributions of contrasts"}
+```{r priorsamp}
 prior_contr_ci <- (fix_all_ci(all_contr_ci, levels = contr_levs)
     ## netgain/loss terms will be NA after fixing with these levels
     |> filter(!is.na(term),
               method == "priorsamp")
 )
+get_ci <- function(tt ) {
+    (prior_contr_ci
+        |> filter(term == tt)
+        |> dplyr::select(estimate, lwr, upr)
+        |> as.list()
+        |> map_dbl(~round(exp(.), 1))
+    )
+}
+gain_ci <- get_ci("intercept_gain")
+```
+
+By sampling directly from the prior and computing contrasts,
+we can confirm that the priors on the contrasts (ratio of AG gain/loss rates depending on male care and sperm competition) are indeed neutral (centered at 1.0) and reasonable (95% confidence intervals extend from 10x slower to 10x faster). The intercept terms for gain and loss represent the *average* evolutionary rates across all states, and are measured in units of expected numbers of events across the entire tree. For example, the prior expected number of gains of AG across the whole tree is `r gain_ci[1]` (95% CI: `r gain_ci[2]`-`r gain_ci[3]`).
+
+```{r priorsamp-fig, fig.cap = "95% CIs for prior distributions of contrasts"}
 (ggplot(prior_contr_ci)
     + aes(x = exp(estimate),
           xmin = exp(lwr),
           xmax = exp(upr), y = term)
     + geom_pointrange()
-    + labs(y = "", x = "hazard/hazard ratio")
+    + labs(y = "", x = "hazard or hazard ratio")
     + scale_x_log10()
     + geom_vline(xintercept = 1, lty = 2)
 )
@@ -248,7 +287,7 @@ This section presents the quantitative results in more detail.
 ## Bayesian
 
 Here are the estimated posterior median and confidence intervals,
-along with $p_\textrm{MCMCM}$ (twice the minimum tail probability)
+along with $p_\textrm{MCMC}$ (twice the minimum tail probability)
 and the "probability of direction" ($p_d$), the probability that the
 parameter has the same sign as the median ($p_d$ is an index of
 how clearly the sign of the parameter is known: $p_\textrm{MCMC} = 2(1-p_d)$)
@@ -293,7 +332,7 @@ they can make use of a larger data set. Points show the
 posterior median, Line ranges represent 95%
 credible intervals.
 
-```{r plot_contrasts, fig.height=4, fig.width=10}
+```{r plot-contrasts, fig.height=4, fig.width=10}
 tar_load(contr_long_ag_mcmc0)
 tar_load(contr_long_ag_mcmc_tb)
 ag_contr_gainloss <- purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
@@ -367,7 +406,7 @@ A["sc","pcsc"] <- anfun(ag_model_pcsc, ag_model_sc)
 C <- matrix(0, nrow=nrow(A), ncol = ncol(A))
 C[!is.na(A)] <- seq(sum(!is.na(A)))
 ```
-```{r lrtest_plot, fig.width = 7, fig.height = 10}
+```{r lrtest-plot, fig.width = 7, fig.height = 10}
 plotmat(A, curve = 0,
         ## pcsc_add box in second row needs to be wider/larger
         box.size = c(0.05, 0.1, 0.05, 0.05),
@@ -404,7 +443,7 @@ test p-value)
 
 ### Parameter estimates/CIs
 
-We can look at the parameter estimates from MLE/MAP fits, although
+We can look at the parameter estimates from MLE fits, although
 most of the confidence intervals of the unregularized fits 
 are undetermined because of the failure
 of the Wald estimates. All confidence intervals more extreme than $\exp(\pm 20)$ are
@@ -516,7 +555,7 @@ gg_ci_nowald <- (gg_ci0 %+% dplyr::filter(all_ci, method != "model_pcsc")
 )
 ```
 
-```{r contrast_ci, fig.width=8, fig.height = 6, warning = FALSE, message = FALSE}
+```{r contrast-ci, fig.width=8, fig.height = 6, warning = FALSE, message = FALSE}
 method_levs <- c("mcmc_tb", "mcmc_0",
                  "mcmc_tb_nogainloss",
                  "full",
@@ -557,7 +596,7 @@ We can draw a variety of conclusions from these results.
 - `mcmc_tb` vs. `full`: although the results from the full model are generally of the same sign as from the reduced (12-parameter) model, they are much less certain. None of the signs of the effects are statistically clear ($p_{\textrm{MCMC}} > 0.05$ for all estimates).
 - `mcmc_tb` vs. `model_pcsc`: the 12-parameter model is too poorly constrained to draw conclusions from the parameter estimates; this agrees with the likelihood ratio and IC tests above, which indicate that the additive model is preferred to the interaction model.
 - `model_pcsc` vs. `model_pcsc_add`: constraining the model slightly by removing the interaction terms helps a little bit - now we get a point estimate and confidence intervals for the `pc_gain` parameter that agrees reasonably well with the full Bayesian fits - but most of the other parameters of interest are still unidentifiable (large confidence intervals/failure of the Wald approximation). The estimates of the rates of gain and loss of the non-focal traits are well identified, but not of interest.
-- `mcmc_tb` vs. `model_pcsc_prior`: when we add the prior information to the MLE fit, we get point estimates that are very close to the primary (`mcmc_tb`) model.
+- `mcmc_tb` vs. `model_pcsc_prior`: when we add the prior information to the MLE fit, we get point estimates, and CIs, that are very close to those from the primary (`mcmc_tb`) model.
 
 # References
 
