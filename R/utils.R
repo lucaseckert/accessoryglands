@@ -3,7 +3,7 @@ pkgList <- c("abind", "bbmle", "bookdown", "broom.mixed", "caper", "coda",
              "emdbook", "fishtree", "GGally", "ggmosaic", "ggnewscale", "ggthemes", 
              "ggtree", "glue", "hues", "igraph", "latticeExtra", "Matrix", 
              "nloptr", "numDeriv", "patchwork", "phangorn", "phytools", "ramcmc", "remotes", 
-             "tarchetypes", "targets", "tidyverse", "visNetwork")
+             "tarchetypes", "targets", "tidyverse", "tikzDevice", "visNetwork")
 
 ## packages to install from GitHub (username, reponame)
 GH_pkgs <- list(c("bbolker","corHMM"),    ## hacked/BMB version
