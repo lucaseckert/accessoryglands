@@ -1,5 +1,5 @@
 ---
-title: "accessory gland model: supplementary material"
+title: "Supplementary material for 'Parental care drives the evolution of reproductive accessory glands in ray-finned fishes'"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
 author: "Ben Bolker and Lucas Eckert"
 bibliography: corHMM.bib
@@ -36,7 +36,7 @@ tar_load(ag_compdata)
 
 # Descriptive statistics
 
-## data
+## Data
 
 	
 ```{r mosaic, eval=FALSE, include=FALSE}
@@ -60,18 +60,47 @@ barplot_trans <- (.
   %>% mutate(across(c(pc, sc), factor, levels = c(0:1, "?")))
   %>% mutate(across(ag, factor, levels = 1:0)) ## reverse order to get ag=1 on top of bars
 )
-bar_data <- purrr::map_dfr(list(fishphylo = ag_compdata$data,
+
+bar_data <- (purrr::map_dfr(list(fishphylo = ag_compdata$data,
                     treeblock = ag_compdata_tb$data),
                barplot_trans,
                .id = "phylo")
+    |> rename(`spawning mode`="sc")
+)
+
 gg1 <- (ggplot(bar_data, aes(x=pc, fill = ag))
   + geom_bar()
-  + facet_grid(phylo~sc, labeller = label_both)
-  + scale_fill_discrete_qualitative()
-  + zmargin
+  + facet_grid(phylo~`spawning mode`, labeller = label_both)
+  + scale_fill_discrete_qualitative(name = "accessory\nglands")
+    + zmargin
+    + labs(x="male parental care")
 )
 print(gg1)
 ```                         
+
+The phylogenies in the treeblock are generated according to an imputation
+scheme described in @rabosky_inverse_2018. We generated 100 stochastic character maps for each of 100 trees; the figure shows the average number of gains and losses per tree (i.e., average gains/losses across the stochastic character maps for each tree).
+
+```{r simcounts, fig.cap = "average number of gains and losses of AGs simulated for each tree in the tree block"}
+x <- load("simmap.rda")
+countsum <- (counts
+    |> as_tibble()
+    |> mutate(r = rep(1:100, each = 100))
+    |> group_by(r)
+    |> rename(gains = "ag0,ag1", losses = "ag1,ag0")
+    |> summarise(across(c(gains, losses), mean))
+    |> pivot_longer(c(gains, losses))
+)
+ggplot(countsum) + geom_histogram(aes(x=value), binwidth = 0.25, colour = "white") + facet_wrap(~name, scale = "free_x")
+``` 
+
+<!-- use ape::getMRCA() to identify families and geom_cladelab() ... ?? -->
+
+```{r densitree, fig.cap = "densitree-style mapping of tree blocks/phylogenetic uncertainty [bouckaertDensiTree2010]", cache=TRUE}
+targets::tar_load(treeblock)
+mp <- do.call("c", treeblock)
+ggtree::ggdensitree(mp, layout = "radial", alpha = 0.02)
+```
 
 ```{r barchart_test, include = FALSE}
 ## bar chart that distinguishes group from ART?
@@ -86,9 +115,9 @@ ff <- full_ag_data |> get_ag_data(trait_names = c("ag", "care", "pairs.groups", 
 
 As described in the main text, a continuous-time stochastic process for three binary traits has a total of 24 possible transitions where a single one of the three states changes. The figure below shows the full and reduced transition matrices. In the axis tick labels, `ag0_pc0_sc1` (for example) refers to the state without AGs (`ag0`), without male care (`pc0`), and with group spawning (`sc1`, loosely "sperm competition present"^[Hereafter we refer to pair spawning as "sperm competition absent" (`sc0`) and group spawning as "sperm competition present" (`sc1`), recognizing that this is an oversimplification.]). Parameter 1 quantifies the log-hazard of a switch to pair spawning in this state (i.e., to `ag0_pc0_sc0`). 
 
-In the right matrix, transitions that are assumed to have equal rates - because we assume that all transitions in spawning mode, and all transitions in male care, are independent of the other states - have the same ID number. Colours denote the estimated log-hazard for each parameter when the 12-parameter model is fitted by maximum likelihood. Below, we denote parameter 1 (in the reduced model, which occupies four different cells in the transition matrix) as `sc_loss`, because it quantifies the loss rate of sperm competition regardless of the states of the other traits; we refer to parameter 3 (for example) as `loss.ag_pc0_sc1`, the loss rate of AGs in the absence of male care and presence of sperm competition.
+The assignment of numbers to rates is arbitrary, numbered in sequence in column-wise order. Knowing the assignment is only necessary when doing low-level computations based on the vector of parameters. The take-home information is which sets of transitions are constrained to be identical in the reduced model; these rates have the same number . In the reduced model (righthand plot), transitions that are assumed to have equal rates - because we assume that all transitions in spawning mode, and all transitions in male care, are independent of the other states - have the same ID number. Colours denote the estimated log-hazard for each parameter when the models are fitted by maximum likelihood. Below, we denote parameter 1 (in the reduced model, which occupies four different cells in the transition matrix) as `sc_loss`, because it quantifies the loss rate of sperm competition regardless of the states of the other traits; we refer to parameter 3 (for example) as `loss.ag_pc0_sc1`, the loss rate of AGs in the absence of male care and presence of sperm competition.
 
-```{r image, message=FALSE, fig.width = 12, fig.height = 5, fig.cap = "Transition matrix for full and reduced (independent evolution of spawning mode and male care) models. Note that estimated rates (represented by grid square colours) for 24-parameter model are extremely uncertain; see sensitivity analysis (last section)."}
+```{r image, message=FALSE, fig.width = 12, fig.height = 5, fig.cap = "Transition matrix for full and reduced (independent evolution of spawning mode and male care) models. Colours of grid squares represent the estimated evolutionary rates (log-hazards) for each transition. Note that the rates for 24-parameter model are extremely uncertain; see sensitivity analysis (last section)."}
 pc <- gray(0.9)
 cowplot::plot_grid(plot(ag_model_full, pnum_col = pc,
                         main = "full (24-parameter)"),
@@ -97,9 +126,9 @@ cowplot::plot_grid(plot(ag_model_full, pnum_col = pc,
                    nrow=1)
 ```
 
-## Contrasts
+## Transitions
 
-```{r contrast-diag, echo = FALSE, out.width = 500, out.height = 500}
+```{r contrast-diag, echo = FALSE, out.width = 500, out.height = 500, fig.cap = "Transitions for the reduced (12-parameter) model. As in Figure 1 in the main text: Sets of connections drawn with the same colours are constrained to identical evolutionary rates (e.g. light gray downward arrows, representing loss of male parental care – all transitions from “pc1” to the corresponding “pc0” state). Top-bottom and left-right transitions, representing loss/gain of parental care and transitions between pair spawning and group spawning, are assumed to be independent of other trait values. Loss/gain of accessory glands (diagonal arrows), which are our primary interest, are all estimated separately (8 different colours for arrows representing loss/gain of accessory glands under the 4 different combinations of the other two traits, parental  care and spawning mode)."}
 knitr::include_graphics("flowfig2.png")
 ```
 
@@ -157,11 +186,27 @@ cc("$$")
 cat(knitr::raw_latex(latexstr))
 ```
 
+Here is an equivalent numeric matrix:
+
+$$
+\left[
+\begin{array}{rrrrrrrr}
+1/4 & 1/4 & 1/4 & 1/4 & . & . & . & . \\
+-1/2 & -1/2 & 1/2 & 1/2 & . & . & . & . \\
+1/2 & -1/2 & -1/2 & 1/2 & . & . & . & . \\
+-1/2 & 1/2 & -1/2 & 1/2 & . & . & . & . \\
+. & . & . & . & 1/4 & 1/4 & 1/4 & 1/4 \\
+. & . & . & . & -1/2 & 1/2 & -1/2 & 1/2 \\
+. & . & . & . & -1/2 & -1/2 & 1/2 & 1/2 \\
+. & . & . & . & 1/2 & -1/2 & -1/2 & 1/2 \\
+\end{array}
+\right]
+$$
 
 # Priors
 
 Here we illustrate our general strategy for constructing priors: pick sensible lower and upper "bounds" (not really bounds, but values we would consider extreme) and use a Normal prior on the log-hazard scale (equivalent to a log-Normal prior on the hazard scale) with a mean halfway between the lower and upper bounds and a standard deviation $\sigma = (\log(\textrm{upper})-\log(\textrm{lower}))/(2 \cdot \textrm{range})$
-In our actual model we use a range of 3 (i.e. the lower and upper bounds are at $\pm 3 \sigma$); in the figure below we use range = 2 so the tails are more clearly visible.
+In our model we use a range of 3 (i.e. the lower and upper bounds are at $\pm 3 \sigma$), to denote that the lower and upper bounds we specify are extreme (99.7% ranges). The figure below uses range = 2 (which would correspond to 95.4% ranges) so the tails are more clearly visible.
 
 ```{r prior-spec, fig.width = 10, fig.height = 5, fig.cap = "Schematic of prior definition in terms of lower and upper tails of a Gaussian distribution. Left, linear scale; right, log scale"}
 fun <- function(logsc = TRUE, range = 2, xp = 1.15) {
@@ -327,7 +372,7 @@ including fits to both the full tree-block data set and the subset of
 the data that includes only species with genetic data ("fishphylo").
 (The latter is useful for comparison with the MLE results, which cannot
 use the Bayesian method of sampling across treeblock phylogenies.)
-The treeblock estimates are slightly more precise, as expected since
+The treeblock estimates are slightly more precise (i.e. the confidence intervals are narrower), as expected since
 they can make use of a larger data set. Points show the
 posterior median, Line ranges represent 95%
 credible intervals.
@@ -364,9 +409,8 @@ For any pair of *nested* models we can do a likelihood ratio test,
 comparing the model fits and number of parameters. We fit restricted models
 with AG evolution independent of both sperm competition and male care
 (`indep`); dependent on male care but not sperm competion (`pc`);
-on sperm competition only (`sc`); *additively* on both traits (i.e.,
-the effects of the trait status on evolutionary rates are added,
-on the log scale); and with an interaction between traits
+dependent on sperm competition only (`sc`); depending *additively* on both traits (i.e., the effects of the trait status on evolutionary rates are added,
+on the log scale - this model has 10 parameters); and with an interaction between traits
 (the full 12-parameter model that is our primary focus).
 
 Testing (most) nested pairs gives this diagram (we omit the
@@ -406,7 +450,7 @@ A["sc","pcsc"] <- anfun(ag_model_pcsc, ag_model_sc)
 C <- matrix(0, nrow=nrow(A), ncol = ncol(A))
 C[!is.na(A)] <- seq(sum(!is.na(A)))
 ```
-```{r lrtest-plot, fig.width = 7, fig.height = 10}
+```{r lrtest-plot, fig.width = 7, fig.height = 10, fig.cap = "likelihood ratio test comparisons"}
 plotmat(A, curve = 0,
         ## pcsc_add box in second row needs to be wider/larger
         box.size = c(0.05, 0.1, 0.05, 0.05),
@@ -414,6 +458,18 @@ plotmat(A, curve = 0,
         arr.lcol = C,
         arr.tcol = C,
         pos = matrix(c(1,1,2,1)))
+```
+
+```{r lrtest-plot-svg}
+svg("lrt_comp.svg")
+plotmat(A, curve = 0,
+        ## pcsc_add box in second row needs to be wider/larger
+        box.size = c(0.05, 0.1, 0.05, 0.05),
+        box.prop = c(0.5, 0.25, 0.5, 0.5),
+        arr.lcol = C,
+        arr.tcol = C,
+        pos = matrix(c(1,1,2,1)))
+dev.off()
 ```
 
 The p-values quoted in the paper are from comparing the full model
@@ -443,7 +499,7 @@ test p-value)
 
 ### Parameter estimates/CIs
 
-We can look at the parameter estimates from MLE fits, although
+We can look at the parameter estimates from maximum likelihood fits, although
 most of the confidence intervals of the unregularized fits 
 are undetermined because of the failure
 of the Wald estimates. All confidence intervals more extreme than $\exp(\pm 20)$ are
@@ -473,7 +529,9 @@ knitr::kable(ptab, digits = 3)
 ### Information-theoretic comparisons
 
 Alternatively, we can make comparisons based on information-theoretic criteria
-such as AICc, AIC, or BIC. These three criteria differ in the kind and strength of penalty that they use to avoid overly complex models. AICc is often recommended for analyses where $n<40$. Using AICc presents a challenge: for this data set (a phylogeny of 607 species with approximately 20 independent origins of accessory glands), it is difficult to quantify the *effective* number of observations (the $n$ in the rule of thumb above, and in the formula for the AICc, is based on a simpler data format where we can assume that every observation is independent). We chose $n=30$ for this comparison, as a guess at the effective sample size (larger $n$ will tend to select larger models as better).
+such as AICc, AIC, or BIC. These three criteria differ in the kind and strength of penalty that they use to avoid overly complex models. Researchers choose different criteria depending on their goals - strictly speaking AIC and its variants are for maximizing predictive accuracy while BIC is for choosing among hypotheses. AICc is often recommended for analyses where $n<40$. Using AICc presents a challenge: for this data set (a phylogeny of 607 species with approximately 20 independent origins of accessory glands), it is difficult to quantify the *effective* number of observations (the $n$ in the rule of thumb above, and in the formula for the AICc, is based on a simpler data format where we can assume that every observation is independent). We chose $n=30$ for this comparison, as a guess at the effective sample size (larger $n$ will tend to select larger models as better).
+
+Negative log-likelihood, which measures the unpenalized goodness-of-fit, is included for completeness/comparison.
 
 ```{r ictab}
 ag_models <- paste0("ag_model_",
@@ -504,7 +562,7 @@ As stated in the main text, we can see that AICc gives similar conclusions to th
 
 # Sensitivity analyses
 
-We performed a range of different analyses to test the sensitivity of our conclusions to technical choices, and to explore the difference between frequentist (MLE), constrained frequentist (MAP), and full Bayesian (MCMC) fitting methods.
+We performed a range of different analyses to test the sensitivity of our conclusions to technical choices, and to explore the difference between frequentist (maximum likelihood estimate = MLE), constrained frequentist (maximum *a posteriori* = MAP), and full Bayesian (MCMC) fitting methods.
 
 - `mcmc_tb`: Bayesian MCMC using neutral priors on the transition rates and biologically informed priors on the gain/loss rates; this is the primary model presented in the main text
 - `mcmc_0`: as `mcmc_tb`, but using only the completely resolved phylogeny (i.e., only including species for which genetic data is available)
@@ -585,7 +643,7 @@ gg_ci1C  <- (gg_ci0 %+% all_contr_ci
 print(gg_ci1C)
 ```
 
-Missing confidence interval lines indicate that confidence intervals could not be computed; points at the edge of the graph (`sc_gain`, `pc_loss`, `pcxsc_loss`) indicate that the point estimates fell outside of the plotted range.
+Points at the edge of the graph (`sc_gain`, `pc_loss`, `pcxsc_loss`) indicate that the point estimates fell outside of the plotted range.
 
 Intercepts are excluded (as being less biologically interesting, and using a different scale from the contrasts: hazards rather than hazard ratios), as are the estimates of the rates of gain and loss of the non-focal traits (spawning mode and male care).
 

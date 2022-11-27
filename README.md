@@ -10,7 +10,7 @@ Phylogenetic comparative analysis on the evolution of reproductive accessory gla
    - possibly: compute Wald and/or likelihood profile confidence intervals
    - specify priors and do MCMC computation
    - plot/interpret results
-   
+
 ## documents
 
 - `ag_bayesdiag.rmd`: Bayes diagnostics for MCMC fits ([link](http://www.math.mcmaster.ca/bolker/AG/ag_bayesdiag.html))
@@ -35,6 +35,8 @@ Files:
 
 ## making stuff
 
+### within R
+
 To run single-threaded:
 
 ```r
@@ -51,11 +53,16 @@ plan("multicore")
 tar_make_future()
 ```
 
+### via `make`
+
+- `make all` if you have `make` installed.
+
 To load existing products (e.g. for debugging):
 
 ```r
 tar_load(everything())
 ```
+
 google drive [link](https://drive.google.com/drive/folders/1S5KwLDQavshwS8i0e9_g1jRiVUw8rnLO?usp=sharing)
 
 ## BayesTraits review

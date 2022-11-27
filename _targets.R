@@ -31,6 +31,8 @@ mcmc_runs_12 <- c("0", "tb", "tb_nogainloss")  ## 12-parameter models only
 ## tar_load(everything())
 
 ## tar_plan is from tarchetypes::tar_plan()
+
+## rules for importing data
 data_input_targets <- tar_plan(
     ## trait data file
     tar_target(
@@ -81,8 +83,9 @@ data_input_targets <- tar_plan(
     )
 )  ## end data_input_targets
 
+## rules for setting up parameter constraints
 parameter_constraint_targets <- tar_plan(
-        ## set constraints on rate equality
+    ## set constraints on rate equality
     ## these are derived by staring at the results of corHMM::getStateMat4Dat(ag_compdata$data)
     ## along with state names and figuring out which transitions to constrain
 
@@ -131,7 +134,7 @@ parameter_constraint_targets <- tar_plan(
     )
 )
 
-##
+## main loop
 list(data_input_targets,
      parameter_constraint_targets,
 
@@ -166,7 +169,7 @@ list(data_input_targets,
           upper = 100 * ape::Ntip(ag_compdata$phy)) ## 100 transitions per species
     ),
 
-    ## fit corHMM models for all sets of constraints
+    ## fit corHMM models for all sets of constraints ('fishphylo' phylogeny only)
     tar_map(
         values = tibble(
             nm = corhmm_models,
@@ -187,6 +190,7 @@ list(data_input_targets,
                 ))
     ),
 
+    ## fit corHMM models for all sets of constraints (using tree block)
     tar_target(
         ## FIXME: DRY (via tar_map) and/or don't bother with 'fishphylo' fit?
         ag_model_tb, {
@@ -203,6 +207,8 @@ list(data_input_targets,
                        )
                 )
         }),
+
+    ## fit corHMM model with priors (MAP estimation)
     tar_target(ag_model_pcsc_prior,
     {
       nll <- make_nllfun(ag_model_pcsc)
@@ -226,13 +232,17 @@ list(data_input_targets,
            method = "BFGS"
            )
     }),
+
+    ## fit additive model by corHMM
     tar_target(ag_model_pcsc_add,
                fit_contrast.corhmm(ag_model_pcsc,
                                    contrast_mat_inv,
                                    ## zero out interactions
                                    fixed_vals = c(pcxsc_loss = 0, pcxsc_gain = 0),
                                    optControl = list(maxit = 20000))
-    ),
+               ),
+
+    ## compute confidence intervals
     tar_target(comp_ci,
     { list(
           wald = tidy(ag_model_pcsc, conf.int = TRUE),
@@ -243,14 +253,20 @@ list(data_input_targets,
         rename(lwr = "conf.low", upr = "conf.high")
     }
     ),
+
+    ## define upper bound for gain/loss ratio
     tar_target(
         maxgainloss,
         log(c(sc = 10, pc = 5, 10))
     ),
+
+    ## define lower bound for gain/loss ratio
     tar_target(
         mingainloss,
         log(c(sc = 1/5, pc = 1/10, 1/1000))
     ),
+
+    ## set up gain/loss priors
     tar_target(
         gainloss_priors,
         list(pairs = gainloss_ind_prs(ag_model_pcsc),
@@ -266,12 +282,16 @@ list(data_input_targets,
           "ag", "sc", "ag", "ag",
           "sc", "pc", "pc", "sc")
     ),
+
+    ## gain/loss parameters for full (24-parameter) model
     tar_target(
         gainloss_priors_full,
         list(pairs = gainloss_ind_prs(ag_model_full),
              ub = maxgainloss[full_pattern],
              lb = mingainloss[full_pattern])
     ),
+
+    ## define column (contrast) order for 12- and 24-parameter models
     tar_map(
         values = tibble(mcmc = rlang::syms(c("ag_mcmc_0", "ag_mcmc_full")),
                         nm = c("0", "full")),
@@ -279,6 +299,8 @@ list(data_input_targets,
         tar_target(col_order,
                    colnames(mcmc[[1]]))
     ),
+
+    ## read in contrast matrices and enforce correct ordering
     tar_map(
         values = tibble(fn = c("contr.csv", "contr_full.csv", "contr_invertible.csv"),
                         col_order = rlang::syms(c("col_order_0", "col_order_full", "col_order_0")),
@@ -300,6 +322,9 @@ list(data_input_targets,
         }
         )
     ),
+
+    ## compute contrasts for 12-parameter fits (fishphylo, treeblock,
+    ##  treeblock without gain/loss priors)
     tar_map(
         values = tibble(mcmc = rlang::syms(glue::glue("ag_mcmc_{mcmc_runs_12}"))),
         tar_target(contr_long,
@@ -310,6 +335,8 @@ list(data_input_targets,
            ),
         )
     ),
+
+    ## stochastic character mapping
     tar_target(
         states_df, {
           sm <- with(ag_model_pcsc,
@@ -323,14 +350,20 @@ list(data_input_targets,
             %>% setNames(gsub("ag_", "", names(.)))
         )
     ),
+
+    ## collect confidence intervals
     tar_target(
         all_ci,
         purrr::map_dfr(mod_list, my_tidy, .id = "method")
     ),
+
+    ## get contrast CIs for 24-parameter model
     tar_target(
         full_contr_ci,
         my_tidy(ag_mcmc_full, contrast_mat = contrast_mat_full) %>% mutate(method = "full", .before = 1)
     ),
+
+    ## collect contrast CIs from all models
     tar_target(
         all_contr_ci,
         (purrr::map_dfr(mod_list, my_tidy, .id = "method",
@@ -342,6 +375,8 @@ list(data_input_targets,
             ## FIXME: gsub("model", "corhmm" OR "mle", method) ...
         )
     ),
+
+    ## run 12-parameter model (SLOW)
     tar_target(ag_mcmc_0,
                corhmm_mcmc(ag_model_pcsc,
                            p_args=list(nllfun = make_nllfun(ag_model_pcsc),
@@ -355,10 +390,12 @@ list(data_input_targets,
                            n_chains = 8,
                            n_burnin = 4000,
                            n_iter = 84000,
-                           n_thin = 20,
+                           n_thin = 10,
                            seed = 101),
                cue = run_slow()
                ),
+
+    ## run 24-parameter model
     ## DRY: map with previous rule
     tar_target(ag_mcmc_full,
     {
@@ -375,12 +412,14 @@ list(data_input_targets,
                            n_chains = 8,
                            n_burnin = 8000,
                            n_iter = 144000,
-                           n_thin = 20,
+                           n_thin = 10,
                            seed = 101)
                },
                    cue = run_slow()
 
-               ),
+    ),
+
+    
     tar_target(ag_mcmc_tb,
                corhmm_mcmc(ag_model_tb,
                            p_args=list(nllfun = make_nllfun(ag_model_tb, treeblock = treeblock),
@@ -394,7 +433,7 @@ list(data_input_targets,
                            n_chains = 8,
                            n_burnin =  4000,
                            n_iter =  84000,
-                           n_thin = 20,
+                           n_thin = 10,
                            seed = 101),
                cue = run_slow()
                ),
@@ -409,7 +448,7 @@ list(data_input_targets,
                            n_chains = 8,
                            n_burnin =  4000,
                            n_iter =  84000,
-                           n_thin = 20,
+                           n_thin = 10,
                            seed = 101),
                cue = run_slow()
                ),
@@ -424,7 +463,7 @@ list(data_input_targets,
                                        ub_gainloss = gainloss_priors$ub),
                            n_burnin = 4000,
                            n_iter = 84000,
-                           n_thin = 20,
+                           n_thin = 10,
                            seed = 101)
                ),
     tar_map(

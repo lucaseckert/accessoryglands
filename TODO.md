@@ -1,3 +1,11 @@
+## BMB
+
+* fuss with transition plots -- label on legend?
+* fuss with flowfig - tikz for better circled labels?
+https://tex.stackexchange.com/questions/7032/good-way-to-make-textcircled-numbers
+* subscripts in output table?
+* clean up LRT diagram (SVG + Inkscape?)
+
 ## BMB (27 July 2022)
 
 https://docs.google.com/document/d/1caLrGnvanUawtSbiyjJ8PkL6JkecZX5f/edit?usp=sharing&ouid=115557938223853461511&rtpof=true&sd=true

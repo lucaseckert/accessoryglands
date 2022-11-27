@@ -2,7 +2,7 @@ pkgList <- c("abind", "bbmle", "bookdown", "broom.mixed", "caper", "coda",
              "colorspace", "corHMM", "cowplot", "diagram", "diagram", "diversitree", 
              "emdbook", "fishtree", "GGally", "ggmosaic", "ggnewscale", "ggthemes", 
              "ggtree", "glue", "hues", "igraph", "latticeExtra", "Matrix", 
-             "nloptr", "numDeriv", "patchwork", "phytools", "ramcmc", "remotes", 
+             "nloptr", "numDeriv", "patchwork", "phangorn", "phytools", "ramcmc", "remotes", 
              "tarchetypes", "targets", "tidyverse", "visNetwork")
 
 ## packages to install from GitHub (username, reponame)
@@ -129,6 +129,11 @@ mk_idf <- function(index.mat) {
                    index=c(na.omit(c(index.mat))))
   return(df)
 }
+
+## my.legend <- packGrob(
+##     draw.colorkey(key=list(col = rainbow, at = do.breaks(range(z),100))), 
+##     textGrob("My title", x = 0, y = 0.5, just = c("left", "centre")), 
+##     height=unit(2, "lines"),side="top", dynamic=TRUE)
 
 ##' utility to plot transition matrix
 ##' @param x transition matrix
@@ -782,4 +787,15 @@ if (FALSE) {
                         ## zero out interactions
                         fixed_vals = c(pcxsc_loss = 0, pcxsc_gain = 0),
                         optControl = list(maxit = 20000, trace = 2))
+}
+
+latex_mat <- function(m, align = "r") {
+    hdr <- c("\\left[",
+             sprintf("\\begin{array}{%s}", paste(rep(align, ncol(m)), collapse = "")))
+    body <- character(nrow(m))
+    for (i in seq(nrow(m))) {
+        body[i] <- paste(paste(m[i,], collapse = " & "), "\\\\")
+    }
+    tail <- c("\\end{array}", "\\right]")
+    c(hdr, body, tail)
 }

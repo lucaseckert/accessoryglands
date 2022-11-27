@@ -1,11 +1,13 @@
 ---
-title: "accessory gland model: Bayesian diagnostics"
+title: "Supplementary material: Bayesian diagnostics for 'Parental care drives the evolution of reproductive accessory glands in ray-finned fishes'"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
 author: "Ben Bolker and Lucas Eckert"
 output:
   html_document:
     code_folding: hide
 ---
+
+All versions of the 12-parameter model were run using 8 chains with 84,000 iterations each with a burn-in of 4000 iterations (with a thinning factor of 10, for a total of 64000 samples). The full 24-parameter model was run similarly, but for 144,000 steps. Runs took approximately 12 hours on a modern Linux workstation.
 
 ```{r setup, message=FALSE}
 source("R/utils.R")
