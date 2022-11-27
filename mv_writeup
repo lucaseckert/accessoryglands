@@ -1,2 +1,0 @@
-#!/bin/bash
-scp ag_model.html ms.mcmaster.ca:~/public_html/misc

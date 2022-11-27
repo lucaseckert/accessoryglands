@@ -11,12 +11,33 @@ Phylogenetic comparative analysis on the evolution of reproductive accessory gla
    - specify priors and do MCMC computation
    - plot/interpret results
 
-## documents
+## contents
+
+### documents
 
 - `ag_bayesdiag.rmd`: Bayes diagnostics for MCMC fits ([link](http://www.math.mcmaster.ca/bolker/AG/ag_bayesdiag.html))
 - `ag_supp.rmd`: supplementary material ([link](http://www.math.mcmaster.ca/bolker/AG/ag_supp.html))
 - `ag_tech.rmd`: tech overview document (????)
 - `ag_model.rmd`: mostly obsolete
+- `corHMM.bib`: bibliography for paper/supp
+
+### input files
+
+- `contr*.csv`: definitions of contrast matrices for different cases. Use `source("R/utils.R"); tar_load(<R_object>); iplot(<R_object>)` to view them.
+    - `contr_full.csv`: contrast matrix for full (24-parameter) model (R object `contrast_mat_full`)
+	- `contr.csv`: 12-parameter model, including contrasts for *net* gain of AGs (gain - loss) (R object `contrast_mat_0`)
+	- `contr_invertible.csv`: 12-parameter model with gain, loss, and including simple (1-to-1) contrasts for transitions in spawning mode and male care
+
+
+
+
+### other folders
+
+- `bayestraits`: explorations of `BayesTraits`
+   - `test_btw.R`: preliminary tests of `btw` package (BayesTraits R interface)
+   - `BTrefs.xls`: papers using BayesTraits with some added information about what priors were used in the papers, how inference was done, etc..
+- `junk`: Miscellaneous old explorations etc.
+- `twotraits`: code for two-trait analyses (comparisons with LE's thesis)
 
 ## getting started
 

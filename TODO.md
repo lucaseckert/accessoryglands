@@ -5,12 +5,11 @@
 https://tex.stackexchange.com/questions/7032/good-way-to-make-textcircled-numbers
 * subscripts in output table?
 * clean up LRT diagram (SVG + Inkscape?)
+* 
 
 ## BMB (27 July 2022)
 
 https://docs.google.com/document/d/1caLrGnvanUawtSbiyjJ8PkL6JkecZX5f/edit?usp=sharing&ouid=115557938223853461511&rtpof=true&sd=true
-
-* improve diagram of transitions? (is figure from Supp good enough?  Note each 4x4 diagonal block has the same structure as the Pagel 4x4 model). Cube diagram? Pictures from https://stats.stackexchange.com/questions/139384/random-walk-on-the-edges-of-a-cube ?
 
 ### Main paper
 
