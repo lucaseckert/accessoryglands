@@ -96,7 +96,7 @@ ggplot(countsum) + geom_histogram(aes(x=value), binwidth = 0.25, colour = "white
 
 <!-- use ape::getMRCA() to identify families and geom_cladelab() ... ?? -->
 
-```{r densitree, fig.cap = "densitree-style mapping of tree blocks/phylogenetic uncertainty [bouckaertDensiTree2010]", cache=TRUE}
+```{r densitree, fig.cap = "densitree-style mapping of tree blocks/phylogenetic uncertainty [@bouckaertDensiTree2010]", cache=TRUE}
 targets::tar_load(treeblock)
 mp <- do.call("c", treeblock)
 ggtree::ggdensitree(mp, layout = "radial", alpha = 0.02)
@@ -460,7 +460,7 @@ plotmat(A, curve = 0,
         pos = matrix(c(1,1,2,1)))
 ```
 
-```{r lrtest-plot-svg}
+```{r lrtest-plot-svg, results = "hide"}
 svg("lrt_comp.svg")
 plotmat(A, curve = 0,
         ## pcsc_add box in second row needs to be wider/larger

@@ -60,6 +60,7 @@ col_order_full|stem|col_order_full|0|skipped
 contrast_mat_full|stem|contrast_mat_full|0|skipped
 full_contr_ci|stem|full_contr_ci|0|skipped
 all_contr_ci|stem|all_contr_ci|0|skipped
-ag_supp_html|stem|ag_supp_html|0|skipped
+ag_supp_html|stem|ag_supp_html|0|started
+ag_supp_html|stem|ag_supp_html|0|built
 traceplot_full|stem|traceplot_full|0|skipped
 ag_bayesdiag_html|stem|ag_bayesdiag_html|0|skipped
