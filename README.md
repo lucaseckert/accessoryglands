@@ -28,8 +28,13 @@ Phylogenetic comparative analysis on the evolution of reproductive accessory gla
 	- `contr.csv`: 12-parameter model, including contrasts for *net* gain of AGs (gain - loss) (R object `contrast_mat_0`)
 	- `contr_invertible.csv`: 12-parameter model with gain, loss, and including simple (1-to-1) contrasts for transitions in spawning mode and male care
 
+### data files (`data/` directory)
 
-
+- `accessTree.R`: extract phylogenies via `fishtree` package, given data
+- `cleanTraitData.csv`: trait data in full format
+- `binaryTraitData.csv`: trait data collapsed to binary (0/1) for traits
+- `treeBlock.rds`: tree block (100 imputed trees)
+- `treeSingle.rds`: phylogeny only for complete genetic data
 
 ### other folders
 
@@ -45,14 +50,6 @@ Phylogenetic comparative analysis on the evolution of reproductive accessory gla
 source("R/utils.R")
 install_pkgs()
 ```
-Files:
-
-- `accessTree.R`
-- `binaryTraitData.csv`
-- `cleanTraitData.csv`
-- `treeBlock.rds`
-- `treeSingle.rds`
-
 
 ## making stuff
 
