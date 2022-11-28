@@ -17,3 +17,5 @@ figures: flowfig.R R/plotmat.R figures.R
 flowfig: flowfig.R R/plotmat.R figures.R
 	R CMD BATCH --vanilla flowfig.R
 
+clean:
+	rm -f *.aux *.log *.Rout *.tikz
