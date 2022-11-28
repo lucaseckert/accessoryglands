@@ -901,9 +901,10 @@ mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
     }
 
     ## protect
+    ## (don't need if latex=TRUE)
     if (tikz) {
-        rownames(R) <- rownames(R2) <- gsub("_", "\\\\_", rownames(R))
-        colnames(R) <- colnames(R2) <- gsub("_", "\\\\_", colnames(R))
+         rownames(R) <- rownames(R2) <- gsub("_", ".", rownames(R))
+         colnames(R) <- colnames(R2) <- gsub("_", ".", colnames(R))
     }
 
     mkplot <- function(mat = R, C = C1) {
@@ -939,6 +940,7 @@ tikz <- function(file, ...) {
 
 enc_line <- "\\newcommand\\encircle[1]{ \\tikz[baseline=(X.base)]  \\node (X) [draw, shape=circle, inner sep=0] {\\strut #1};}"
 
+library(tikzDevice)
 tLP <- getOption("tikzLatexPackages")
 if (!any(grepl("encircle", tLP))) {
     options("tikzLatexPackages" = c(tLP,
