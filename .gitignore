@@ -22,3 +22,6 @@ flowfig.png
 flowfig.pdf
 fig2.png
 Rplots.pdf
+*.aux
+*.log
+*.tikz

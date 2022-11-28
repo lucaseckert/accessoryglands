@@ -799,3 +799,153 @@ latex_mat <- function(m, align = "r") {
     tail <- c("\\end{array}", "\\right]")
     c(hdr, body, tail)
 }
+
+mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
+                       nmag = 0.04, with_labs = FALSE) {
+    M <- model$solution
+    R <- model$args.list$rate
+    dimnames(R) <- dimnames(M)
+    col_vec1 <- rep(NA, max(R)-1)
+    R[R==max(R)] <- NA
+
+    ## constrained model colour vectors
+    ## 12-parameter model
+    ## match by name ...
+    ## up_down_ind == all arrows between equal ag*
+    ag_labs <- substr(colnames(R), 1, 3)
+    updown <- outer(ag_labs, ag_labs, "==")
+    up_down_ind <- sort(unique(R[!is.na(R) & updown])) ## c(1,2,4,6) 
+    col_vec1[up_down_ind] <- gray(c(0, 0.3, 0.6, 0.9))
+    col_vec1[-up_down_ind] <- qualitative_hcl(8)
+    C1 <- c(R)
+    C1 <- col_vec1[C1] ## map colors to indices
+    dim(C1) <- dim(R)
+
+    ## pc-only model
+    col_vec2 <- col_vec1
+    pc_pairs <- list(c(5, 6), c(7, 8), c(1, 2), c(3, 4))
+    for (i in seq_along(pc_pairs)) {
+        col_vec2[pc_pairs[[i]][2]] <- col_vec2[pc_pairs[[i]][1]]
+    }
+    C2 <- c(R)
+    C2 <- col_vec2[C2] ## map colors to indices
+    dim(C2) <- dim(R)
+
+    ## sc-only model
+    col_vec3 <- col_vec1
+    sc_pairs <- list(c(5, 7), c(6, 8), c(1, 3), c(2, 4))
+    for (i in seq_along(sc_pairs)) {
+        col_vec3[sc_pairs[[i]][2]] <- col_vec3[sc_pairs[[i]][1]]
+    }
+    C3 <- c(R)
+    C3 <- col_vec2[C3] ## map colors to indices
+    dim(C3) <- dim(R)
+
+    mksymm <- function(X) {
+        eqzero <- function(z) !is.na(z) && z == 0
+        for (i in 1:nrow(X)) {
+            for (j in 1:ncol(X)) {
+                if (eqzero(X[i,j]) && !eqzero(X[j,i])) {
+                    X[i,j] <- X[j,i]
+                }
+                if (eqzero(X[j,i]) && !eqzero(X[i,j])) {
+                    X[j,i] <- X[i,j]
+                }
+            }
+        }
+        X
+    }
+
+    ## nudges for arrows
+    Nx <- M
+    Nx[!is.na(Nx)] <- 0
+    Ny <- Nx
+
+    ## outer up/down arrows: nudge L/R
+    Nx[matrix(c("ag1_pc1_sc0", "ag1_pc0_sc0",
+                "ag1_pc1_sc1", "ag1_pc0_sc1"),
+              byrow = TRUE, ncol = 2)] <- c(-nmag, nmag)
+    Nx <- mksymm(Nx)
+    ## outer L/R arrows: nudge up/down
+    Ny[matrix(c("ag1_pc1_sc0", "ag1_pc1_sc1",
+                "ag1_pc0_sc0", "ag1_pc0_sc1"),
+              byrow = TRUE, ncol = 2)] <- c(nmag, -nmag)
+    Ny <- mksymm(Ny)
+
+    ## turn off arrow labels
+    storage.mode(R) <- "character"
+    R[!is.na(R)] <- ""
+
+    ## node arrangement
+    ## hack (reverse order)
+    vals <- expand.grid(sc=0:1, pc=0:1, ag=0:1)[,3:1]
+    ## put nodes on flattened hypercube
+    ##  (ag=0 inner square, ag = 1 outer square
+
+    box_mag <- vals$ag+0.5
+    shift <- c(0.3, 0.5)
+    xval <- with(vals, (sc-0.5)*box_mag)
+    yval <- with(vals, (pc-0.5)*box_mag)
+    pos <- cbind(xval, yval)
+    pos2 <- (pos-min(pos) + shift[1])/(diff(range(pos))*(1+shift[2]))
+
+    
+    ## labels on subset of arrows (for constraint example)
+    R2 <- R
+    from <- sprintf("ag0_pc%d_sc%d", rep(0:1,2), rep(0:1, each=2))
+    to <-   sprintf("ag1_pc%d_sc%d", rep(0:1,2), rep(0:1, each=2))
+    if (!tikz) {
+        R2[cbind(from, to)] <- LETTERS[1:4]
+    } else {
+        R2[cbind(from, to)] <- sprintf("\\encircle{%s}", LETTERS[1:4])
+    }
+
+    ## protect
+    if (tikz) {
+        rownames(R) <- rownames(R2) <- gsub("_", "\\\\_", rownames(R))
+        colnames(R) <- colnames(R2) <- gsub("_", "\\\\_", colnames(R))
+    }
+
+    mkplot <- function(mat = R, C = C1) {
+        plotmat(mat, pos = pos2, xlim = c(-3,3),
+                ## arr.lwd = sqrt(M/50),
+                box.type = "ellipse", box.prop = 0.5,
+                arr.lcol = C, arr.col = C,
+                arr.nudge.x = Nx,
+                arr.nudge.y = Ny,
+                latex = tikz)
+    }
+    
+    if (!with_labs) {
+        mkplot()
+    } else {
+        ## with labels, for supp/contrast explanation
+        pp <- mkplot(R2, C1)
+        w <- nzchar(na.omit(c(R2)))
+        if (!tikz) {
+            ## not quite sure why this fussing is required
+            nx <- 0.015*c(0.75,0.75,-0.75,-1)
+            ny <- 0.015*c(-0.9,0.9,0.9,0)
+            with(pp$arr, mapply(plotrix::draw.circle, TextX[w]+nx, TextY[w]+ny,
+                                MoreArgs=list(radius=0.025)))
+        }
+    }
+    invisible(NULL)
+}
+
+tikz <- function(file, ...) {
+    tikzDevice::tikz(file, ..., standAlone = TRUE)
+}
+
+enc_line <- "\\newcommand\\encircle[1]{ \\tikz[baseline=(X.base)]  \\node (X) [draw, shape=circle, inner sep=0] {\\strut #1};}"
+
+tLP <- getOption("tikzLatexPackages")
+if (!any(grepl("encircle", tLP))) {
+    options("tikzLatexPackages" = c(tLP,
+                                    enc_line))
+}
+
+## tikz_insert <- function(file, str = enc_line, line = 12) {
+##     system(sprintf("sed '%d i %s' %s", line = , str, file))
+## }
+

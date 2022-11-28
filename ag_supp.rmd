@@ -472,7 +472,7 @@ plotmat(A, curve = 0,
 dev.off()
 ```
 
-The p-values quoted in the paper are from comparing the full model
+	The p-values quoted in the paper are from comparing the full model
 with interactions to the `pc` and `sc` models. These comparisons are
 analogous to "type 3" tests in ANOVA [@fox_r_2018], which are the 
 most commonly used approach in the biological literature. "Type 2"
