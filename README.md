@@ -41,7 +41,7 @@ Phylogenetic comparative analysis on the evolution of reproductive accessory gla
 - `bayestraits`: explorations of `BayesTraits`
    - `test_btw.R`: preliminary tests of `btw` package (BayesTraits R interface)
    - `BTrefs.xls`: papers using BayesTraits with some added information about what priors were used in the papers, how inference was done, etc..
-- `junk`: Miscellaneous old explorations etc.
+- `old`: Miscellaneous old explorations etc.
 - `twotraits`: code for two-trait analyses (comparisons with LE's thesis)
 
 ## getting started
