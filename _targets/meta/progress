@@ -61,5 +61,6 @@ mod_list|stem|mod_list|0|skipped
 all_ci|stem|all_ci|0|skipped
 ag_old_rmd|stem|ag_old_rmd|0|skipped
 all_contr_ci|stem|all_contr_ci|0|skipped
-ag_supp_html|stem|ag_supp_html|0|skipped
+ag_supp_html|stem|ag_supp_html|0|started
+ag_supp_html|stem|ag_supp_html|0|built
 comp_ci|stem|comp_ci|0|skipped

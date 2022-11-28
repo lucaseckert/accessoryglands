@@ -6,6 +6,7 @@ source("R/functions.R")
 source("R/mcmc.R")
 options(tidyverse.quiet = TRUE)
 grDevices::X11.options(type = "cairo")
+options(bitmapType = "cairo")
 tar_option_set(packages = pkgList)
 
 ## prevent parallelization from getting out of hand

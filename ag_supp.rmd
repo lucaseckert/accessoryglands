@@ -24,7 +24,6 @@ library(targets)
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-
 ```{r load}
 tar_load(ag_model_pcsc)
 tar_load(ag_model_full)
@@ -450,18 +449,15 @@ A["sc","pcsc"] <- anfun(ag_model_pcsc, ag_model_sc)
 C <- matrix(0, nrow=nrow(A), ncol = ncol(A))
 C[!is.na(A)] <- seq(sum(!is.na(A)))
 ```
-```{r lrtest-plot, fig.width = 7, fig.height = 10, fig.cap = "likelihood ratio test comparisons"}
-plotmat(A, curve = 0,
-        ## pcsc_add box in second row needs to be wider/larger
-        box.size = c(0.05, 0.1, 0.05, 0.05),
-        box.prop = c(0.5, 0.25, 0.5, 0.5),
-        arr.lcol = C,
-        arr.tcol = C,
-        pos = matrix(c(1,1,2,1)))
+
+<!-- figure produced as SVG, edited to adjust label positions -->
+
+```{r lrtest-plot, fig.cap = "likelihood ratio test comparisons"}
+knitr::include_graphics("pix/lrt_comp.png")
 ```
 
 ```{r lrtest-plot-svg, results = "hide"}
-svg("lrt_comp.svg")
+svg("lrt_comp.svg", width = 18, height = 10)
 plotmat(A, curve = 0,
         ## pcsc_add box in second row needs to be wider/larger
         box.size = c(0.05, 0.1, 0.05, 0.05),
@@ -472,7 +468,7 @@ plotmat(A, curve = 0,
 dev.off()
 ```
 
-	The p-values quoted in the paper are from comparing the full model
+The p-values quoted in the paper are from comparing the full model
 with interactions to the `pc` and `sc` models. These comparisons are
 analogous to "type 3" tests in ANOVA [@fox_r_2018], which are the 
 most commonly used approach in the biological literature. "Type 2"
