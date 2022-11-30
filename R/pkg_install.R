@@ -18,7 +18,7 @@ GH_core_pkgs <- list(c("bbolker","corHMM"),    ## hacked/BMB version
 
 GH_pix_pkgs <- list(c("YuLab-SMU","ggtree"))
 
-GH_pkgs <- c(GH_core_pkgs, GH_pix_pkgs)
+GH_pkgs <- sapply(c(GH_core_pkgs, GH_pix_pkgs), function(x) x[2])
 
 all_pkgs <- c(CRAN_pkgs, GH_pkgs)
 
