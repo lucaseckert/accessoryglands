@@ -371,8 +371,8 @@ list(data_input_targets,
                         contrast_mat = contrast_mat_inv)
             %>% bind_rows(full_contr_ci)
             %>% bind_rows((tidy(ag_model_pcsc_add, conf.int = TRUE)
-                |> mutate(method = "model_pcsc_add")
-                |> rename(lwr = "conf.low", upr = "conf.high")))
+                %>% mutate(method = "model_pcsc_add")
+                %>% rename(lwr = "conf.low", upr = "conf.high")))
             ## FIXME: gsub("model", "corhmm" OR "mle", method) ...
         )
     ),
