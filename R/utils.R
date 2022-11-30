@@ -938,11 +938,13 @@ tikz <- function(file, ...) {
 
 enc_line <- "\\newcommand\\encircle[1]{ \\tikz[baseline=(X.base)]  \\node (X) [draw, shape=circle, inner sep=0] {\\strut #1};}"
 
-library(tikzDevice)
-tLP <- getOption("tikzLatexPackages")
-if (!any(grepl("encircle", tLP))) {
-    options("tikzLatexPackages" = c(tLP,
-                                    enc_line))
+## need tikzDevice to create these definitions, but want to define pkg_install() ...
+if (require("tikzDevice")) {
+    tLP <- getOption("tikzLatexPackages")
+    if (!any(grepl("encircle", tLP))) {
+        options("tikzLatexPackages" = c(tLP,
+                                        enc_line))
+    }
 }
 
 ## tikz_insert <- function(file, str = enc_line, line = 12) {
