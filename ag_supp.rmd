@@ -1,13 +1,17 @@
 ---
 title: "Supplementary material for 'Parental care drives the evolution of reproductive accessory glands in ray-finned fishes'"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
-author: "Ben Bolker and Lucas Eckert"
 bibliography: corHMM.bib
 output:
+  pdf_document:
+    toc: true
+    toc_depth: 2
+    includes:
+      in_header: "preamble.tex"
   bookdown::html_document2:
     toc: true
     toc_depth: 2
-    number_sections: true	
+    number_sections: true
 ---
 
 <!-- disable code folding entirely if not building as HTML? --  'r ifelse(knitr::is_html_output(),"hide", ...)' -->
@@ -21,8 +25,12 @@ load_pkgs()
 zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
 theme_set(theme_bw())
 library(targets)
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, dpi = 200, optipng = knitr::hook_optipng)
+options(bitmapType = "cairo")
 ```
+
+<!-- use PNG for heavy graphics to avoid blowing up file size.
+  -- see https://bookdown.org/yihui/rmarkdown-cookbook/optipng.html for info on installing OptiPNG-->
 
 ```{r load}
 tar_load(ag_model_pcsc)
@@ -95,7 +103,7 @@ ggplot(countsum) + geom_histogram(aes(x=value), binwidth = 0.25, colour = "white
 
 <!-- use ape::getMRCA() to identify families and geom_cladelab() ... ?? -->
 
-```{r densitree, fig.cap = "densitree-style mapping of tree blocks/phylogenetic uncertainty [@bouckaertDensiTree2010]", cache=TRUE}
+```{r densitree, fig.cap = "densitree-style [@bouckaertDensiTree2010] mapping of tree blocks/phylogenetic uncertainty ", cache=TRUE, dev = "png", optipng = "-o7"}
 targets::tar_load(treeblock)
 mp <- do.call("c", treeblock)
 ggtree::ggdensitree(mp, layout = "radial", alpha = 0.02)
@@ -127,8 +135,8 @@ cowplot::plot_grid(plot(ag_model_full, pnum_col = pc,
 
 ## Transitions
 
-```{r contrast-diag, echo = FALSE, out.width = 500, out.height = 500, fig.cap = "Transitions for the reduced (12-parameter) model. As in Figure 1 in the main text: Sets of connections drawn with the same colours are constrained to identical evolutionary rates (e.g. light gray downward arrows, representing loss of male parental care – all transitions from “pc1” to the corresponding “pc0” state). Top-bottom and left-right transitions, representing loss/gain of parental care and transitions between pair spawning and group spawning, are assumed to be independent of other trait values. Loss/gain of accessory glands (diagonal arrows), which are our primary interest, are all estimated separately (8 different colours for arrows representing loss/gain of accessory glands under the 4 different combinations of the other two traits, parental  care and spawning mode)."}
-knitr::include_graphics("flowfig2.png")
+```{r contrast-diag, echo = FALSE, out.width = '6in', out.height = '6in', fig.cap = "Transitions for the reduced (12-parameter) model. As in Figure 1 in the main text: Sets of connections drawn with the same colours are constrained to identical evolutionary rates (e.g. light gray downward arrows, representing loss of male parental care – all transitions from “pc1” to the corresponding “pc0” state). Top-bottom and left-right transitions, representing loss/gain of parental care and transitions between pair spawning and group spawning, are assumed to be independent of other trait values. Loss/gain of accessory glands (diagonal arrows), which are our primary interest, are all estimated separately (8 different colours for arrows representing loss/gain of accessory glands under the 4 different combinations of the other two traits, parental  care and spawning mode)."}
+knitr::include_graphics("flowfig2.pdf")
 ```
 
 The transitions denoted A-D all represent gains of accessory glands, under different combinations of male care/spawning mode. Arrows A and B both represent AG gains in states with pair spawning (`sc0`); C and D both represent states in states with group spawning (`sc1`). Thus rate(pair) = (rate(A) + rate(B))/2 is the average rate of AG gain under pair spawning; rate(group) = (rate(C) + rate(D))/2 is the average rate under group spawning; and rate(group)-rate(pair) is the *contrast*, which we can think of as "the effect of group vs pair spawning on the rate of AG gain". We can similarly compute other combinations such as rate(no male care) (`pc0`) = (rate(B) + rate(D))/2; rate(male care)  (`pc1`)  = (rate(A) + rate(C))/2; and contrast(male care) = rate(male care) - rate(no male care).
@@ -453,7 +461,7 @@ C[!is.na(A)] <- seq(sum(!is.na(A)))
 <!-- figure produced as SVG, edited to adjust label positions -->
 
 ```{r lrtest-plot, fig.cap = "likelihood ratio test comparisons"}
-knitr::include_graphics("pix/lrt_comp.png")
+knitr::include_graphics("pix/lrt_comp.pdf")
 ```
 
 ```{r lrtest-plot-svg, results = "hide"}
@@ -651,6 +659,112 @@ We can draw a variety of conclusions from these results.
 - `mcmc_tb` vs. `model_pcsc`: the 12-parameter model is too poorly constrained to draw conclusions from the parameter estimates; this agrees with the likelihood ratio and IC tests above, which indicate that the additive model is preferred to the interaction model.
 - `model_pcsc` vs. `model_pcsc_add`: constraining the model slightly by removing the interaction terms helps a little bit - now we get a point estimate and confidence intervals for the `pc_gain` parameter that agrees reasonably well with the full Bayesian fits - but most of the other parameters of interest are still unidentifiable (large confidence intervals/failure of the Wald approximation). The estimates of the rates of gain and loss of the non-focal traits are well identified, but not of interest.
 - `mcmc_tb` vs. `model_pcsc_prior`: when we add the prior information to the MLE fit, we get point estimates, and CIs, that are very close to those from the primary (`mcmc_tb`) model.
+
+# Technical details of Bayesian computations
+
+## MCMC run parameters
+
+All versions of the 12-parameter model were run using 8 chains with 84,000 iterations each with a burn-in of 4000 iterations (with a thinning factor of 10, for a total of 64000 samples). The full 24-parameter model was run similarly, but for 144,000 steps. For each model, runs took approximately 12-24 hours on 8 cores on a modern Linux workstation.
+
+```{r setup_bayes, message=FALSE}
+source("R/utils.R")
+source("R/mcmc.R")
+source("R/functions.R")
+source("R/monitornew.R")
+load_pkgs()
+zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
+theme_set(theme_bw())
+library(targets)
+```
+
+For each model type we show the traceplots; the improved $\hat R$ statistics according to @lambertRobust2022; and a pairs plot of the posterior distributions with hexbin plots of the samples in the lower triangle; kernel density estimates of the marginal posterior density for each parameter on the diagonal; and highest posterior density regions in the upper triangle.
+
+## Fish-phylo model
+
+This is the model that uses only the full/known phylogeny. (Probably irrelevant.)
+
+```{r bayes_traceplot, fig.width=8, fig.height=8, dev = "png", optipng = "-o7"}
+tar_load(traceplot_0)
+print(traceplot_0)
+```
+
+```{r improved_rhat}
+tar_load(ag_mcmc0)
+aa <- do.call(abind, c(ag_mcmc0, list(along=3)))
+aa2 <- aperm(aa,c(1,3,2), resize=TRUE)
+monitor(aa2)
+```
+
+```{r bayes_pairs, fig.width=10, fig.height=10, echo=FALSE, eval=FALSE}
+pairs(as.matrix(ag_mcmc0), gap = 0, pch = ".")
+```
+
+```{r bayes_pairs2, fig.width=10, fig.height=10, cache=TRUE}
+tar_load(mc_pairsplots_0)
+knitr::include_graphics('pix/mcmc_pairs_0.png')
+```
+
+Contour levels are: 50%, 80% 90%, 95% (largest) highest posterior density regions.
+
+
+## Treeblock model (12 parameters)
+
+The model that samples over the 'tree block' (sample of phylogeny reconstructions)
+
+```{r traceplot_tb, fig.width=8, fig.height=8, dev = "png", optipng = "-o7"}
+tar_load(traceplot_tb)
+print(traceplot_tb)
+```
+
+```{r improved_rhat_tb}
+tar_load(ag_mcmc_tb)
+aa <- do.call(abind, c(ag_mcmc_tb, list(along=3)))
+aa2 <- aperm(aa,c(1,3,2), resize=TRUE)
+monitor(aa2)
+```
+
+```{r bayes_pairs_tb, fig.width=10, fig.height=10, cache=TRUE}
+tar_load(mc_pairsplots_tb)
+knitr::include_graphics('pix/mcmc_pairs_tb.png')
+```
+
+## Full model (24 parameters)
+
+```{r traceplot_full, fig.width=8, fig.height=8, dev = "png", optipng = "-o7"}
+tar_load(traceplot_full)
+print(traceplot_full)
+```
+
+```{r improved_rhat_full}
+tar_load(ag_mcmc_full)
+aa <- do.call(abind, c(ag_mcmc_full, list(along=3)))
+aa2 <- aperm(aa,c(1,3,2), resize=TRUE)
+monitor(aa2)
+```
+
+```{r bayes_pairs_full, fig.width=10, fig.height=10, cache=TRUE}
+tar_load(mc_pairsplots_full)
+knitr::include_graphics('pix/mcmc_pairs_full.png')
+```
+
+## No gain/loss priors
+
+```{r traceplot_tb_nogainloss, fig.width=8, fig.height=8, dev = "png", optipng = "-o7"}
+tar_load(traceplot_tb_nogainloss)
+print(traceplot_tb_nogainloss)
+```
+
+```{r improved_rhat_tb_nogainloss}
+tar_load(ag_mcmc_tb_nogainloss)
+aa <- do.call(abind, c(ag_mcmc_tb_nogainloss, list(along=3)))
+aa2 <- aperm(aa,c(1,3,2), resize=TRUE)
+monitor(aa2)
+```
+
+```{r bayes_pairs_tb_nogainloss, fig.width=10, fig.height=10, cache=TRUE}
+tar_load(mc_pairsplots_tb_nogainloss)
+knitr::include_graphics('pix/mcmc_pairs_tb_nogainloss.png')
+```
 
 # References
 

@@ -17,5 +17,8 @@ figures: flowfig.R R/plotmat.R figures.R
 flowfig: flowfig.R R/plotmat.R figures.R
 	R CMD BATCH --vanilla flowfig.R
 
+ag_supp.pdf: ag_supp.rmd
+	Rscript -e "rmarkdown::render('ag_supp.rmd', output_format = 'pdf_document')"
+
 clean:
 	rm -f *.aux *.log *.Rout *.tikz

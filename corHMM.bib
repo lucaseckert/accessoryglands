@@ -207,3 +207,21 @@ Publisher: Nature Publishing Group},
   doi = {10.1093/bioinformatics/btq110},
   abstract = {Motivation: Bayesian analysis through programs like BEAST (Drummond and Rumbaut, 2007) and MrBayes (Huelsenbeck et al., 2001) provides a powerful method for reconstruction of evolutionary relationships. One of the benefits of Bayesian methods is that well-founded estimates of uncertainty in models can be made available. So, for example, not only the mean time of a most recent common ancestor (tMRCA) is estimated, but also the spread. This distribution over model space is represented by a set of trees, which can be rather large and difficult to interpret. DensiTree is a tool that helps navigating these sets of trees.Results: The main idea behind DensiTree is to draw all trees in the set transparently. As a result, areas where a lot of the trees agree in topology and branch lengths show up as highly colored areas, while areas with little agreement show up as webs. This makes it possible to quickly get an impression of properties of the tree set such as well-supported clades, distribution of tMRCA and areas of topological uncertainty. Thus, DensiTree provides a quick method for qualitative analysis of tree sets.Availability: DensiTree is freely available from http://compevol.auckland.ac.nz/software/DensiTree/. The program is licensed under GPL and source code is available.Contact:remco@cs.auckland.ac.nz}
 }
+
+@article{lambertRobust2022,
+  title = {{$R_\ast}$}: A Robust {MCMC} Convergence Diagnostic with Uncertainty Using Decision Tree Classifiers},
+  shorttitle = {{{R}}{${_\ast}$}},
+  author = {Lambert, Ben and Vehtari, Aki},
+  year = {2022},
+  month = jun,
+  journal = {Bayesian Analysis},
+  volume = {17},
+  number = {2},
+  pages = {353--379},
+  publisher = {{International Society for Bayesian Analysis}},
+  issn = {1936-0975, 1931-6690},
+  doi = {10.1214/20-BA1252},
+  abstract = {Markov chain Monte Carlo (MCMC) has transformed Bayesian model inference over the past three decades: mainly because of this, Bayesian inference is now a workhorse of applied scientists. Under general conditions, MCMC sampling converges asymptotically to the posterior distribution, but this provides no guarantees about its performance in finite time. The predominant method for monitoring convergence is to run multiple chains and monitor individual chains' characteristics and compare these to the population as a whole: if within-chain and between-chain summaries are comparable, then this is taken to indicate that the chains have converged to a common stationary distribution. Here, we introduce a new method for diagnosing convergence based on how well a machine learning classifier model can successfully discriminate the individual chains. We call this convergence measure R{${_\ast}$}. In contrast to the predominant R\textasciicircum, R{${_\ast}$} is a single statistic across all parameters that indicates lack of mixing, although individual variables' importance for this metric can also be determined. Additionally, R{${_\ast}$} is not based on any single characteristic of the sampling distribution; instead it uses all the information in the chain, including that given by the joint sampling distribution, which is currently largely overlooked by existing approaches. We recommend calculating R{${_\ast}$} using two different machine learning classifiers \textemdash{} gradient-boosted regression trees and random forests \textemdash{} which each work well in models of different dimensions. Because each of these methods outputs a classification probability, as a byproduct, we obtain uncertainty in R{${_\ast}$}. The method is straightforward to implement and could be a complementary additional check on MCMC convergence for applied analyses.},
+  file = {/home/bolker/Zotero/storage/RX9L2CNB/Lambert and Vehtari - 2022 - R∗ A Robust MCMC Convergence Diagnostic with Unce.pdf}
+}
+
