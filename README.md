@@ -6,8 +6,13 @@ Phylogenetic comparative analysis on the evolution of reproductive accessory gla
 
 ### getting started
 
+A recent version of R (i.e. 4.2.0 or higher) and updating your packages is strongly recommended (`update.packages()`). You will probably need to have compilation tools installed on your system, for installing R packages from source.
+
+If you want to make everything including all of the pictures in the supplementary material you
+
 ```r
 if (!require("remotes")) install.packages("remotes")
+detach("package:remotes")
 source("R/pkg_install.R")
 install_pkgs()
 ```

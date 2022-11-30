@@ -1,8 +1,4 @@
 
-## redundant with `tar_option_set(packages = pkgList)` ?
-load_pkgs <- function() {
-  invisible(lapply(pkgList, library, character.only = TRUE))
-}
 
 ##' utility function for hexbin panels for MCMC pairs plot
 ##' @param data ...
