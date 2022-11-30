@@ -1,30 +1,3 @@
-pkgList <- c("abind", "bbmle", "bookdown", "broom.mixed", "caper", "coda", 
-             "colorspace", "corHMM", "cowplot", "diagram", "diagram", "diversitree", 
-             "emdbook", "fishtree", "GGally", "ggmosaic", "ggnewscale", "ggthemes", 
-             "ggtree", "glue", "hues", "igraph", "latticeExtra", "Matrix", 
-             "nloptr", "numDeriv", "patchwork", "phangorn", "phytools", "ramcmc", "remotes", 
-             "tarchetypes", "targets", "tidyverse", "tikzDevice", "visNetwork")
-
-## packages to install from GitHub (username, reponame)
-GH_pkgs <- list(c("bbolker","corHMM"),    ## hacked/BMB version
-                c("YuLab-SMU","ggtree"),
-                c("bbolker","btw")       ## BayesTree interface (hacked/BMB version)
-                )
-
-base_pkgs <- "Matrix"
-##' install uninstalled pkgs from pkgList and GH_pkgs
-##' FIXME: use renv() ?
-install_pkgs <- function() {
-    ip <- installed.packages()
-    to_install <- setdiff(pkgList,
-                          ## skip installed packages and GitHub packages
-                          c(rownames(ip),
-                            purrr::map_chr(GH_pkgs, ~.[2])))
-    install.packages(to_install)
-    ## since install_github checks hashes, don't bother checking whether already installed
-    purrr::map(GH_pkgs, ~remotes::install_github(paste(.[[1]], .[[2]], sep = "/")))
-    return(invisible(NULL))
-}
 
 ## redundant with `tar_option_set(packages = pkgList)` ?
 load_pkgs <- function() {

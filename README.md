@@ -2,6 +2,52 @@
 
 Phylogenetic comparative analysis on the evolution of reproductive accessory glands in fishes.
 
+## running the project
+
+### getting started
+
+```r
+if (!require("remotes")) install.packages("remotes")
+source("R/pkg_install.R")
+install_pkgs()
+```
+
+### running the workflow
+
+#### within R
+
+To run single-threaded:
+
+```r
+library(targets)
+tar_make()
+```
+
+Or multi-threaded:
+
+```r
+library(targets)
+library(future)
+plan("multicore")
+tar_make_future()
+```
+
+#### via `make`
+
+- `make all` if you have `make` installed.
+
+To load existing products (e.g. for debugging):
+
+```r
+targets::tar_load(everything())
+```
+
+To visualize the workflow:
+
+```r
+targets::tar_visnetwork()
+```
+
 ## workflow
 
 - implemented in the [targets package](https://books.ropensci.org/targets/)
@@ -46,42 +92,6 @@ Phylogenetic comparative analysis on the evolution of reproductive accessory gla
 - `old`: Miscellaneous old explorations etc.
 - `twotraits`: code for two-trait analyses (comparisons with LE's thesis)
 
-## getting started
-
-```r
-source("R/utils.R")
-install_pkgs()
-```
-
-## making stuff
-
-### within R
-
-To run single-threaded:
-
-```r
-library(targets)
-tar_make()
-```
-
-Or multi-threaded:
-
-```r
-library(targets)
-library(future)
-plan("multicore")
-tar_make_future()
-```
-
-### via `make`
-
-- `make all` if you have `make` installed.
-
-To load existing products (e.g. for debugging):
-
-```r
-tar_load(everything())
-```
 
 google drive [link](https://drive.google.com/drive/folders/1S5KwLDQavshwS8i0e9_g1jRiVUw8rnLO?usp=sharing)
 
