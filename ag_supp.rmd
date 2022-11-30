@@ -21,6 +21,7 @@ output:
 source("R/utils.R")
 source("R/mcmc.R")
 source("R/functions.R")
+source("R/pkg_install.R")
 load_pkgs(skip = "tikzDevice")
 zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
 theme_set(theme_bw())
