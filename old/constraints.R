@@ -17,7 +17,7 @@ pc_pars <- c(pcsc_pars,
           )
 
 ## add constraints: ag gain/loss depends only on sc
-sc_pars, <- c(pcsc_pars,
+sc_pars <- c(pcsc_pars,
           list(c(13, 19), ## ag_gain with sc==0
                c(16, 22), ## ag_gain with sc==1
                c(3,   9), ## ag_loss with sc==0

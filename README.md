@@ -35,6 +35,8 @@ Phylogenetic comparative analysis on the evolution of reproductive accessory gla
 - `binaryTraitData.csv`: trait data collapsed to binary (0/1) for traits
 - `treeBlock.rds`: tree block (100 imputed trees)
 - `treeSingle.rds`: phylogeny only for complete genetic data
+- `dataReferencecs.csv`: list of references for each species
+- `referenceList.rtf`: full reference list corresponding to the above csv
 
 ### other folders
 

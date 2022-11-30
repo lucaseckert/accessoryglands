@@ -1,0 +1,608 @@
+Order,Family,Genus,Species,FishTree Name,Common name,References
+Acipenseriformes,Acipenseridae,Acipenser,baerii,Acipenser_baerii,siberian sturgeon,"Wrobel & Jouma, 2004"
+Acipenseriformes,Acipenseridae,Acipenser,brevirostrum,Acipenser_brevirostrum,shortnose sturgeon,"Alavi, Rodina, Gela, & Linhart, 2012, Vecsei et al. 2000, Kynard et al. 2016"
+Acipenseriformes,Acipenseridae,Acipenser,fulvescens,Acipenser_fulvescens,Lake sturgeon,"Bruch & Binkowski 2002, Breder & Rosen 1966"
+Acipenseriformes,Acipenseridae,Acipenser,gueldenstaedtii,Acipenser_gueldenstaedtii,russian sturgeon,"Alavi, Rodina, Gela, & Linhart, 2012, Breder & Rosen 1966 "
+Acipenseriformes,Acipenseridae,Acipenser,medirostris,Acipenser_medirostris,green sturgeon,"Alavi, Rodina, Gela, & Linhart, 2012, Balon 1975, Israel & May 2010 "
+Acipenseriformes,Acipenseridae,Acipenser,nudiventris,Acipenser_nudiventris,ship sturgeon,"Alavi, Rodina, Gela, & Linhart, 2012, Vecsei et al. 2001, Eenennaam et al. 2012 "
+Acipenseriformes,Acipenseridae,Acipenser,oxyrinchus,Acipenser_oxyrinchus,atlantic sturgeon,"Alavi, Rodina, Gela, & Linhart, 2012, Breder & Rosen 1966, Hilton et al. 2016"
+Acipenseriformes,Acipenseridae,Acipenser,persicus,Acipenser_persicus,persian sturgeon,"Alavi, Rodina, Gela, & Linhart, 2012"
+Acipenseriformes,Acipenseridae,Acipenser,ruthenus,Acipenser_ruthenus,sterlet sturgeon,"Wrobel & Jouma, 2004"
+Acipenseriformes,Acipenseridae,Acipenser,sinensis,Acipenser_sinensis,chinese sturgeon,"Alavi, Rodina, Gela, & Linhart, 2012, Wei et al. 2009 "
+Acipenseriformes,Acipenseridae,Acipenser,stellatus,Acipenser_stellatus,stellate sturgeon,"Alavi, Rodina, Gela, & Linhart, 2012, Balon 1975 "
+Acipenseriformes,Acipenseridae,Acipenser,sturio,Acipenser_sturio,baltic sturgeon,"Alavi, Rodina, Gela, & Linhart, 2012, Breder & Rosen 1966, Williot et al. 2011 "
+Acipenseriformes,Acipenseridae,Acipenser,transmontanus,Acipenser_transmontanus,white sturgeon,"Alavi, Rodina, Gela, & Linhart, 2012, Breder & Rosen 1966, Jay et al. 2014 "
+Acipenseriformes,Acipenseridae,Huso,dauricus,Huso_dauricus,kaluga,"Alavi, Rodina, Gela, & Linhart, 2012, Krykhtin & Svirskii 1997"
+Acipenseriformes,Acipenseridae,Huso,huso,Huso_huso,beluga,"Alavi, Rodina, Gela, & Linhart, 2012, Vecsei et al. 2002 "
+Acipenseriformes,Polyodontidae,Polyodon,spathula,Polyodon_spathula,paddlefish,"Alavi, Rodina, Gela, & Linhart, 2012, Breder & Rosen 1966 "
+Albuliformes,Albulidae,Albula,vulpes,Albula_vulpes,Bonefish,"Mank & Avise 2006, Jones et al. 1978, Breder & Rosen 1966, Danylchuck et al. 2011"
+Albuliformes,Albulidae,Nemoossis,belloci,Pterothrissus_belloci,Longfin bonefish,"Mank & Avise 2006, Breder & Rosen 1966"
+Albuliformes,Albulidae,Pterothrissus,gissu,Pterothrissus_gissu,Japanese gissu,"Mank & Avise 2006, Breder & Rosen 1966"
+Amiiformes,Amiidae,Amia,calva,Amia_calva,Bowfin,"Mank & Avise 2006, Balon 1990, Breder & Rosen 1966, Stockley et al. 1997"
+Anguilliformes,Anguillidae,Anguilla,anguilla,Anguilla_anguilla,european eel,Guarniero et al. 2020
+Anguilliformes,Chlopsidae,Chilorhinus,platyrhynchus,Chilorhinus_platyrhynchus,flatnose xenocongrid eel,Fishelson 1994 
+Anguilliformes,Chlopsidae,Chilorhinus,suensonii,Chilorhinus_suensonii,seagrass eel,Fishelson 1994
+Anguilliformes,Chlopsidae,Kaupichthys,hyoproroides,Kaupichthys_hyoproroides,false moray,Fishelson 1994 
+Anguilliformes,Colocongridae,Coloconger,cadenati,Coloconger_cadenati,,Fishelson 1994 
+Anguilliformes,Congridae,Acromycter,perturbator,Acromycter_perturbator,,Fishelson 1994 
+Anguilliformes,Congridae,Ariosoma,anago,Ariosoma_anago,silvery conger,Fishelson 1994 
+Anguilliformes,Congridae,Ariosoma,marginatum,Ariosoma_marginatum,large-eye conger,Fishelson 1994 
+Anguilliformes,Congridae,Ariosoma,selenops,Ariosoma_selenops,,Fishelson 1994 
+Anguilliformes,Congridae,Bathycongrus retrotinctus,retrotincta,Bathycongrus retrotinctus_retrotincta,blackedge conger,Fishelson 1994 
+Anguilliformes,Congridae,Coloconger,meadi,Coloconger_meadi,,Fishelson 1994 
+Anguilliformes,Congridae,Coloconger,raniceps,Coloconger_raniceps,froghead eel,Fishelson 1994 
+Anguilliformes,Congridae,Conger,conger,Conger_conger,European conger,"Mank & Avise 2006, Gothel 1992"
+Anguilliformes,Congridae,Conger,myriaster,Conger_myriaster,Whitespotted conger,Fishelson 1994 
+Anguilliformes,Congridae,Conger,oceanicus,Conger_oceanicus,American conger,Fishelson 1994 
+Anguilliformes,Congridae,Congriscus,megastomus,Congriscus_megastomus,,Fishelson 1994 
+Anguilliformes,Congridae,Gnathophis,habenatus,Gnathophis_habenatus,little conger eel,Fishelson 1994 
+Anguilliformes,Congridae,Gnathophis,heterognathos,Gnathophis_heterognathos,,Fishelson 1994 
+Anguilliformes,Congridae,Heteroconger,longissimus,Heteroconger_longissimus,Brown garden eel,"Fishelson 1994, Kakizaki et al. 2015 "
+Anguilliformes,Congridae,Paraconger,notialis,Paraconger_notialis,Guinean conger,Fishelson 1994 
+Anguilliformes,Congridae,Pseudophichthys,splendens,Pseudophichthys_splendens,purplemouthed conger,Fishelson 1994 
+Anguilliformes,Congridae,Rhynchoconger,flavus,Rhynchoconger_flavus,yellow conger,Fishelson 1994 
+Anguilliformes,Congridae,Rhynchoconger,gracilior,Rhynchoconger_gracilior,whiptail conger,Fishelson 1994 
+Anguilliformes,Congridae,Xenomystax,atrarius,Xenomystax_atrarius,deepwater conger,Fishelson 1994 
+Anguilliformes,Congridae,Xenomystax,congroides,Xenomystax_congroides,bristletooth conger,Fishelson 1994 
+Anguilliformes,Derichthyidae,Derichthys,serpentinus,Derichthys_serpentinus,narrownecked oceanic eel,Fishelson 1994 
+Anguilliformes,Derichthyidae,Nessorhamphus,ingolfianus,Nessorhamphus_ingolfianus,duckbill oceanic eel,Fishelson 1994 
+Anguilliformes,Derichthyidae,Nessorhamphus ,danae,Nessorhamphus_danae,dana duckbill eel,Fishelson 1994 
+Anguilliformes,Heterenchelyidae,Pythonichthys,asodes,Pythonichthys_asodes,Pacific mud eel,Fishelson 1994 
+Anguilliformes,Muraenesocidae,Congresox,talabon,Congresox_talabon,yellow pike conger,Fishelson 1994 
+Anguilliformes,Muraenesocidae,Gavialiceps,taeniola,Gavialiceps_taeniola,,Fishelson 1994 
+Anguilliformes,Muraenesocidae,Muraenesox,cinereus,Muraenesox_cinereus,daggertooth pike conger,"Fishelson 1994, Umezawa et al. 1991 "
+Anguilliformes,Muraenesocidae,Oxyconger,leptognathus,Oxyconger_leptognathus,shorttail pike conger,Fishelson 1994 
+Anguilliformes,Muraenidae,Echidna,nebulosa,Echidna_nebulosa,starry moray,Fishelson 1992 
+Anguilliformes,Muraenidae,Gymnomuraena,zebra,Gymnomuraena_zebra,zebra moray,Fishelson 1992 
+Anguilliformes,Muraenidae,Gymnothorax,buroensis,Gymnothorax_buroensis,vagrant moray,Fishelson 1992 
+Anguilliformes,Muraenidae,Gymnothorax,hepaticus,Gymnothorax_hepaticus,liver-colored moray,Fishelson 1992 
+Anguilliformes,Muraenidae,Gymnothorax,herrei,Gymnothorax_herrei,Herre's moray,"Ferraris 1985, Mank & Avise 2006 , Loh & Chen 2018 "
+Anguilliformes,Muraenidae,Gymnothorax,margaritophorus,Gymnothorax_margaritophorus,blotch-necked moray,Fishelson 1992 
+Anguilliformes,Muraenidae,Gymnothorax,meleagris,Gymnothorax_meleagris,turkey moray,Fishelson 1992 
+Anguilliformes,Muraenidae,Gymnothorax,richardsoni,Gymnothorax_richardsonii,Richardson's moray,Fishelson 1992 
+Anguilliformes,Muraenidae,Gymnothorax,undulatus,Gymnothorax_undulatus,undulated moray,Fishelson 1992 
+Anguilliformes,Muraenidae,Gymnothorax,zonipectis,Gymnothorax_zonipectis,barredfin moray,Fishelson 1992 
+Anguilliformes,Nemichthyidae,Avocettina,bowersii,Avocettina_bowersii,,Fishelson 1994 
+Anguilliformes,Nemichthyidae,Avocettina,infans,Avocettina_infans,avocet snipe eel,Fishelson 1994 
+Anguilliformes,Nemichthyidae,Nemichthys,scolopaceus,Nemichthys_scolopaceus,slender snipe eel,Fishelson 1994 
+Anguilliformes,Nettastomatidae,Facciolella,equatoralis,Facciolella_equatorialis,dogface witch eel,Fishelson 1994 
+Anguilliformes,Nettastomatidae,Hoplunnis,macrura,Hoplunnis_macrura,,Fishelson 1994 
+Anguilliformes,Nettastomatidae,Nettastoma,melanurum,Nettastoma_melanurum,blackfin sorcerer,Fishelson 1994 
+Anguilliformes,Nettastomatidae,Saurenchelys,fierasfer,Saurenchelys_fierasfer,,Fishelson 1994 
+Anguilliformes,Serrivomeridae,Serrivomer,beanii,Serrivomer_beanii,stout sawpalate,Fishelson 1994 
+Anguilliformes,Serrivomeridae,Serrivomer,samoensis,Serrivomer_samoensis,samoa sawtooth,Fishelson 1994 
+Anguilliformes,Serrivomeridae,Serrivomer,sector,Serrivomer_sector,sawtooth eel,Fishelson 1994 
+Anguilliformes,Synaphobranchidae,Atractodenchelys,phrix,Atractodenchelys_phrix,,Fishelson 1994 
+Anguilliformes,Synaphobranchidae,Dysomma,anguillare,Dysomma_anguillare,short belly eel,Fishelson 1994 Miller et al. 2002 
+Anguilliformes,Synaphobranchidae,Dysommina,rugosa,Dysommina_rugosa,,Fishelson 1994 
+Anguilliformes,Synaphobranchidae,Ilyophis,brunneus,Ilyophis_brunneus,muddy arrowtooth,Fishelson 1994 
+Anguilliformes,Synaphobranchidae,Simenchelys,parasititca,Simenchelys_parasitica,snubnosed eel,Fishelson 1994 
+Anguilliformes,Synaphobranchidae,Synaphobranchus,affinis,Synaphobranchus_affinis,grey cutthroat,Fishelson 1994 
+Anguilliformes,Synaphobranchidae,Synaphobranchus,brevidorsalis,Synaphobranchus_brevidorsalis,Shortdorsal cutthroat eel,Fishelson 1994 
+Anguilliformes,Synaphobranchidae,Synaphobranchus,kaupii,Synaphobranchus_kaupii,Kaupi's arrowtooth,Fishelson 1994 
+Anguilliformes,Synaphobranchidae,Synaphobranchus,oregoni,Synaphobranchus_oregoni,,Fishelson 1994 
+Atheriniformes,Atherinopsidae,Menidia,menidia,Menidia_menidia,Atlantic silverside,"Middaugh et al. 1981, Conover & Kynard 1984"
+Atheriniformes,Atherinopsidae,Odontesthes,nigricans,Odontesthes_nigricans,South american silverside,Morriconi et al. 2009 
+Atheriniformes,Atherinopsidae,Odontesthes,smitti,Odontesthes_smitti,Neotropical silverside,Morriconi et al. 2009 
+Atheriniformes,Melanotaeniidae,Glossolepis,incisus,Glossolepis_incisus,red raindowfish,"Mank & Avise 2006, Rudiger & Baensch 1991, Kadarini et al. 2018 "
+Atheriniformes,Melanotaeniidae,Melanotaenia,nigrans,Melanotaenia_nigrans,Black-banded rainbowfish,"Mank & Avise 2006, Breder & Rosen 1966, Crowley and Ivanstoff 1982"
+Atheriniformes,Phallostethidae,Gulaphallus,bikolanus,Gulaphallus_bikolanus,,Grier & Parenti 1994 
+Atheriniformes,Phallostethidae,Gulaphallus,mirabilis,Gulaphallus_mirabilis,,"Grier & Parenti 1994, Villadolid & Manacop 1934"
+Atheriniformes,Phallostethidae,Neostethus,bicornis,Neostethus_bicornis,,"Mok & Munro 1997, Mank & Avise 2006 , Grier & Parenti 1994 "
+Atheriniformes,Phallostethidae,Neostethus,borneensis,Neostethus_borneensis,,Grier & Parenti 1994 
+Atheriniformes,Phallostethidae,Neostethus,lankesteri,Neostethus_lankesteri,,"Grier & Parenti 1994, Mank & Avise 2006 "
+Atheriniformes,Phallostethidae,Phenacostethus ,posthon,Phenacostethus_posthon,,Grier & Parenti 1994 
+Atheriniformes,Phallostethidae,Phenacostethus ,smithi,Phenacostethus_smithi,Smith's priapium,Grier & Parenti 1994 
+Atheriniformes,Pseudomugilidae,Pseudomugil,gertrudae,Pseudomugil_gertrudae,Spotted blue-eye,Howe 1987
+Atheriniformes,Pseudomugilidae,Pseudomugil,mellis,Pseudomugil_mellis,Honey blue-eye,Howe 1987
+Atheriniformes,Pseudomugilidae,Pseudomugil,signifer,Pseudomugil_signifer,Pacific blue-eye,"Howe 1987, Breder & Rosen 1966"
+Atheriniformes,Pseudomugilidae,Pseudomugil,tenellus,Pseudomugil_tenellus,Delicate blue-eye,"Howe 1987, Mank & Avise 2006 "
+Aulopiformes,Alepisauridae,Alepisaurus,ferox,Alepisaurus_ferox,long snouted lancetfish,Smith & Atz 1973 
+Aulopiformes,Bathysauridae,Bathysaurus,ferox,Bathysaurus_ferox,deep-sea lizard fish,"Sulak, Sedberry & Van Guelpin 1985"
+Aulopiformes,Bathysauridae,Bathysaurus,mollis,Bathysaurus_mollis,highfin lizardfish,"Sulak, Sedberry & Van Guelpin 1985"
+Aulopiformes,Chlorophthalmidae,Chlorophthalmus,agassizi,Chlorophthalmus_agassizi,Shortnose greeneye,"Mank & Avise 2006, de Mitcheson & Liu 2008, Parenti et al. 2015, Cabbidu et al. 2010"
+Aulopiformes,Chlorophthalmidae,Parasudis,truculenta,Parasudis_truculenta,Longnose greeneye,"Mank & Avise 2006, de Mitcheson & Liu 2008"
+Aulopiformes,Giganturidae,Gigantura,indica,Gigantura_indica,Telescopefish,"Fishelson 1994, Konstantinidis & Johnson 2016 "
+Aulopiformes,Ipnopidae,Bathypterois,dubius,Bathypterois_dubius,mediterranean spiderfish,"Fishelson & Galil 2001, Porcu et al. 2010 "
+Aulopiformes,Synodontidae,Synodus,ulae,Synodus_ulae,Red lizard fish,"Zaiser & Moyer 1981, Mank & Avise 2006 "
+Batrachoidiformes,Batrachoididae,Halobatrachus,didactylus,Halobatrachus_didactylus,Lusitanian toadfish,"Modesto & Canario 2002, Almorim et al. 2006, Vasconcelos et al. 2011, Carrico et al. 2014 "
+Batrachoidiformes,Batrachoididae,Opsanus,tau,Opsanus_tau,Oyster toadfish,"Barni et al. 2001, Hoffman 1963, Gray & Winn 1961 Fine et al. 1984, Maruska & Mensinger 2009 "
+Batrachoidiformes,Batrachoididae,Porichthys,notatus,Porichthys_notatus,Plainfin midshipman,"Barni et al. 2001, Brantley & Bass 1994, Knapp & Wingfield 1999"
+Beloniformes,Adrianichthyidae,Oryzias,latipes,Oryzias_latipes,Japanese medaka,"Grant et al. 1995, Mank & Avise 2006 "
+Beloniformes,Belonidae,Tylosurus,acus melanotus,Tylosurus_acus melanotus,keel-jawed needlefish,Liao & Chang 2011 Collette et al. 2010
+Beloniformes,Belonidae,Xenentodon,cancila,Xenentodon_cancila,freshwater garfish,"Chakrabarti & Banerjee 2014, Foster 1973 "
+Beloniformes,Exocoetidae,Parexocoetus,brachypterus,Parexocoetus_brachypterus,Salinfin flyingfish,"Stevens et al. 2003, Mank & Avise 2006 "
+Beloniformes,Hemiramphidae,Hemiramphus,saltator,Hemiramphus_saltator,Longfin halfbeak,"Mank & Avise 2006, Watson 1996"
+Beloniformes,Hemiramphidae,Hyporhamphus,unifasciatus,Hyporhamphus_unifasciatus,Common halfbeak,"Mank & Avise 2006, Watson 1996"
+Beloniformes,Zenarchopteridae,Dermogenys,ebrardti,Nomorhamphus_ebrardtii,,Downing et al. 1995 Meisner and Burns 1997 
+Beloniformes,Zenarchopteridae,Dermogenys,montanus,Dermogenys_montana,,"Downing et al. 1995 Meisner 2001, Downing & Burns 1995 "
+Beloniformes,Zenarchopteridae,Dermogenys,orientalis,Dermogenys_orientalis,,"Downing et al. 1995 Meisner 2001, Downing & Burns 1995 "
+Beloniformes,Zenarchopteridae,Dermogenys,pusilla,Dermogenys_pusilla,wrestling halfbeak,Downing et al. 1995 Senarat et al. 2019
+Beloniformes,Zenarchopteridae,Dermogenys,viviparus,Nomorhamphus_vivipara,,Downing et al. 1995 Meisner 2001 
+Beloniformes,Zenarchopteridae,Dermogenys,weberi,Nomorhamphus_weberi,,"Downing et al. 1995, Meisner & Burns 1997 "
+Beloniformes,Zenarchopteridae,Hemirhamphodon,chrysopunctatus,Hemirhamphodon_chrysopunctatus,,"Downing et al. 1995, Meisner and Burns 1997 "
+Beloniformes,Zenarchopteridae,Hemirhamphodon,kapuasensis,Hemirhamphodon_kapuasensis,,"Downing et al. 1995 Downing and Burns 1995, Reznick et al. 2007 "
+Beloniformes,Zenarchopteridae,Hemirhamphodon,kuekenthali,Hemirhamphodon_kuekenthali,,"Downing et al. 1995 Downing and Burns 1995, Reznick et al. 2007 "
+Beloniformes,Zenarchopteridae,Hemirhamphodon,phaisoma,Hemirhamphodon_phaiosoma,,"Downing et al. 1995, Downing & Burns 1995 "
+Beloniformes,Zenarchopteridae,Hemirhamphodon,pogonognathus,Hemirhamphodon_pogonognathus,forest halfbeak,"Downing et al. 1995 Jamieson 1989, Downing & Burns 1995 "
+Beloniformes,Zenarchopteridae,Hemirhamphodon,tengah,Hemirhamphodon_tengah,,Downing et al. 1995 
+Beloniformes,Zenarchopteridae,Nomorhamphus,celebensis,Nomorhamphus_celebensis,poso halfbeak,"Downing et al. 1995, Meisner 2001 "
+Beloniformes,Zenarchopteridae,Nomorhamphus,liemi,Nomorhamphus_liemi,celebes halfbeak,Downing et al. 1995 Magyer and Greven 2007
+Beloniformes,Zenarchopteridae,Nomorhamphus,ravnaki,Nomorhamphus_ravnaki,,"Downing et al. 1995, Meisner 2001"
+Beloniformes,Zenarchopteridae,Nomorhamphus,sanussi,Nomorhamphus_sanussii,,Downing et al. 1995 
+Beloniformes,Zenarchopteridae,Nomorhamphus,towoetii,Nomorhamphus_towoetii,,Downing et al. 1995 Meisner & Burns 1997 
+Beloniformes,Zenarchopteridae,Zenarchopterus,buffonis,Zenarchopterus_buffonis,Buffon's river garfish,"Kottelat & Lim 1999, Mank & Avise 2006 "
+Beloniformes,Zenarchopteridae,Zenarchopterus,gilli,Zenarchopterus_gilli,Viviparous halfbeak,"Kottelat & Lim 1999, Mank & Avise 2006 "
+Beryciformes,Berycidae,Beryx,splendens,Beryx_splendens,splendid alfonsino,"Lehodey, Grandperrin, Marchal 1997, Akimoto et al. 2002 Baumberger et al. 2010 "
+Beryciformes,Trachichthyidae,Hoplostethus,atlanticus,Hoplostethus_atlanticus,orange roughy,"Pankhurst, McMillan, and Tracey 1987, Branch 2001 "
+Cetomimiformes,Cetomimidae,Cetostoma,regani,Cetostoma_regani,,Johnson et al. 2009 
+Characiformes,Acestrorhynchidae,Acestrorhynchus,lacustris,Acestrorhynchus_lacustris,,Bazzoli & Godinho 1991 
+Characiformes,Anostomidae,Leporinus,macrocephalus,Leporinus_macrocephalus,,"Munoz et a. 2011, Oliveira et al. 2015, Reynalte-Tataje et al. 2013 "
+Characiformes,Bryconidae,Brycon,opalinus,Brycon_opalinus,,Gomiero and Bragg 2006 
+Characiformes,Bryconidae,Brycon,orthotaenia,Brycon_orthotaenia,,Goncalves et al. 2006 
+Characiformes,Characidae,Argopleura,chocoensis,Argopleura_chocoensis,,Burns et al. 1995 
+Characiformes,Characidae,Argopleura,magdalenensis,Argopleura_magdalenensis,,Burns et al. 1995 
+Characiformes,Characidae,Brittanichthys,axelrodi,Brittanichthys_axelrodi,,"Jovanillo, Burns, & Weitzman 2007 "
+Characiformes,Characidae,Corynopoma ,riisei,Corynopoma_riisei,swordtail characin,"Azevedo, Malabarba & Fialho 2000, Atkins & Fink 1979 Bushmann & Burns 1993, Amcoff 2008 "
+Characiformes,Characidae,Diapoma,speculiferum,Diapoma_speculiferum,,"Azevedo, Malabarba & Fialho 2000 "
+Characiformes,Characidae,Diapoma,terofali,Diapoma_terofali,,Burns et al. 1995 
+Characiformes,Characidae,Gephyrocharax,atracaudatus,Gephyrocharax_atracaudatus,,Burns et al. 1995 
+Characiformes,Characidae,Gephyrocharax,chocoensis,Gephyrocharax_chocoensis,,Burns et al. 1995 
+Characiformes,Characidae,Gephyrocharax,intermedius,Gephyrocharax_intermedius,,Burns et al. 1995 
+Characiformes,Characidae,Gephyrocharax,valencia,Gephyrocharax_valencia,,Burns et al. 1995 
+Characiformes,Characidae,Gephyrocharax,venezuelae,Gephyrocharax_venezuelae,,Burns et al. 1995 
+Characiformes,Characidae,Glandulocauda,melanogenys,Glandulocauda_melanopleura,,Burns et al. 1995 
+Characiformes,Characidae,Gymnocharacinus,bergii,Gymnocharacinus_bergii,Naked characin,"Cussac & Ortubay 2002, Mank & Avise 2006 "
+Characiformes,Characidae,Hysteronotus,hesperus,Chrysobrycon_hesperus,,Burns et al. 1995 
+Characiformes,Characidae,Hysteronotus,megalostomus,Hysteronotus_megalostomus,,Burns et al. 1995 
+Characiformes,Characidae,Hysteronotus,myersi,Chrysobrycon_myersi,,Burns et al. 1995 
+Characiformes,Characidae,Iotabrycon,praecox,Iotabrycon_praecox,,Burns et al. 1995 
+Characiformes,Characidae,Landonia,latidens,Landonia_latidens,,Burns et al. 1995 
+Characiformes,Characidae,Mimagoniates,barberi,Mimagoniates_barberi,,Burns et al. 1995 
+Characiformes,Characidae,Mimagoniates,lateralis,Mimagoniates_lateralis,,Burns et al. 1995 
+Characiformes,Characidae,Mimagoniates,microlepis,Mimagoniates_microlepis,blue tetra,Burns et al. 1995 
+Characiformes,Characidae,Mimagoniates,rheocharis,Mimagoniates_rheocharis,,Burns et al. 1995 
+Characiformes,Characidae,Mimagoniates,sylvicola,Mimagoniates_sylvicola,,Burns et al. 1995 
+Characiformes,Characidae,Phenacobrycon,henni,Phenacobrycon_henni,,Burns et al. 1995 
+Characiformes,Characidae,Planaltina,myersi,Planaltina_myersi,,Burns et al. 1995 
+Characiformes,Characidae,Pseudocorynopoma,doriae,Pseudocorynopoma_doriae,dragonfin tetra,"Burns et al. 1995, Breder & Rosen 1966 "
+Characiformes,Characidae,Pseudocorynopoma,heterandria,Pseudocorynopoma_heterandria,,Burns et al. 1995 
+Characiformes,Characidae,Pterobrycon,myrnae,Pterobrycon_myrnae,,Burns et al. 1995 Bussing 1974 
+Characiformes,Characidae,Ptychocharax,rhyacophila,Ptychocharax_rhyacophila,,Burns et al. 1995 
+Characiformes,Characidae,Xenurobrycon,polyancistrus,Xenurobrycon_polyancistrus,,Burns et al. 1995 
+Characiformes,Chilodontidae,Chilodus,punctatus,Chilodus_punctatus,Spotted headstander,"Pecio 2003, Rudiger and Baensch 1991 "
+Characiformes,Distichondontidae,Distichodus,rostratus,Distichodus_rostratus,Grass-eater,Shinkafi et al. 2013 
+Characiformes,Hepsetidae,Hepsetus,odoe,Hepsetus_odoe,african pike,"Idowu 2017, Merron et al. 1990 "
+Characiformes,Iguanodectidae,Bryconops,affinis,Bryconops_affinis,Orangefin tetra,Andrade et al. 2001 
+Characiformes,Iguanodectidae,Bryconops,melanurus,Bryconops_melanurus,,Santana et al. 2013 
+Characiformes,Parodontidae,Apareiodon,affinis,Apareiodon_affinis,Darter characine,"Ratton et al. 2003, Smith et al. 2013 "
+Characiformes,Parodontidae,Apareiodon,ibitiensis,Apareiodon_ibitiensis,,"Sazima 1980, Gomiero & Braga 2007 "
+Characiformes,Parodontidae,Apareiodon,piracicabe,Apareiodon_piracicabae,,"Sazima 1980, Mank & Avise 2006 "
+Characiformes,Prochilodontidae,Prochilodus,argenteus,Prochilodus_argenteus,,Boncampagni-Junior et al. 2013 Godinho et al. 2017 Ribolli et al. 2020 
+Clupeiformes,Chirocentridae,Chirocentrus,dorab,Chirocentrus_dorab,Dorab wolf-herring,Luther 1986 
+Clupeiformes,Clupeidae,Jenkinsia,lamprotaenia,Jenkinsia_lamprotaenia,Dwarf round herring,"Coblentz 1995, Mank & Avise 2006 "
+Clupeiformes,Clupeidae,Sardina,pilchardus,Sardina_pilchardus,European pilchard,"Ganias et al. 2003, Breder & Rosen 1966, Mank & Avise 2006 "
+Clupeiformes,Engraulidae,Engraulis,encrasicolis,Engraulis_encrasicolus,European anchovy,"Mank & Avise 2006, Whitehead 1984, Breder & Rosen 1966 "
+Clupeiformes,Engraulidae,Stolephorus,commersonnii,Stolephorus_commersonnii,Commerson's anchovy,"Mank & Avise 2006, Whitehead et al. 1988"
+Cypriniformes,Botiidae,Leptobotia,elongata,Leptobotia_elongata,,"Zhang et al. 2022, Yin et al. 2012"
+Cypriniformes,Catostomidae,Erimyzon,oblongus,Erimyzon_oblongus,Eastern creek chubsucker,"Page & Johnston 1990, Breder & Rosen 1966, Mank & Avise 2006 "
+Cypriniformes,Cobitidae,Cobitis,striata,Cobitis_striata,Striated spined loach,"Saitoh 1990, Breder & Rosen 1966"
+Cypriniformes,Cyprinidae,Danio,rerio,Danio_rerio,zebrafish,"van den Hurk & Resink, 1992 Spence & Smith 2006, Spence et al. 2007 "
+Cypriniformes,Cyprinidae,Puntius,denisonii,Puntius_denisonii,denison barb,"Sajan & Mercy 2016, Mercy et al. 2015 "
+Cypriniformes,Cyprinidae,Rhodeus,ocellatus,Rhodeus_ocellatus,Rosy bitterling,"Kanoh 1996, Casalini et al. 2010 "
+Cypriniformes,Cyprinidae,Rhodeus,sericeus,Rhodeus_sericeus,Bitterling,"Candolin & Reynolds 2002, Mills & Reynolds 2003, Mank & Avise 2006 "
+Cypriniformes,Cyprinidae,Rutilus,rutilus,Rutilus_rutilus,Roach,Kortet et al. 2004
+Cyprinodontiformes,Anablepidae,Anableps,anableps,Anableps_anableps,Largescale foureyes,"Grier et al. 1981, Breder & Rosen 1966 "
+Cyprinodontiformes,Anablepidae,Anableps,dowei,Anableps_dowei,pacific foureyed fish,Grier et al. 1981 
+Cyprinodontiformes,Anablepidae,Jenynsia,lineatus,Jenynsia_lineata,onesided livebearer,"Grier et al. 1981, Breder & Rosen 1966"
+Cyprinodontiformes,Anablepidae,Jenynsia,multidentata,Jenynsia_multidentata,Rio de la Plata one-sided livebearer,"Bisazza et al. 2000, Mank & Avise 2006 Barbosa & Magurran 2006 "
+Cyprinodontiformes,Cyprinodontidae,Cyprinodon,variegatus,Cyprinodon_variegatus_variegatus,Sheepshead minnow,"Leiser & Itzkowitz 2004, Taborsky 1994, Breder & Rosen 1966, Mank & Avise 2006 "
+Cyprinodontiformes,Fundulidae,Fundulus,heteroclitus,Fundulus_heteroclitus_heteroclitus,mummichog,"Selman & Wallace 1986, Mank & Avise 2006 , Mitton & Koehn 1975 "
+Cyprinodontiformes,Goodeidae,Girardinichthys,multiradiatus,Girardinichthys_multiradiatus,Darkedged splitfin,"Macias-Garcia & Valero 2010, Mank & Avise 2006 "
+Cyprinodontiformes,Poeciliidae,Poecilia,reticulata,Poecilia_reticulata,Guppy,"Houde & Endler 1990, Pilastro & Bisazza 1999, Magurran & Nowak 1991 "
+Cyprinodontiformes,Poeciliidae,Xiphophorus,variatus,Xiphophorus_variatus,Variable platyfish,"Borowsky 1987, Wischnath 1993, Mank & Avise 2006 "
+Cyprinodontiformes,Rivulidae,Austrolebias,charrua,Austrolebias_charrua,,Arezo et al. 2007 Berois & Arezo 2014 
+Cyprinodontiformes,Rivulidae,Kryptolebias,marmoratus,Kryptolebias_marmoratus,mangrove rivulus,Sakakura et al. 2006 
+Elopiformes,Elopidae,Elops,saurus,Elops_saurus,Ladyfish,"Mank & Avise 2006, Breder & Rosen 1966 "
+Elopiformes,Megalopidae,Megalops,atlanticus,Megalops_atlanticus,Tarpon,"Mank & Avise 2006, Breder & Rosen 1966 "
+Elopiformes,Megalopidae,Megalops,cyprinoides,Megalops_cyprinoides,Indo-Pacific tarpon,"Mank & Avise 2006, Coates 1987, Breder & Rosen 1966 "
+Esociformes,Esocidae,Esox,lucius,Esox_lucius,Northern pike,"Clark 1950, Breder & Rosen "
+Gadiformes,Gadidae,Gadus,morhua,Gadus_morhua,Atlantic cod,"Brawn 1961, Breder & Rosen 1966, Mank & Avise 2006 "
+Gadiformes,Gadidae,Melanogrammus,aeglefinus,Melanogrammus_aeglefinus,Haddock,"Casaretto & Hawkins 2002, Mank & Avise 2006 "
+Gadiformes,Gadidae,Theragra,chalcogrammus,Theragra_chalcogramma,Alaska pollock,"Schabetsberger et al. 1999, Mank & Avise 2006 "
+Gadiformes,Macrouridae,Coryphaenoides,rupestris,Coryphaenoides_rupestris,roundnose grenadier,"Bergstad 1990, Knutsen et al. 2012, Neat 2017"
+Gadiformes,Merlucciidae,Macruronus,novaezelandiae,Macruronus_novaezelandiae,blue grenadier,"Gunn et al. 1989, Patchel et al. 1987 "
+Gadiformes,Moridae,Pseudophycis,bachus,Pseudophycis_bachus,red codling,"Kemp, Jenkins & Swearer 2012, Robertson 1975"
+Gadiformes,Phycidae,Phycis,phycis,Phycis_phycis,forkbeard,Glavic et al. 2014 Vieira et al. 2016 
+Gadiformes,Phycidae,Urophycis,brasiliensis,Urophycis_brasiliensis,Brazilian codling,Viana et al. 2000 Acuna et al. 2000 
+Gasterosteiformes,Gasterosteidae,Gasterosteus,aculeatus,Gasterosteus_aculeatus,Three-spined stickleback,"Reimchen 1989, Rico et al. 1992, Breder & Rosen 1966, Mank & Avise 2006 "
+Gasterosteiformes,Gasterosteidae,Spinachia,spinachia,Spinachia_spinachia,Sea stickleback,"Jones et al. 1998, Mank & Avise 2006 "
+Gasterosteiformes,Hypoptychidae,Hypoptychus,dybowskii,Hypoptychus_dybowskii,Korean sandlance,"Akagawa & Okiyama 1993, Mank & Avise 2006 , Munehara & Narimatsu 2001 "
+Gasterosteiformes,Indostomidae,Indostomus,paradoxus,Indostomus_paradoxus,Pipe fish,Britz 2000
+Gasterosteiformes,Pegasidae,Eurypegasus,draconis,Eurypegasus_draconis,Short dragonfish,"Herold & Clark 1993, Mank & Avise 2006 "
+Gobiesociformes,Gobiesocidae,Gobiesox,maeandricus,Gobiesox_maeandricus,Northern clingfish,"Mank & Avise 2006, Coleman 1999 "
+Gobiesociformes,Gobiesocidae,Lepadogaster,lepadogaster,Lepadogaster_lepadogaster,Shore clingfish,"Mank & Avise 2006, Russell 1976, Breder & Rosen "
+Gonornchiformes,Chanidae,Chanos,chanos,Chanos_chanos,Milkfish,"Mank & Avise 2006, Breder & Rosen, Bagarinao 1994 "
+Gymnotiformes,Apteronotidae,Apteronotus,leptorhynchus,Apteronotus_leptorhynchus,Brown ghost knifefish,"Hagedorn & Heiligenberg 1985, Kirschbaum & Schugardt 2002, Mank & Avise 2006 "
+Gymnotiformes,Gymnotidae,Gymnotus,carapo,Gymnotus_carapo,Banded knifefish,"Vergilio et al. 2013, Kirschbaum & Schugardt 2002 "
+Gymnotiformes,Hypopomidae,Brachyhypopomus,pinnicaudatus,Brachyhypopomus_pinnicaudatus,,"Quintana et al. 2004, Kirschbaum & Stugardt 2002 Miranda et al. 2008 "
+Gymnotiformes,Sternopygidae,Eigenmannia,trilineata,Eigenmannia_trilineata,,Giora & Fialho 2009 
+Gymnotiformes,Sternopygidae,Eigenmannia,virescens,Eigenmannia_virescens,Glass knifefish,"Hagedorn & Heiligenberg 1985, Mank & Avise 2006 "
+Lampriformes,Regalecidae,Regalecus,russelii,Regalecus_russelii,oarfish,"Forsgren et al. 2017, "
+Lampriformes,Trachipteridae,Trachipterus,ishikawae,Trachipterus_ishikawae,slender ribbonfish,Honma et al. 2005 
+Lepisosteiformes,Lepisosteidae,Atractosteus,spatula,Atractosteus_spatula,alligator gar,"Ferrara & Irwin 2001, Leon et al. 2001 "
+Lepisosteiformes,Lepisosteidae,Atractosteus,tropicus,Atractosteus_tropicus,tropical gar,"Mendez-Marin et al. 2016, Breder & Rosen 1966, Frias-Quintana et al. 2015 "
+Lepisosteiformes,Lepisosteidae,Lepisosteus,oculatus,Lepisosteus_oculatus,spotted gar,"Ferrara & Irwin 2001, Balon 1975, Love 2004, Tyler & Granger 1984 "
+Lepisosteiformes,Lepisosteidae,Lepisosteus,osseus,Lepisosteus_osseus,longnose gar,"Ferrara & Irwin 2001, Balon 1975, Kelley 2012 "
+Lophiiformes,Caulophrynidae,Caulophryne,jordani,Caulophryne_jordani,Fanfin angler,"Mank & Avise 2006, Breder & Rosen 1966"
+Lophiiformes,Caulophrynidae,Robia,legula,Robia_legula,,"Mank & Avise 2006, Breder & Rosen 1966"
+Lophiiformes,Ceratiidae,Ceratias,holboelli,Ceratias_holboelli,Kroyer's deep-sea angler fish,"Pietsch 2005 , Pietsch 1976 "
+Lophiiformes,Linophrynidae,Borophryne,apogon,Borophryne_apogon,,Pietsch 2005 
+Lophiiformes,Linophrynidae,Haplophryne,mollis,Haplophryne_mollis,soft leafvent angler,Pietsch 2005 
+Lophiiformes,Lophiidae,Lophius,budegassa,Lophius_budegassa,blackbellied angler,"Colmenero et al. 2013, Breder & Rosen 1966 "
+Lophiiformes,Melanocetidae,Melanocetus,johnsonii,Melanocetus_johnsonii,humpback anglerfish,Pietsch 2005 
+Lophiiformes,Melanocetidae,Melanocetus,murrayi,Melanocetus_murrayi,murray's abyssal anglerfish,Pietsch 2005 
+Lophiiformes,Neoceratiidae,Neoceratias,spinifer,Neoceratias_spinifer,,"Pietsch 2005, Munk 2000 "
+Lophiiformes,Oneirodidae,Bertella,idiomorpha,Bertella_idiomorpha,,Pietsch 2005 
+Lophiiformes,Oneirodidae,Leptacanthichthys,gracilispinis,Leptacanthichthys_gracilispinis,plainchin dreamarm,Pietsch 2005 
+Mugiliformes,Mugilidae,Chelon,labrosus,Chelon_labrosus,Thicklip grey mullet,"Mank & Avise 2006, Breder & Rosen 1966"
+Mugiliformes,Mugilidae,Liza,dumerili,Liza_dumerili,grooved mullet,"Van der Horst 1978 , Breder & Rosen 1966 "
+Mugiliformes,Mugilidae,Mugil,cephalus,Mugil_cephalus,Flathead grey mullet,"Mank & Avise 2006 , Breder & Rosen 1966"
+Mugiliformes,Mugilidae,Mugil,liza,Mugil_liza,Lebranche mullet,"Albieri & Araujo 2010, Breder & Rosen 1966 "
+Myctophiformes,Myctophidae,Benthosema,pterotum,Benthosema_pterotum,Skinnycheek lanternfish,"Gjosaeter & Tileth 1988, Mank & Avise 2006 "
+Myctophiformes,Myctophidae,Lampanyctodes,hectoris,Lampanyctodes_hectoris,Hector's lanternish,"Young et al. 1987, Robertson 1977 "
+Notacanthiformes,Notacanthidae,Polyacanthonotus,challengeri,Polyacanthonotus_challengeri,longnose tapirfish,Fishelson 1994 
+Notacanthiformes,Notacanthidae ,Polyacanthonotus,rissoanus,Polyacanthonotus_rissoanus,Smallmouth spiny eel,Fishelson 1994 
+Ophidiiformes,Aphyonidae,Barathronus,multidens,Barathronus_multidens,,Nielsen 1984
+Ophidiiformes,Aphyonidae,Barathronus,unicolor,Barathronus_unicolor,,Nielsen 1984
+Ophidiiformes,Bythitidae,Cataetyx ,alleni,Cataetyx_alleni,,Follesa et al. 2010 
+Ophidiiformes,Bythitidae,Ogilbia,cayorum,Ogilbia_cayorum,Key brotula,Suarez 1975 
+Ophidiiformes,Carapidae,Carapus,bermudensis,Carapus_bermudensis,pearlfish,Smith et al. 1981 
+Ophidiiformes,Ophidiidae,Ophidion,barbatum,Ophidion_barbatum,snake blenny,Hernandez et al. 2005
+Osmeriformes,Alepocephalidae,Alepocephalus,bairdii,Alepocephalus_bairdii,Baird's slickhead,"Mank & Avise 2006 , Breder & Rosen 1966"
+Osmeriformes,Alepocephalidae,Bathytroctes,microlepis,Bathytroctes_microlepis,Smallscale smooth-head,"Mank & Avise 2006 , Breder & Rosen 1966"
+Osmeriformes,Galaxiidae,Galaxias,fasciatus,Galaxias_fasciatus,Banded kokopu,"Mitchell & Penlington 1982, Mank & Avise 2006 "
+Osmeriformes,Lepidogalaxiidae,Lepidogalaxias ,salamandroides ,Lepidogalaxias_salamandroides,Salamanderfish,"Pusey & Stewart 1989, Mank & Avise 2006 "
+Osmeriformes,Osmeridae,Hypomesus,japonicus,Hypomesus_japonicus,Japanese surf smelt,Hirose & Kawaguchi 1998 
+Osmeriformes,Retropinnidae,Prototroctes,maraena,Prototroctes_maraena,Australian grayling,Berra 1984 
+Osteoglossiformes,Arapaimidae,Arapaima,gigas,Arapaima_gigas,Arapaima,"Godinho et al. 2005, Castello 2008 "
+Osteoglossiformes,Gymnarchidae,Gymnarchus,niloticus,Gymnarchus_niloticus,Aba,"Opadokun & Ajani 2015, Breder & Rosen 1966, Fisheye "
+Osteoglossiformes,Hiodontidae,Hiodon,alosoides,Hiodon_alosoides,Goldeye,"Mank & Avise 2006 , Breder & Rosen 1966"
+Osteoglossiformes,Hiodontidae,Hiodon,tergisus,Hiodon_tergisus,Mooneye,"Mank & Avise 2006, Breder & Rosen 1966"
+Osteoglossiformes,Mormyridae,Pollimyrus,isidori,Pollimyrus_isidori_isidori,Elephant fish,"Bratton & Kramer 1989, Crawford et al. 1986 "
+Osteoglossiformes,Notopteridae,Chitala,chitala,Chitala_chitala,Clown knifefish,"Friese 1980, Breder & Rosen 1966 "
+Osteoglossiformes,Osteoglossidae,Osteoglossum,bicirrhosum,Osteoglossum_bicirrhosum,Arawana,"Mank & Avise 2006, Riehl & Baensch 1991, Breder & Rosen 1966 "
+Osteoglossiformes,Osteoglossidae,Scleropages,leichardti,Scleropages_leichardti,Spotted bonytongue,"Mank & Avise 2006, Allen 1989, Merrick & Green 1982 "
+Osteoglossiformes,Pantodontidae,Pantodon,buchholzi,Pantodon_buchholzi,freshwater butterflyfish,"Van Deurs & Lastein 1973, Ibim et al. 2019 "
+Perciformes,Acanthuridae,Acanthurus,nigrofuscus,Acanthurus_nigrofuscus,Brown surgeonfish,"Fishelson et al. 1987, Domier & Colin 1997, Myrberg et al. 1988 , Kiflawi et al. 1998 "
+Perciformes,Ambassidae,Ambassis,agassizii,Ambassis_agassizii,Agassiz's glassfish,Llewellyn 2008 
+Perciformes,Ambassidae,Parambassis,siamensis,Parambassis_siamensis,,Okutsu et al. 2011 
+Perciformes,Anabantidae,Anabas,testudineus,Anabas_testudineus,climbing perch,"Behera et al. 2015, Zworykin 2012"
+Perciformes,Anarhichadidae,Anarhichas,lupus,Anarhichas_lupus,atlantic wolffish,"Johannessen et al. 1993, Keats et al. 1985, Pavlov 1994 "
+Perciformes,Apogonidae,Apogon,apogonides,Ostorhinchus_apogonoides,short-tooth cardinal,Fishelson et al. 2006
+Perciformes,Apogonidae,Apogon,crassiceps,Apogon_crassiceps,Transparent cardinalfish,Fishelson et al. 2006
+Perciformes,Apogonidae,Apogon,evermanni,Zapogon_evermanni,Evermann's cardinalfish,Fishelson et al. 2006
+Perciformes,Arripidae,Arripis,trutta,Arripis_trutta,Australian salmon,Stewart & Hughes 2011 
+Perciformes,Artedidraconidae,Artedidraco,skottsbergi,Artedidraco_skottsbergi,,Meneghesso et al. 2016 
+Perciformes,Artedidraconidae,Dolloidraco,longedorsalis,Dolloidraco_longedorsalis,,Meneghesso et al. 2016 
+Perciformes,Artedidraconidae,Pogonophryne,scotti,Pogonophryne_scotti,Saddleback plunderfish,"La Mesa et al. 2020, Jones and Near 2012 "
+Perciformes,Bathydraconidae,Akarotaxis,nudiceps,Akarotaxis_nudiceps,,"Mesa et al. 2007, Mesa et al. 2018, Breder and Rosen 1966 "
+Perciformes,Bathydraconidae,Bathydraco,marri,Bathydraco_marri,Deep-water dragon,"Mesa et al. 2007, Mesa et al. 2018, Kock and Kellermann 1991 "
+Perciformes,Bathydraconidae,Gymnodraco,acuticeps,Gymnodraco_acuticeps,Ploughfish,Evans et al. 2005
+Perciformes,Bathydraconidae,Parachaenichthys,charcoti,Parachaenichthys_charcoti,,"Barrera-Oro and Lagger 2010, Novillo et al. 2018"
+Perciformes,Blenniidae,Aidablennius,sphynx,Aidablennius_sphynx,Sphinx blenny,"Richtarski & Patzner 2000, Neat & Locatello 2002, Mank & Avise "
+Perciformes,Blenniidae,Blennius,ocellaris,Blennius_ocellaris,Butterfly blenny,"Richtarski & Patzner 2000, Breder & Rosen 1966 "
+Perciformes,Blenniidae,Coryphoblennius,galerita,Coryphoblennius_galerita,Montagu's blenny,"Richtarski & Patzner 2000, Breder & Rosen 1966 "
+Perciformes,Blenniidae,Ecsenius,bicolor,Ecsenius_bicolor,bicolor blenny,Patzner 1988
+Perciformes,Blenniidae,Lipophrys,adriaticus,Microlipophrys_adriaticus,Adriatic blenny,"Richtarski & Patzner 2000, Whitehead 1986, Giacomello et al. 2007 "
+Perciformes,Blenniidae,Lipophrys,canevae,Microlipophrys_canevae,,"Richtarski & Patzner 2000, Whitehead 1986 "
+Perciformes,Blenniidae,Lipophrys,dalmatinus,Microlipophrys_dalmatinus,,"Richtarski & Patzner 2000, Whitehead 1986, Giacomello et al. 2008 "
+Perciformes,Blenniidae,Lipophrys,nigriceps,Microlipophrys_nigriceps,Black-headed blenny,"Richtarski & Patzner 2000, Whitehead 1986 "
+Perciformes,Blenniidae,Parablennius,gattorugine,Parablennius_gattorugine,Tompot blenny,"Richtarski & Patzner 2000, Breder & Rosen 1966 "
+Perciformes,Blenniidae,Parablennius,incognitus,Parablennius_incognitus,Mystery blenny,"Richtarski & Patzner 2000, Breder & Rosen 1966, Duci et al. 2009 "
+Perciformes,Blenniidae,Parablennius,rouxi,Parablennius_rouxi,Longstriped blenny,"Richtarski & Patzner 2000, Whitehead 1986 "
+Perciformes,Blenniidae,Parablennius,sanguinolentus,Parablennius_sanguinolentus,Rusty blenny,"Richtarski & Patzner 2000, Santos et al. 1996, Mank & Avise 2006 "
+Perciformes,Blenniidae,Parablennius,sanguinolentus parvicornis,Parablennius_parvicornis,Rock-pool blenny,"Santos 1995, Oliveria et al. 2005, Santos & barreiros 1993 "
+Perciformes,Blenniidae,Parablennius,tentacularis,Parablennius_tentacularis,Tentacled blenny,"Richtarski & Patzner 2000, Giacomello & Rasotto 2005 "
+Perciformes,Blenniidae,Parablennius,zvonimiri,Parablennius_zvonimiri,Zvonimir's blenny,"Richtarski & Patzner 2000, Duci et al. 2009 "
+Perciformes,Blenniidae,Paralipophyrs,trigloides,Lipophrys_trigloides,,"Richtarski & Patzner 2000, Faria et al. 2005 "
+Perciformes,Blenniidae,Salaria,pavo,Salaria_pavo,Peacock blenny,"Richtarski & Patzner 2000, Mank & Avise 2006 "
+Perciformes,Blenniidae,Salarias,fasciatus,Salarias_fasciatus,jewelled blenny,"Patzner, 1989, Awata et al. 2010 "
+Perciformes,Blenniidae,Scartella,cristata,Scartella_cristata,Molly Miller,"Richtarski & Patzner 2000, Neat et al. 2003, Mank & Avise 2006 "
+Perciformes,Callionymidae,Callionymus,maculatus,Callionymus_maculatus,,Gibson & Ezzi 1979 
+Perciformes,Caproidae,Capros,aper,Capros_aper,Boarfish,"Farrell et al. 2012, Hiemstra 1962, Yapici & Filiz 2014 "
+Perciformes,Carangidae,Trachinotus,carolinus,Trachinotus_carolinus,Florida pompano,"Kloth 1980, Mank & Avise 2006 "
+Perciformes,Centrarchidae,Lepomis,macrochirus,Lepomis_macrochirus,Bluegill sunfish,"Dominey 1980, Mank & Avise 2006, Neff et al. 2003, Breder & Rosen 1966 "
+Perciformes,Centropomidae,Centropomus,medius,Centropomus_medius,blackfin snook,Maldonado-Garcia et al. 2005 
+Perciformes,Cepolidae,Cepola,macropthalma,Cepola_macrophthalma,red bandfish,"Stergiou et al. 1996, Vallisneri et al. 2006, Taborsky 1994, Stergiou 1993 "
+Perciformes,Chaenopsidae,Acanthemblemaria,spinosa,Acanthemblemaria_spinosa,Spinyhead blenny,"Rasotto 1995, Clarke & Tyler 2003 "
+Perciformes,Chaenopsidae,Coralliozetus,angelicus,Coralliozetus_angelicus,Angel blenny,"Patzner 1991, Hasting 1988"
+Perciformes,Chaetodontidae,Chaetodon,multicinctus,Chaetodon_multicinctus,pebbled butterflyfish,"Tricas & Hiramoto 1989, Whiteman et al. 2004 "
+Perciformes,Chaetodontidae,Chaetodon,plebius,Chaetodon_plebeius,blueblotch butterflyfish,"Fowler 1991, Whiteman et al. 2004 "
+Perciformes,Chaetodontidae,Chaetodon,rainfordi,Chaetodon_rainfordi,Rainford's butterflyfish,"Fowler 1991, Whiteman et al. 2004 Roberts & Ormond 1992 "
+Perciformes,Channichthyidae,Chaenocephalus,aceratus,Chaenocephalus_aceratus,Blackfin icefish,"Vanella et al. 2005, Detrich et al. 2005 "
+Perciformes,Channichthyidae,Chionodraco,rastrospinosus,Chionodraco_rastrospinosus,Ocellated icefish,Vanella et al. 2005 
+Perciformes,Channichthyidae,Pseudochaenichthys,georgianus,Pseudochaenichthys_georgianus,South Georgian icefish,Vanella et al. 2005 
+Perciformes,Channidae,Channa,punctata,Channa_punctata,spotted snakehead,"Belsare 1966, Koundal et al. 2015, Marimuthu et al. 2001 "
+Perciformes,Cichlidae,Alcolapia,grahami,Alcolapia_grahami,lake magadi tilapia,"Papah et al. 2013, Kavembe et al. 2016  "
+Perciformes,Cichlidae,Lamprologus,callipterus,Lamprologus_callipterus,,"Sato et al. 2004, Taborsky 1994, Mank & Avise 2006 , Schutz & Taborsky 2000, Hirschenhauser et al. 2004 "
+Perciformes,Cichlidae,Mchenga,cyclicos,Mchenga_cyclicos,,Kellogg et al. 1995
+Perciformes,Cichlidae,Sarotherodon,galilaeus,Sarotherodon_galilaeus,Mango tilapia,"Fishelson & Hilzerman 2002, Balshine-Earn 1997, Mank & Avise 2006 "
+Perciformes,Cirrhitidae,Amblycirrhitus,pinos,Amblycirrhitus_pinos,red-spotted hawkfish,Sadovy & Donaldson 1995 
+Perciformes,Cirrhitidae,Cirrhitus ,pinnulatus,Cirrhitus_pinnulatus,stocky hawkfish,"Sadovy & Donaldson 1995, Donaldson 1988 "
+Perciformes,Cirrhitidae,Neocirrhites,armatus,Neocirrhites_armatus,flame hawkfish,"Sadovy & Donaldson 1995, Whiteman et al. 2004 "
+Perciformes,Cirrhitidae,Paracirrhites,arcatus,Paracirrhites_arcatus,arc-eye hawkfish,"Sadovy & Donaldson 1995, Donaldson & Colin 1989, Donaldson 1988 "
+Perciformes,Cirrhitidae,Paracirrhites,forsteri,Paracirrhites_forsteri,blackside hawkfish,"Sadovy & Donaldson 1995, Kadota et al. 2010, Donaldson 1988 "
+Perciformes,Clinidae,Clinitrachus,argentatus,Clinitrachus_argentatus,,"Patzner & Lahnsteiner 2009, Wirtz & Zander 1986 "
+Perciformes,Clinidae,Heterostichus,rostratus,Heterostichus_rostratus,Giant kelpfish,"Coyer 1982, Mank & Avise 2006 "
+Perciformes,Coryphaenidae,Coryphaena ,hippurus,Coryphaena_hippurus,common dolphinfish,"Zuniga-Flores et al. 2011, Dos Santos et al. 2014, Palko et al. 1982 Retheesh et al. 2017 "
+Perciformes,Creediidae,Limnichthys,fasciatus,Limnichthys_fasciatus,Barred sand burrower,Shitamitsu and Sunobe 2017
+Perciformes,Dactyloscopidae,Gillellus,rubrocinctus,Platygillellus_rubrocinctus,Saddle stargazer,Rasotto 1995
+Perciformes,Echeneidae,Remora,brachyptera,Remora_brachyptera,spearfish remora,Banon et al. 2017 
+Perciformes,Eleginopidae,Eleginops,maclovinus,Eleginops_maclovinus,Patagonian blennie,Brickle et al. 2005 
+Perciformes,Eleotridae,Bostrychus,sinensis,Bostrychus_sinensis,Four-eyed sleeper,"Hong et al. 2006, Wang et al. 2011 "
+Perciformes,Eleotridae,Gobiomorphus,breviceps,Gobiomorphus_breviceps,Upland bully,"Hamilton et al. 1997, Mank & Avise 2006 "
+Perciformes,Eleotridae,Gobiomorus,dormitor,Gobiomorus_dormitor,Bigmouth sleeper,"Hernandenz-Saavedra et al. 2004, Bacheler et al. 2004 "
+Perciformes,Embiotocidae,Cymatogaster,aggregata,Cymatogaster_aggregata,Shiner perch,"Wiebe 1968, Breder & Rosen 1966, Liu & Avise 2011 "
+Perciformes,Embiotocidae,Embiotoca,jacksoni,Embiotoca_jacksoni,Black perch,"Bond et al. 2017, Breder & Rosen 1966 Reisser et al. 2009 "
+Perciformes,Gempylidae,Ruvettus,pretiosus,Ruvettus_pretiosus,oilfish,Vasilakopoulas et al. 2011 
+Perciformes,Gerreidae,Gerres,filamentosus,Gerres_filamentosus,Whipfin silver-biddy,Cyrus & Blaber 1984 
+Perciformes,Gerreidae,Gerres,longirostris,Gerres_longirostris,Strongspine silver-biddy,Cyrus & Blaber 1984 
+Perciformes,Gerreidae,Gerres,methueni,Gerres_methueni,Striped silver biddy,Cyrus & Blaber 1984 
+Perciformes,Girellidae,Girella,leonina,Girella_leonina,,Takai et al. 2017 
+Perciformes,Girellidae,Girella,punctata,Girella_punctata,,Takai et al. 2017 
+Perciformes,Gobiidae,Amblygobius,nocturnus,Amblygobius_nocturnus,Pyjama goby,"Mazzoldi et al. 2005, Whiteman 2004 "
+Perciformes,Gobiidae,Amblygobius,rainfordi,Koumansetta_rainfordi,Rainford's goby,Mazzoldi et al. 2005 
+Perciformes,Gobiidae,Bathygobius,fuscus,Bathygobius_fuscus,dusky frillgoby,"Fishelson, 1991, Mank & Avise 2006 , Tsuboi & Sakai 2016 "
+Perciformes,Gobiidae,Buenia,jeffreysii,Buenia_jeffreysii,Jeffrey's goby,"Fishelson, 1991, Byrkjedal et al. 2016 "
+Perciformes,Gobiidae,Cryptocentrus,lutheri,Cryptocentrus_lutheri,Luther's prawn goby,Mazzoldi et al. 2005  
+Perciformes,Gobiidae,Gillichthys,mirabilis,Gillichthys_mirabilis,Longjaw mudsucker,"Weisel 1949, Weisel 1947 "
+Perciformes,Gobiidae,Glossogobius,giuris,Glossogobius_giuris,Tank goby,"Sircar & Har 1980, Islam et al. 2014  "
+Perciformes,Gobiidae,Glossogobius,olivaceus,Glossogobius_olivaceus,Urohaze goby,"Asahina et al. 1983, Senta & Wada 1970 "
+Perciformes,Gobiidae,Gobiodon,oculolineatus,Gobiodon_oculolineatus,eyeline coralgoby,"Cole, 2010, Nakashima et al. 1996, Whiteman & Cote 2003 "
+Perciformes,Gobiidae,Gobiodon,okinawae,Gobiodon_okinawae,Yellow clown goby,"Cole & Hoese 2001, Nakashima et al. 1996"
+Perciformes,Gobiidae,Gobiodon,quinquestrigatus,Gobiodon_quinquestrigatus,Five-lined coral goby,"Cole 1990, Nakashima et al. 1996, Whiteman et al. 2004 "
+Perciformes,Gobiidae,Gobiodon,rivulatus,Gobiodon_rivulatus,rippled goby,"Cole, 2010, Nakashima et al. 1996 "
+Perciformes,Gobiidae,Gobius,cobitis,Gobius_cobitis,giant goby,"Fishelson, 1991, Faria et al. 1998 , Mazzoldi et al. 2005 "
+Perciformes,Gobiidae,Gobius,niger,Gobius_niger,Black goby,"Mazzoldi et al. 2005, Mank & Avise 2006 "
+Perciformes,Gobiidae,Gobius,paganellus,Gobius_paganellus,Rock goby,"Stanley et al. 1965, Miller 1961, Mazzoldi et al. 2005 "
+Perciformes,Gobiidae,Knipowitschia,panizzae,Knipowitschia_panizzae,Adriatic dwarf goby,"Mazzoldi et al. 2005, Massironi et al. 2005 "
+Perciformes,Gobiidae,Lythrypnus,dalli,Lythrypnus_dalli,Blue-banded goby,"Drilling & Grober 2005, Rodgers et al. 2006, Tsuboi & Sakai 2016 "
+Perciformes,Gobiidae,Neogobius,melanostomus,Neogobius_melanostomus,Round goby,"Arbuckle et al. 2005, Marentette et al. 2009, Corkum et al. 2004 "
+Perciformes,Gobiidae,Padogobius,bonelli,Padogobius_bonelli,Padanian goby,"Mazzoldi et al. 2005 , Pompei et al. 2016 "
+Perciformes,Gobiidae,Paragobiodon,echinocephalus,Paragobiodon_echinocephalus,Redhead goby,"Cole 1990, Kuwamura et al. 1994, Whiteman and Cote 2004 "
+Perciformes,Gobiidae,Pomatoschistus,marmoratus,Pomatoschistus_marmoratus,Mural goby,"Mazzoldi et al. 2005, Mazzoldi et al. 2002 "
+Perciformes,Gobiidae,Pomatoschistus,microps,Pomatoschistus_microps,common goby,"Cole, 2010, Mank & Avise 2006 , Nakashima et al. 1996 "
+Perciformes,Gobiidae,Pomatoschistus,minutus,Pomatoschistus_minutus,Sand goby,"Mazzoldi et al. 2005, Lindstrom & Hellstrom 1991, Jones et al. 2001 "
+Perciformes,Gobiidae,Valenciennea,muralis,Valenciennea_muralis,Painted grudgeon,"Sircar & Har 1980, Mazzoldi et al. 2005 , Hernaman & Munday 2007 "
+Perciformes,Gobiidae,Valenciennea,sexguttata,Valenciennea_sexguttata,Sixspot goby,"Mazzoldi et al. 2005 , Whiteman & Cote 2003 "
+Perciformes,Gobiidae,Valenciennea,strigata,Valenciennea_strigata,Blueband goby,"Mazzoldi et al. 2005, Whiteman 2004 "
+Perciformes,Gobiidae,Zosterisessor,ophiocephalus,Zosterisessor_ophiocephalus,Grass goby,"Lahnsteiner et al. 1992, Locatello et al. 2013, Mazzoldi 2000 "
+Perciformes,Grammatidae,Gramma,brasiliensis,Gramma_brasiliensis,Brazilian basslet,Leite et al. 2016 
+Perciformes,Grammatidae,Gramma,loreto,Gramma_loreto,Royal gramma,"Asoh & Shapiro 1997, Asoh et al. 1996 "
+Perciformes,Haemulidae,Haemulon,flavolineatum,Haemulon_flavolineatum,french grunt,"Rasotto & Sadovy, 1995, Shulman & Ogden 1987 Barden et al. 2014 "
+Perciformes,Haemulidae,Haemulon,plumierii,Haemulon_plumierii,white grunt,"Rasotto & Sadovy, 1995, Breder & Rosen 1966, Saksena & Richards 1975 "
+Perciformes,Hapalogenyidae,Hapalogenys,nigripinnis,Hapalogenys_nigripinnis,Short barbeled velvetchin,
+Perciformes,Icosteidae,Icosteus,aenigmaticus,Icosteus_aenigmaticus,ragfish,Allen 2001 
+Perciformes,Istiophoridae,Makaira,nigricans,Makaira_nigricans,blue marlin,"de Sylva & Breder 1997, Sun et al. 2009 Shimose et al. 2009 "
+Perciformes,Istiophoridae,Tetrapturus,albidus,Kajikia_albida,atlantic white marlin,de Sylva & Breder 1997 
+Perciformes,Istiophoridae,Tetrapturus,angustirostris,Tetrapturus_angustirostris,shortbill spearfish,Merrett 1970 
+Perciformes,Istiophoridae,Tetrapturus,audax,Kajikia_audax,striped marlin,de Sylva & Breder 1997 
+Perciformes,Kraemeriidae,Kraemeria,bryani,Kraemeria_bryani,Bryan's sand dart,Burns & Cole 2017 
+Perciformes,Kurtidae,Kurtus,gulliveri,Kurtus_gulliveri,nurseryfish,"Berra et al. 2007, Breder & Rosen 1966 Sommer et al. 2011 "
+Perciformes,Kyphosidae,Kyphosus,biggibus,Kyphosus_bigibbus,brown chub,Yamaguchi et al. 2011
+Perciformes,Labridae,Cheilinus,undulatus,Cheilinus_undulatus,Humphead wrasse,"Sadovy de Mitcheson et al. 2010, Colin 2010 "
+Perciformes,Labridae,Halichoeres,bivittatus,Halichoeres_bivittatus,Slippery dick,"Warner & Robertson 1978, Shulman and Bermingham 1995 "
+Perciformes,Labridae,Halichoeres,garnoti,Halichoeres_garnoti,Yellowhead wrasse,"Warner & Robertson 1978, Swearer & Robertson 1999 "
+Perciformes,Labridae,Halichoeres,maculipinna,Halichoeres_maculipinna,Clown wrasse,Warner & Robertson 1978
+Perciformes,Labridae,Halichoeres,melanurus,Halichoeres_melanurus,Tail-spot wrasse,Kuwamura et al. 2000 
+Perciformes,Labridae,Halichoeres,pictus,Halichoeres_pictus,Rainbow wrasse,Warner & Robertson 1978
+Perciformes,Labridae,Halichoeres,poeyi,Halichoeres_poeyi,Blackear wrasse,Warner & Robertson 1978
+Perciformes,Labridae,Thalassoma,bifasciatum,Thalassoma_bifasciatum,Bluehead,"Warner & Robertson 1978, Petersen et al. 2001, Taborsky 1994, Mank & Avise 2006 "
+Perciformes,Labrisomidae,Labrisomus,bucciferus,Labrisomus_bucciferus,Puffcheek blenny,Rasotto 1995
+Perciformes,Labrisomidae,Labrisomus,haitiensis,Labrisomus_haitiensis,Longfin blenny,Rasotto 1995
+Perciformes,Labrisomidae,Labrisomus,nuchipinnis,Labrisomus_nuchipinnis,Hairy blenny,"Rasotto 1995, Gibran et al. 2004 "
+Perciformes,Labrisomidae,Malacoctenus,macropus,Malacoctenus_macropus,Rosy blenny,"Rasotto 1995, Petersen 1988 "
+Perciformes,Labrisomidae,Malacoctenus,triangulatus,Malacoctenus_triangulatus,Saddled blenny,"Rasotto 1995, Draud et al. 1990, Hanlon & Hixon 1986 "
+Perciformes,Labrisomidae,Malacoctenus,versicolor,Malacoctenus_versicolor,Barfin blenny,Rasotto 1995
+Perciformes,Labrisomidae,Paraclinus,nigripinnis,Paraclinus_nigripinnis,Blackfin blenny,Rasotto 1995
+Perciformes,Labrisomidae,Starksia,atlantica,Starksia_atlantica,Smooth-eye blenny,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,elongata,Starksia_elongata,Elongate blenny,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,fasciata,Starksia_fasciata,Blackbar blenny,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,fulva,Starksia_fulva,Yellow blenny,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,galapagensis,Starksia_galapagensis,Galapagos blenny,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,greenfieldi,Starksia_greenfieldi,,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,guadalupae,Starksia_guadalupae,Guadalupe blenny,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,guttata,Starksia_guttata,Spotted blenny,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,hoesei,Starksia_hoesei,Hose blenny,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,lepicoelia,Starksia_lepicoelia,Blackcheek blenny,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,nanodes,Starksia_nanodes,Dwarf blenny,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,occidentalis,Starksia_occidentalis,Occidental blenny,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,sangreyae,Starksia_sangreyae,Sangrey's blenny,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,sluiteri,Starksia_sluiteri,Chessboard blenny,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,smithvanizi,Starksia_smithvanizi,Brokenbar blenny,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,spinipenis,Starksia_spinipenis,Phallic blenny,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,weigti,Starksia_weigti,Weigt's blenny,Fishelson et al. 2013
+Perciformes,Labrisomidae,Starksia,williamsi,Starksia_williamsi,,Fishelson et al. 2013
+Perciformes,Labrisomidae,Xenomedea,rhodopyga,Xenomedea_rhodopyga,,Fishelson et al. 2013
+Perciformes,Lateolabracidae,Lateolabrax,japonicus,Lateolabrax_japonicus,Japanese seabass,"Hayashi 1969, Hibino et al. 2007 "
+Perciformes,Latidae,Lates,niloticus,Lates_niloticus,nile perch,"Basiita et al. 2010, Mwanja & Mwanja 2008"
+Perciformes,Leiognathidae,Leiognathus,equulus,Leiognathus_equulus,common ponyfish,Lee et al. 2005
+Perciformes,Lethrinidae,Lethrinus,atkinsoni,Lethrinus_atkinsoni,pacific yellowtail emperor,"Ebisawa 1999, Al-Areeki et al. 2007"
+Perciformes,Lutjanidae,Lutjanus,argentiventris,Lutjanus_argentiventris,Yellow snapper,"Lucano-Ramirez et al., 2014, Mank & Avise "
+Perciformes,Lutjanidae,Lutjanus,kasmira,Lutjanus_kasmira,Common bluestripe snapper,Suzuki & Hioki 1979 
+Perciformes,Luvaridae,Luvarus,imperialis,Luvarus_imperialis,Luvar,
+Perciformes,Malacanthidae,Caulolatilus,microps,Caulolatilus_microps,grey tilefish,Ross & Merriner 1983 
+Perciformes,Microdesmidae,Cerdale,floridana,Cerdale_floridana,Pugjaw wormfish,Thacker & Grier 2005 
+Perciformes,Microdesmidae,Microdesmus,bahianus,Microdesmus_bahianus,,Thacker & Grier 2005 
+Perciformes,Moronidae,Morone,saxatilis,Morone_saxatilis,striped bass,"Holland et al. 2000, Holland et al. 1996, Balon 1975, Liu & Ely 2009, Hassin et al. 2000 "
+Perciformes,Mullidae,Upeneus,tragula,Upeneus_tragula,freckled goatfish,Pavlov et al. 2014 
+Perciformes,Nandidae,Nandus,nandus,Nandus_nandus,gangetic leaffish,"Dalela, Rani, & Verma 1976, Pal et al. 2003 , Sarkar et al. 2009 "
+Perciformes,Nemipteridae,Nemipterus,japonicus,Nemipterus_japonicus,Japanese threadfin bream,"Lau & Sadovy 2001, Puentes Granada et al. 2004 "
+Perciformes,Nemipteridae,Nemipterus,virgatus,Nemipterus_virgatus,Golden threadfin bream,"Lau & Sadovy 2001, Breder & Rosen 1966 "
+Perciformes,Nototheniidae,Dissostichus,mawsoni,Dissostichus_mawsoni,antarctic toothfish,Piyanova & Kokorin 2010
+Perciformes,Nototheniidae,Patagonotothen,tessellata,Patagonotothen_tessellata,black southern cod,"Rae & Calvo 1996, 1995"
+Perciformes,Nototheniidae,Pleuragramma,antarctica,Pleuragramma_antarctica,antarctic silverfish,"Ghigliotti et al. 2017, Vacchi et al. 2004 "
+Perciformes,Odacidae,Odax,pullus,Odax_pullus,butterfish,Trip et al. 2011 
+Perciformes,Percichthyidae,Macquaria,novemaculeata,Macquaria_novemaculeata,Australian bass,Harris 1986 
+Perciformes,Percidae,Etheostoma,caeruleum,Etheostoma_caeruleum,Rainbow darter,"Mank & Avise 2006, Taborsky 1994, Balon 1990"
+Perciformes,Percidae,Percina,caprodes,Percina_caprodes,Logperch,"Mank & Avise 2006, Taborsky 1994, Balon 1975, Cooper 1978 "
+Perciformes,Percidae,Zingel,asper,Zingel_asper,rhone streber,"Chevalier, de Conto, & Exbrayat 2011, Danancher et al. 2008 "
+Perciformes,Pholidae,Pholis,nebulosa,Pholis_nebulosa,Tidepool gunnel,"Kimura et al. 1989, Kimura et al. 1988, Gnyubkina & Markevich 2008"
+Perciformes,Pinguipedidae,Parapercis,snyderi,Parapercis_snyderi,U-mark sandperch,"Ohnishi et al. 1997, Carvalho et al. 2003"
+Perciformes,Pinguipedidae,Pinguipes,brasilianus,Pinguipes_brasilianus,brazilian sandperch,Villanueva-Gomila et al. 2015
+Perciformes,Polynemidae,Eleutheronema,tetradactylum,Eleutheronema_tetradactylum,fourfinger threadfin,"Shihab et al. 2017, Horne et al. 2011 "
+Perciformes,Polyprionidae,Polyprion,americanus,Polyprion_americanus,wreckfish,Peres & Klippel 2003 
+Perciformes,Pomacanthidae,Holacanthus,tricolor,Holacanthus_tricolor,rock beauty,"Hourigan & Kelley 1985, Moyer et al. 1983 "
+Perciformes,Pomacentridae,Dascyllus ,aruanus,Dascyllus_aruanus,whitetail dascyllus,"Cole 2002, Mizushima 2000 , Coates 1982, Wong et al. 2012"
+Perciformes,Priacanthidae,Priacanthus,hamrur,Priacanthus_hamrur,moontail bullseye,Sivakami et al. 2001 
+Perciformes,Rachycentridae,Rachycentron,canadum,Rachycentron_canadum,cobia,"Dhansekar, Selvakumar & Munuswamy, Joseph et al. 1964 "
+Perciformes,Rhyacichthyidae,Rhyacichthys,aspro,Rhyacichthys_aspro,Loach goby,Miller 1992 
+Perciformes,Scaridae,Chlorurus,gibbus,Chlorurus_gibbus,Heavybeak parrotfish,"Mank & Avise 2006, Breder & Rosen 1966, "
+Perciformes,Scaridae,Scarus,psittacus,Scarus_psittacus,Common parrotfish,"Mank & Avise 2006, Choat & Robertson 1975, "
+Perciformes,Scatophagidae,Scatophagus,argus,Scatophagus_argus,spotted scat,"Shao, Hwang & Lee 2004, Barry & Fast 1992 , Madhavi et al. 2015 "
+Perciformes,Schindleriidae,Schindleria,praematura,Schindleria_praematura,Schindler's fish,Thacker and Grier 2005 
+Perciformes,Sciaenidae,Otolithes,ruber,Otolithes_ruber,tigertooth croaker,"Dadzie & Abou-Seedo, 2004, Breder & Rosen 1966 "
+Perciformes,Scombridae,Thunnus,alalunga,Thunnus_alalunga,albacore,"Ratty, Laurs, & Kelly 1990, Breder & Rosen 1966 "
+Perciformes,Scombrolabracidae,Scombrolabrax,heterolepis,Scombrolabrax_heterolepis,longfin escolar,Bond and Uyeno 1981 
+Perciformes,Serranidae,Bullisichthys,caribbaeus,Bullisichthys_caribbaeus,pugnose bass,Smith & Erdman 1973
+Perciformes,Serranidae,Epinephelus,tauvina,Epinephelus_tauvina,greasy grouper,"Abu-Hakima 1987, Mathew et al. 2002, Ohta et al. 2017"
+Perciformes,Serranidae,Serranus,cabrilla,Serranus_cabrilla,comber,"Garcia-Diaz et al. 1997, Lahnsteiner 2006, Garcia-Diaz et al. 2002"
+Perciformes,Serranidae,Serranus,scriba,Serranus_scriba,painted comber,"Tuset et al. 2005, Taborsky 1994, Alos et al. 2013"
+Perciformes,Siganidae,Siganus,luridus,Siganus_luridus,dusky spinefoot,Azzurro et al. 2007
+Perciformes,Sillaginidae,Sillago,robusta,Sillago_robusta,Stout whiting,Butcher & Brown 1995 
+Perciformes,Sparidae,Cheimerius,nufar,Cheimerius_nufar,Santer seabream,"Mank & Avise 2006, Taborsky 1994, Garratt 1991"
+Perciformes,Sparidae,Pagrus,auratus,Chrysophrys_auratus,Silver seabream,"Mank & Avise 2006, Taborsky 1994, Nahas et al. 2003 "
+Perciformes,Sphyraenidae,Sphyraena,barracuda,Sphyraena_barracuda,great barracuda,"DeSylva 1963, D'Allesandro et al. 2011 "
+Perciformes,Stichaeidae,Ulvaria,subbifurcata,Ulvaria_subbifurcata,radiated shanny,"LeDrew & Green 1975, Coleman 1992"
+Perciformes,Stromateidae,Peprilus,medius,Peprilus_medius,pacific harvestfish,Maldonade-Amparo et al. 2017 
+Perciformes,Trichiuridae,Lepidopus,caudatus,Lepidopus_caudatus,silver scabbardfish,"Tuset et al. 2006, Breder & Rosen 1966 "
+Perciformes,Tripterygiidae,Enneapterygius,atriceps,Enneapterygius_atriceps,Hawaiian blackhead triplefin,"Longenecker & Langston, 2005"
+Perciformes,Trypterygiidae,Axoclinus,nigricaudus,Axoclinus_nigricaudus,Cortez triplefin,Neat 2001
+Perciformes,Trypterygiidae,Enneanectes,boehlkei,Enneanectes_boehlkei,Roughhead triplefin,"Rasotto 1995, Thresher 1984"
+Perciformes,Trypterygiidae,Enneanectes,carminalis,Enneanectes_carminalis,Delicate triplefin,Neat 2001
+Perciformes,Trypterygiidae,Enneanectes,pectoralis,Enneanectes_pectoralis,Redeye triplefin,"Rasotto 1995, Thresher 1984"
+Perciformes,Trypterygiidae,Tripterygion,delaisi,Tripterygion_delaisi,,De Jonge et al. 1989 
+Perciformes,Trypterygiidae,Tripterygion,tripteronotum,Tripterygion_tripteronotum,Red-black triplefin,De Jonge et al. 1989 
+Perciformes,Xiphiidae,Xiphias,gladius,Xiphias_gladius,swordfish,"Young and Drake 2002, Palko et al. 1981 "
+Perciformes,Zoarcidae,Zoarces,americanus,Zoarces_americanus,Ocean pout,"Yao & Crim 1995, Steimle et al. 1999, Keats et al. 1985 "
+Percopsiformes,Aphredoderidae,Aphredoderus,sayanus,Aphredoderus_sayanus,Pirate perch,"Mank & Avise 2006, Fletcher et al. 2004 "
+Pleuronectiformes,Achiridae,Achirus,lineatus,Achirus_lineatus,Lined sole,"Kobelkowsky 2000, Burghart et al. 2014 "
+Pleuronectiformes,Achiridae,Gymnachirus,texae,Gymnachirus_texae,Mexican fringed sole,Kobelkowsky 2000 
+Pleuronectiformes,Achiridae,Trinectes,maculatus,Trinectes_maculatus,Hogchoker,"Kobelkowsky 2000, Smith 1986 "
+Pleuronectiformes,Bothidae,Bothus,ellipticus,Bothus_ellipticus,,"Konstantinou & Shen 1995, Mank & Avise 2006, Morato et al. 2007 "
+Pleuronectiformes,Bothidae,Bothus,ocellatus,Bothus_ocellatus,Eyed flounder,"Konstantinou & Shen 1995, Mank & Avise 2006, Manabe et al. 2000 "
+Pleuronectiformes,Bothidae,Engyprosopon,grandisquama,Engyprosopon_grandisquama,Largescale flounder,"Manabe et al. 2000, Mank & Avise 2006 "
+Pleuronectiformes,Cynoglossidae,Cynoglossus,arel,Cynoglossus_arel,largescale tonguesole,Ghaffari et al. 2015 
+Pleuronectiformes,Osphronemidae,Betta,splendens,Betta_splendens,siamese fighting fish,"Lim et al. 2014, Clotfelter et al. 2006 "
+Pleuronectiformes,Osphronemidae,Colisa,lalia,Trichogaster_lalius,dwarf gourami,"Hayakawa & Kobayashi 2010, Sahu et al. 2018 "
+Pleuronectiformes,Pleuronectidae,Kareius,bicoloratus,Kareius_bicoloratus,stone flounder,"Kang, Kim, & Chung 2016 "
+Pleuronectiformes,Pleuronectidae,Pseudopleuronectes,americanus,Pseudopleuronectes_americanus,Winter flounder,"Breder 1922, Mank & Avise 2006 "
+Pleuronectiformes,Psettodidae,Psettodes,erumei,Psettodes_erumei,indian halibut,Ramanathan & Natarajan 1979 
+Pleuronectiformes,Scophthalmidae,Psetta,maxima,Scophthalmus_maximus,turbot,"Caputo et al. 2001, McEvoy & McEvoy 1992 "
+Pleuronectiformes,Scophthalmidae,Scophthalmus,rhombus,Scophthalmus_rhombus,brill,Caputo et al. 2001 
+Pleuronectiformes,Soleidae,Solea,senegalensis,Solea_senegalensis,senegalese sole,"Garcia-Lopez, Martinez-Rodriques, & Sarasquete 2005, Ramos-Judez et al. 2021, "
+Polypteriformes,Polypteridae,Erpetoichthys,calabaricus,Erpetoichthys_calabaricus,Reedfish,"Britz & Bartsch 1998, "
+Saccopharyngiformes,Cyematidae,Cyema,atrum,Cyema_atrum,bobtail eel,Fishelson 1994 
+Saccopharyngiformes,Eurypharyngidae,Eurypharynx,pelecanoides,Eurypharynx_pelecanoides,pelican eel,Fishelson 1994 
+Salmoniformes,Salmonidae,Salmo,salar,Salmo_salar,Atlantic salmon,"Aubin-Horth & Dodson 2004, Taborsky 1994, Balon 1975 "
+Salmoniformes,Salmonidae,Salvelinus,malma,Salvelinus_malma,Dolly varden,"Koseki et al. 2002, Taborsky 1994, Balon 1975 "
+Scorpaeniformes,Agonidae,Aspidophoroides ,monopterygius,Aspidophoroides_monopterygius,alligatorfish,Arbour et al. 2010
+Scorpaeniformes,Anoplopomatidae,Anoplopoma,fimbria,Anoplopoma_fimbria,sablefish,"Luckenbach & Fairgrieve 2016, Kendal et al. 1987, Morita et al. 2012"
+Scorpaeniformes,Cottidae,Cottus,bairdii,Cottus_bairdii,Mottled sculpin,"Fiumera et al. 2002, Mank & Avise 2006 "
+Scorpaeniformes,Cottidae,Cottus,nozawae,Cottus_nozawae,Fluvial sculpin,"Goto 1982, Mank & Avise 2006 "
+Scorpaeniformes,Cottidae,Radulinopsis,taranetzi,Radulinopsis_taranetzi,,Abe & Munehara 2007
+Scorpaeniformes,Hexagrammidae,Hexagrammos,agrammus,Hexagrammos_agrammus,spotty-bellied greenling,"Kurita et al. 1995 , Munehara et al. 2000"
+Scorpaeniformes,Jordaniidae,Jordania,zonope,Jordania_zonope,Longfin sculpin,"Koya & Hayakawa 2011, Demetropoulos et al. 1990 "
+Scorpaeniformes,Platycephalidae,Platycephalus,bassensis,Platycephalus_bassensis,Southern sand flathead,"Bani et al. 2009, "
+Scorpaeniformes,Scorpaenidae,Caracanthus,typicus,Caracanthus_typicus,hawaiian orbicular velvetfish,Cole 2003
+Scorpaeniformes,Scorpaenidae,Caracanthus,unipinna,Caracanthus_unipinna,pygmy coral croucher,"Cole 2003, Wong et al. 2005"
+Scorpaeniformes,Scorpaenidae,Dendrochirus,zebra,Dendrochirus_zebra,Zebra turkeyfish,"Moyer & Zaiser 1981, Mank & Avise "
+Scorpaeniformes,Scorpaenidae,Scorpaena,notata,Scorpaena_notata,Small red scorpionfish,"Munoz, Casadevall, & Bonet, 2002, Munoz et al. 2002 "
+Scorpaeniformes,Scorpaenidae,Scorpaena,porcus,Scorpaena_porcus,black scorpionfish,"Sabat et al. 2009, Breder & Rosen 1966 "
+Scorpaeniformes,Scorpaenidae,Scorpaena,scrofa,Scorpaena_scrofa,red scorpionfish,"Sabat et al. 2009, Breder & Rosen 1966 "
+Scorpaeniformes,Sebastidae,Helicolenus,dactylopterus,Helicolenus_dactylopterus,blackbelly rosefish,"Munoz, Casadevall, & Bonet 1999, Pavlov & Emel Yanova 2013 "
+Scorpaeniformes,Triglidae,Chelidonichthys,obscura,Chelidonichthys_obscurus,longfin gurnard,"Munoz, Casadevall, & Bonet 2009, Turan et al. 2016 "
+Scorpaeniformes,Triglidae,Trigla,lyra,Trigla_lyra,Piper gurnard,"Munoz et al., 2002, Breder & Rosen 1966 "
+Siluriformes,Amphiliidae,Amphilus,natalensis,Amphilius_natalensis,natal mountain catfish,Mariott et al. 1997 
+Siluriformes,Ariidae ,Sciades,couma,Sciades_couma,Couma catfish,Loir et al. 1989
+Siluriformes,Ariidae ,Sciades,parkeri,Sciades_parkeri,Gillbacker catfish,Loir et al. 1989
+Siluriformes,Ariidae ,Sciades,proops,Sciades_proops,Crucifix catfish,"Loir et al. 1989, Carvallho et al. 2015 "
+Siluriformes,Astroblepidae,Astroblepus,choate,Astroblepus_chotae,,Spadella et al. 2012
+Siluriformes,Astroblepidae,Astroblepus,sabalo,Astroblepus_sabalo,,Spadella et al. 2012
+Siluriformes,Astroblepidae,Astroblepus,trifasciatus,Astroblepus_trifasciatus,,Spadella et al. 2012
+Siluriformes,Auchenipteridae,Ageneiosus,inermis,Ageneiosus_inermis,Manduba,Loir et al. 1989
+Siluriformes,Auchenipteridae,Auchenipterus,nuchalis,Auchenipterus_nuchalis,Moustache cat,Mazzoldi et al. 2007
+Siluriformes,Auchenipteridae,Tatia,intermedia,Tatia_intermedia,Driftwood cat,Mazzoldi et al. 2007
+Siluriformes,Auchenipteridae,Trachelyopterus,galeatus,Trachelyopterus_galeatus,Common woodcat,"Meisner et al. 2000, Lemes et al. 2016 "
+Siluriformes,Auchenipteridae,Trachelyopterus,lucenai,Trachelyopterus_lucenai,,Meisner et al. 2000
+Siluriformes,Auchenipteridae,Trachelyopterus,striatulus,Trachelyopterus_striatulus,Singing catfish,Ihering 1937
+Siluriformes,Bagridae,Mystus,tengara,Mystus_tengara,Indian catfish,Rastogi 1969
+Siluriformes,Bagridae,Mystus,vitattus,Mystus_vittatus,striped dwarf catfish,"Joy & Singh 1998, Hossain 2014 "
+Siluriformes,Bagridae,Rita,rita,Rita_rita,,"Joy & Singh, 1998 "
+Siluriformes,Callichthyidae,Callichthys,callichthys,Callichthys_callichthys,Armoured catfish,"Mazzoldi et al. 2007, Ridley 1978"
+Siluriformes,Callichthyidae,Corydoras,aeneus,Corydoras_aeneus,Bronze cory,"Mazzoldi et al. 2007, Kohda et al. 2002, Mank & Avise 2006 "
+Siluriformes,Callichthyidae,Corydoras,bondi,Corydoras_bondi,Blackstripe cory,Mazzoldi et al. 2007
+Siluriformes,Callichthyidae,Corydoras,ehrhardti,Corydoras_ehrhardti,,Mazzoldi et al. 2007
+Siluriformes,Callichthyidae,Corydoras,potaroensis,Corydoras_potaroensis,,Mazzoldi et al. 2007
+Siluriformes,Callichthyidae,Hoplosternum,littorale,Hoplosternum_littorale,Fork tailed hoplo,"Mazzoldi et al. 2007, Hostache & Mol 1998, Breder & Rosen 1966 "
+Siluriformes,Cetopsidae,Helogenes,marmoratus,Helogenes_marmoratus,,Loir et al. 1989
+Siluriformes,Clariidae,Clarias,batrachus,Clarias_batrachus,Walking catfish,"Singh & Joy 1999, Ridley 1978, Breder & Rosen 1966 "
+Siluriformes,Clariidae,Clarias,gariepinus,Clarias_gariepinus,African catfish,"Van den Hurk 1987, Bruton 1979, Bruton 1978 "
+Siluriformes,Clariidae,Heterobranchus,longifilis,Heterobranchus_longifilis,Sampa,Oteme et al. 1996 
+Siluriformes,Claroteidae,Auchenoglanis,occidentalis,Auchenoglanis_occidentalis,bubu,"Shinkafi, Ipinjolu, & Hassan 2011 "
+Siluriformes,Claroteidae,Clarotes,laticeps,Clarotes_laticeps,widehead catfish,"Ekokotu, Olele 2014 "
+Siluriformes,Doradidae,Hassar,affinis,Hassar_affinis,,Cantanhede et al. 2016
+Siluriformes,Heptapteridae,Pimelodella,vitatta,Pimelodella_vittata,,Santos et al. 2010 
+Siluriformes,Heptapteridae,Rhamdia ,quelen,Rhamdia_quelen,south american catfish,"Tessaro et al. 2012, Silva et al. 2003"
+Siluriformes,Heteropneustidae,Heteropneustes,fossilis,Heteropneustes_fossilis,Asian stinging catfish,"Nayyar & Sundararaj 1970, Orkisz et al. 2010 "
+Siluriformes,Horabagridae ,Horabagrus,brachysoma,Horabagrus_brachysoma,Günther's catfish,"Chandran & Prasad 2018, Bindu et al. 2012"
+Siluriformes,Ictaluridae,Ictalurus,furcatus,Ictalurus_furcatus,blue catfish,Sneed & Clemmens 1963
+Siluriformes,Ictaluridae,Ictalurus,punctatus,Ictalurus_punctatus,channel catfish,Sneed & Clemmens 1963
+Siluriformes,Ictaluridae,Noturus,gyrinus,Noturus_gyrinus,tadpole madtom,Whiteside & Burr 1986 
+Siluriformes,Loricariidae,Fonchiiichthys,uracanthus,Fonchiiichthys_uracanthus,,Eric et al. 1982
+Siluriformes,Loricariidae,Rhinelepis,aspera,Rhinelepis_aspera,,Melo et al. 2011 
+Siluriformes,Malapteruridae,Malapterurus,electricus,Malapterurus_electricus,electric catfish,Shahin 2006 
+Siluriformes,Mochokidae,Synodontis,multipunctata,Synodontis_multipunctatus,,"Mank & Avise 2006 , Taborsky 1994"
+Siluriformes,Pangasiidae,Pangassius,pangassius,Pangasius_pangasius,pangas catfish,"Joy & Singh, 1998 "
+Siluriformes,Pimelodidae,Conorhynchos,conirostris,Conorhynchos_conirostris,pira catfish,Cruz & dos Santos 2004 
+Siluriformes,Pimelodidae,Iheringichtys,labrosus,Iheringichthys_labrosus,,Cruz & dos Santos 2004 
+Siluriformes,Pimelodidae,Pimelodus,maculatus,Pimelodus_maculatus,,Cruz & dos Santos 2004 
+Siluriformes,Pimelodidae,Pseudoplatystoma ,corruscans ,Pseudoplatystoma_corruscans,Spotted sorubim,"Brito & Bazzoli 2003, Godinho et al. 2007"
+Siluriformes,Plotosidae,Neosilurus,ater,Neosilurus_ater,Narrowfront tandan,"Orr & Milward 1984, Mank & Avise 2006 "
+Siluriformes,Plotosidae,Neosilurus,hyrtlii,Neosilurus_hyrtlii,Glencoe tandan,"Orr & Milward 1984, Mank & Avise 2006 "
+Siluriformes,Pseudopimelodidae,Lophiosilurus,alexandri,Lophiosilurus_alexandri,,"Melo et al. 2011, Guimaraes-Cruz et al. 2009 "
+Siluriformes,Schilbeidae,Eutropiichthys,vacha,Eutropiichthys_vacha,Batchwa vacha,Soomro et al. 2012 
+Siluriformes,Schilbeidae,Schilbe,mystus,Schilbe_mystus,African butter catfish,Ayoade 2010 
+Siluriformes,Scoloplacidae,Scoloplax,distolothrix,Scoloplax_distolothrix,,Spadella et al. 2008 
+Siluriformes,Siluridae,Ompok ,siluroides,Ompok_siluroides,,"Joy & Singh, 1998 "
+Siluriformes,Siluridae,Silurus,aristotelis,Silurus_aristotelis,Aristotle's catfish,"Iliadou & Fishelson 1995, Balon 1975 "
+Siluriformes,Siluridae,Silurus,asotus,Silurus_asotus,Amur catfish,"Maehata 2002, Mank & Avise 2006 "
+Siluriformes,Siluridae,Silurus,lithophilus,Silurus_lithophilus,Rock catfish,"Maehata 2001, Mank & Avise 2006 "
+Siluriformes,Sisoridae,Glyptothorax,brevipinnis,Glyptothorax_brevipinnis,river cat,"Khanna & Pant, 1966 "
+Siluriformes,Trichomycteridae,Hatcheria,macraei,Hatcheria_macraei,,Chiarello-Sosa et al. 2016 
+Stomiiformes,Gonostomatidae,Gonostoma,elongatum,Gonostoma_elongatum,elongated bristlemouth,"Fisher 1983 , Watson 1996 "
+Stomiiformes,Gonostomatidae,Sigmops,bathyphilus,Sigmops_bathyphilus,spark anglemouth,Badcock 1986 
+Stomiiformes,Sternoptychidae,Maurolicus,muelleri,Maurolicus_muelleri,silvery lightfish,"Young, Blaber, Rose 1987 "
+Synbranchiformes,Mastacembelidae,Mastacembelus,platysoma,Mastacembelus_platysoma,,"Abe 1998, Mank & Avise 2006 "
+Synbranchiformes,Synbranchidae,Monopterus,cuchia,Monopterus_cuchia,Cuchia,"Nasar 1989, Mank & Avise 2006 "
+Synbranchiformes,Synbranchidae,Synbranchus,marmoratus,Synbranchus_marmoratus,,Lo Nostro et al. 2003 
+Syngnathiformes,Aulostomidae,Aulostomus,chinensis,Aulostomus_chinensis,Chinese trumpetfish,"Mank & Avise 2006 , Patzner 2008"
+Syngnathiformes,Aulostomidae,Aulostomus,maculatus,Aulostomus_maculatus,Trumpetfish,"Mank & Avise 2006, Patzner 2008"
+Syngnathiformes,Centriscidae,Macroramphosus,scolopax,Macroramphosus_scolopax,Longspine snipefish,"de Oliveira et al. 1993, Taborsky 1994"
+Syngnathiformes,Fistulariidae,Fistularia,commersonii,Fistularia_commersonii,bluespotted cornetfish,"Bariche, Kajajian, & Azzurro 2013, Mank & Avise "
+Syngnathiformes,Syngnathidae,Phyllopteryx,taeniolatus,Phyllopteryx_taeniolatus,Common seadragon,"Mank & Avise 2006, Breder & Rosen 1966 "
+Syngnathiformes,Syngnathidae,Syngnathus,acus,Syngnathus_acus,Greater pipefish,"Mank & Avise 2006, Breder & Rosen 1966 "
+Tetraodontiformes,Balistidae,Pseudobalistes,flavimarginatus,Pseudobalistes_flavimarginatus,Yellowmargin triggerfish,"Gladstone 1994, Mank & Avise 2006 "
+Tetraodontiformes,Balistidae,Xanthichthys,mento,Xanthichthys_mento,Redtail triggerfish,"Kawase 2003, Mank & Avise "
+Tetraodontiformes,Diodontidae,Chilomycterus,reticulatus,Chilomycterus_reticulatus,Spotfin burrfish,"Mank & Avise 2006, Breder & Rosen 1966, Doi et al. 2015 "
+Tetraodontiformes,Diodontidae,Diodon,hystrix,Diodon_hystrix,Spot-fin porcupinefish,"Mank & Avise 2006, Breder & Rosen 1966"
+Tetraodontiformes,Molidae,Ranzania,laevis,Ranzania_laevis,slender sunfish,Breder & Rosen 1966 
+Tetraodontiformes,Monacanthidae,Oxymonacanthus,longirostris,Oxymonacanthus_longirostris,Longnose filefish,"Barlow 1987, Kawase & Nakazono 1995"
+Tetraodontiformes,Monacanthidae,Rudarius,ercodes,Rudarius_ercodes,Whitespotted pygmy filefish,Kawase & Nakazono 1995
+Tetraodontiformes,Monacanthidae,Stephanolepis ,hispidus,Stephanolepis_hispidus,planehead filefish,Mancera-Rodriguez & Castro-Hernandez 2015
+Tetraodontiformes,Ostraciidae,Lactoria,diaphana,Lactoria_diaphana,Roundbelly cowfish,"Mank & Avise 2006, Taborsky 1994, Breder & Rosen 1966, Leis & Moyer 1984"
+Tetraodontiformes,Tetraodontidae,Canthigaster,valentini,Canthigaster_valentini,Sharpnose puffer,"Gladstone 1987, Mank & Avise 2006, Whiteman and Cote 2004 "
+Zeiformes,Oreosomatidae,Allocyttus,verrucosus,Allocyttus_verrucosus,Warty oreo,"Lyle & Smith 1997, DeMartini & Sikkel 2006 "
+Zeiformes,Oreosomatidae,Neocyttus,rhomboidalis,Neocyttus_rhomboidalis,spiky oreo,Lyle & Smith 1997
+Zeiformes,Zeidae,Zenopsis,conchifer,Zenopsis_conchifer,Silvery John dory,Vaz-dos-Santos et al. 2014 
