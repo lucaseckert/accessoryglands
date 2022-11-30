@@ -730,9 +730,18 @@ knitr::include_graphics('pix/mcmc_pairs_tb.png')
 
 ## Full model (24 parameters)
 
-```{r traceplot_full, fig.width=8, fig.height=8, dev = "png", optipng = "-o7"}
-tar_load(traceplot_full)
-print(traceplot_full)
+First half:
+
+```{r traceplot_full1, fig.width=8, fig.height=8, dev = "png", optipng = "-o7"}
+tar_load(traceplot_full1)
+print(traceplot_full1)
+```
+
+Second half:
+
+```{r traceplot_full2, fig.width=8, fig.height=8, dev = "png", optipng = "-o7"}
+tar_load(traceplot_full2)
+print(traceplot_full2)
 ```
 
 ```{r improved_rhat_full}

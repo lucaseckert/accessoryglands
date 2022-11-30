@@ -473,6 +473,13 @@ list(data_input_targets,
         names = nm,
         tar_target(traceplot, lattice::xyplot(mcmc, aspect="fill", layout=c(2,6)))
     ),
+    ## split traceplot in two pieces
+    tar_target(traceplot_full1,
+               lattice::xyplot(ag_mcmc_full[,1:12], aspect = "fill", layout = c(2,6))
+    ),
+    tar_target(traceplot_full2,
+           lattice::xyplot(ag_mcmc_full[,13:24], aspect = "fill", layout = c(2,6))
+    ),
     tar_map(values = tibble(mcmc = rlang::syms(glue::glue("ag_mcmc_{mcmc_runs}")),
                             nm = mcmc_runs),
             names = nm,
@@ -498,11 +505,11 @@ list(data_input_targets,
     ##                    alpha=0.05) ## less extreme than default (alpha=0.01)
     ##            ),
     ## old(ish) technical model info
-    tar_render(ag_old_rmd, "ag_model.rmd"),
+    ## tar_render(ag_old_rmd, "ag_model.rmd"),
     ## Bayesian diagnostics (roll into/include in supplementary material?)
-    tar_render(ag_bayesdiag_html, "ag_bayesdiag.rmd"),
+    ## tar_render(ag_bayesdiag_html, "ag_bayesdiag.rmd"),
     ## technical note (audience: technical users/computational folks)
-    tar_render(ag_tech_html, "ag_tech.rmd"),
+    ## tar_render(ag_tech_html, "ag_tech.rmd") ## ,
     ## supplementary material (audience: general, stats enthusiasts)
     tar_render(ag_supp_html, "ag_supp.rmd")
     ## tar_render(ag_supp_docx, "ag_supp.rmd", output_format = "word_document")
