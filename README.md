@@ -1,6 +1,6 @@
 # accessoryglands
 
-Phylogenetic comparative analysis on the evolution of reproductive accessory glands in fishes.
+Code and data for analyzing the evolution of reproductive accessory glands across fishes. Specifically, we test whether the evolution of accessory glands is driven by other reproductive traits, namely parental care and spawning mode. 
 
 ## running the project
 
