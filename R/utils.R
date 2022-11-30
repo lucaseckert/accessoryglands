@@ -377,7 +377,6 @@ glance.corhmm <- function(x, nobs = NULL, ...) {
     if (!is.null(nobs)) {
         res <- mutate(res, BIC = -2*logLik + log(nobs)*df,
                    AICc = AIC + 2*(df^2 + df)/(nobs-df-1))
-        )
     }
     return(res)
 }
