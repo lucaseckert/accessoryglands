@@ -40,3 +40,9 @@ dataReferences.csv: references for data for all species
 -references: all references for that species for all traits in cleanTraitData.csv
 
 referenceList.rtf: full reference list for the sources listed in dataReferences.csv
+
+accessTree.R: code for accessing the tree block and single phylogeny from Fish Tree of Life
+
+treeBlock.rds: R object of tree block (100 phylogenies) for all species in our dataset, generated from accessTree.R
+
+treeSingle.rds: R object of fully resolved phylogeny for species in our dataset, generated from accessTree.R
