@@ -24,8 +24,9 @@ GH_pkg_nms <- sapply(GH_pkgs, function(x) x[2])
 all_pkgs <- c(CRAN_pkgs, GH_pkg_nms)
 
 ## redundant with `tar_option_set(packages = pkgList)` ?
-load_pkgs <- function() {
-  invisible(lapply(all_pkgs, library, character.only = TRUE))
+load_pkgs <- function(skip = NULL) {
+    pkgs <- setdiff(all_pkgs, skip)
+    invisible(lapply(pkgs, library, character.only = TRUE))
 }
 
 
