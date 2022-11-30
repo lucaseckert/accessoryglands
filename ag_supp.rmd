@@ -89,6 +89,7 @@ The phylogenies in the treeblock are generated according to an imputation
 scheme described in @rabosky_inverse_2018. We generated 100 stochastic character maps for each of 100 trees; the figure shows the average number of gains and losses per tree (i.e., average gains/losses across the stochastic character maps for each tree).
 
 ```{r simcounts, fig.cap = "average number of gains and losses of AGs simulated for each tree in the tree block"}
+if (file.exists("simmap.rda")) {
 x <- load("simmap.rda")
 countsum <- (counts
     |> as_tibble()
@@ -99,7 +100,11 @@ countsum <- (counts
     |> pivot_longer(c(gains, losses))
 )
 ggplot(countsum) + geom_histogram(aes(x=value), binwidth = 0.25, colour = "white") + facet_wrap(~name, scale = "free_x")
+} else {
+  warning("run figures.R?")
+}
 ``` 
+
 
 <!-- use ape::getMRCA() to identify families and geom_cladelab() ... ?? -->
 

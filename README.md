@@ -8,7 +8,7 @@ Phylogenetic comparative analysis on the evolution of reproductive accessory gla
 
 A recent version of R (i.e. 4.2.0 or higher) and updating your packages is strongly recommended (`update.packages()`). You will probably need to have compilation tools installed on your system, for installing R packages from source.
 
-If you want to make everything including all of the pictures in the supplementary material you
+If you want to make everything including all of the pictures in the supplementary material you will need a few additional tools: a working LaTeX installation, the [optipng]() program, ...
 
 ```r
 if (!require("remotes")) install.packages("remotes")
@@ -18,6 +18,8 @@ install_pkgs()
 ```
 
 ### running the workflow
+
+These instructions will run all the code and build the supplementary material.
 
 #### within R
 
@@ -52,6 +54,12 @@ To visualize the workflow:
 ```r
 targets::tar_visnetwork()
 ```
+
+## figures
+
+- figure 1: `mk_flowfig.R` (needs LaTeX, imagemagick for PDF to PNG conversion)
+- figure 2: used `diversitree` package, `phytools` for stochastic mapping; overlaid in PowerPoint
+- 
 
 ## workflow
 
