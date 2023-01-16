@@ -2,12 +2,13 @@ library("targets")
 library("tarchetypes")
 library("tidyverse")
 source("R/utils.R")
+source("R/pkg_install.R")
 source("R/functions.R")
 source("R/mcmc.R")
 options(tidyverse.quiet = TRUE)
 grDevices::X11.options(type = "cairo")
 options(bitmapType = "cairo")
-tar_option_set(packages = pkgList)
+tar_option_set(packages = all_pkgs)
 
 ## prevent parallelization from getting out of hand
 Sys.setenv(OPENBLAS_NUM_THREADS="1")
@@ -371,8 +372,8 @@ list(data_input_targets,
                         contrast_mat = contrast_mat_inv)
             %>% bind_rows(full_contr_ci)
             %>% bind_rows((tidy(ag_model_pcsc_add, conf.int = TRUE)
-                |> mutate(method = "model_pcsc_add")
-                |> rename(lwr = "conf.low", upr = "conf.high")))
+                %>% mutate(method = "model_pcsc_add")
+                %>% rename(lwr = "conf.low", upr = "conf.high")))
             ## FIXME: gsub("model", "corhmm" OR "mle", method) ...
         )
     ),

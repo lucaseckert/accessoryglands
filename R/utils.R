@@ -1,35 +1,4 @@
-pkgList <- c("abind", "bbmle", "bookdown", "broom.mixed", "caper", "coda", 
-             "colorspace", "corHMM", "cowplot", "diagram", "diagram", "diversitree", 
-             "emdbook", "fishtree", "GGally", "ggmosaic", "ggnewscale", "ggthemes", 
-             "ggtree", "glue", "hues", "igraph", "latticeExtra", "Matrix", 
-             "nloptr", "numDeriv", "patchwork", "phangorn", "phytools", "ramcmc", "remotes", 
-             "tarchetypes", "targets", "tidyverse", "tikzDevice", "visNetwork")
 
-## packages to install from GitHub (username, reponame)
-GH_pkgs <- list(c("bbolker","corHMM"),    ## hacked/BMB version
-                c("YuLab-SMU","ggtree"),
-                c("bbolker","btw")       ## BayesTree interface (hacked/BMB version)
-                )
-
-base_pkgs <- "Matrix"
-##' install uninstalled pkgs from pkgList and GH_pkgs
-##' FIXME: use renv() ?
-install_pkgs <- function() {
-    ip <- installed.packages()
-    to_install <- setdiff(pkgList,
-                          ## skip installed packages and GitHub packages
-                          c(rownames(ip),
-                            purrr::map_chr(GH_pkgs, ~.[2])))
-    install.packages(to_install)
-    ## since install_github checks hashes, don't bother checking whether already installed
-    purrr::map(GH_pkgs, ~remotes::install_github(paste(.[[1]], .[[2]], sep = "/")))
-    return(invisible(NULL))
-}
-
-## redundant with `tar_option_set(packages = pkgList)` ?
-load_pkgs <- function() {
-  invisible(lapply(pkgList, library, character.only = TRUE))
-}
 
 ##' utility function for hexbin panels for MCMC pairs plot
 ##' @param data ...
@@ -375,10 +344,8 @@ glance.corhmm <- function(x, nobs = NULL, ...) {
                          error = function(e) NULL)
     }
     if (!is.null(nobs)) {
-        res <- (res |>
-            mutate(BIC = -2*logLik + log(nobs)*df,
+        res <- mutate(res, BIC = -2*logLik + log(nobs)*df,
                    AICc = AIC + 2*(df^2 + df)/(nobs-df-1))
-        )
     }
     return(res)
 }
@@ -940,11 +907,13 @@ tikz <- function(file, ...) {
 
 enc_line <- "\\newcommand\\encircle[1]{ \\tikz[baseline=(X.base)]  \\node (X) [draw, shape=circle, inner sep=0] {\\strut #1};}"
 
-library(tikzDevice)
-tLP <- getOption("tikzLatexPackages")
-if (!any(grepl("encircle", tLP))) {
-    options("tikzLatexPackages" = c(tLP,
-                                    enc_line))
+## need tikzDevice to create these definitions, but want to define pkg_install() ...
+if (require("tikzDevice")) {
+    tLP <- getOption("tikzLatexPackages")
+    if (!any(grepl("encircle", tLP))) {
+        options("tikzLatexPackages" = c(tLP,
+                                        enc_line))
+    }
 }
 
 ## tikz_insert <- function(file, str = enc_line, line = 12) {

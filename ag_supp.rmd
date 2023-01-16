@@ -21,7 +21,8 @@ output:
 source("R/utils.R")
 source("R/mcmc.R")
 source("R/functions.R")
-load_pkgs()
+source("R/pkg_install.R")
+load_pkgs(skip = "tikzDevice")
 zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
 theme_set(theme_bw())
 library(targets)
@@ -89,6 +90,7 @@ The phylogenies in the treeblock are generated according to an imputation
 scheme described in @rabosky_inverse_2018. We generated 100 stochastic character maps for each of 100 trees; the figure shows the average number of gains and losses per tree (i.e., average gains/losses across the stochastic character maps for each tree).
 
 ```{r simcounts, fig.cap = "average number of gains and losses of AGs simulated for each tree in the tree block"}
+if (file.exists("simmap.rda")) {
 x <- load("simmap.rda")
 countsum <- (counts
     |> as_tibble()
@@ -99,7 +101,11 @@ countsum <- (counts
     |> pivot_longer(c(gains, losses))
 )
 ggplot(countsum) + geom_histogram(aes(x=value), binwidth = 0.25, colour = "white") + facet_wrap(~name, scale = "free_x")
+} else {
+  warning("run figures.R?")
+}
 ``` 
+
 
 <!-- use ape::getMRCA() to identify families and geom_cladelab() ... ?? -->
 
@@ -136,7 +142,7 @@ cowplot::plot_grid(plot(ag_model_full, pnum_col = pc,
 ## Transitions
 
 ```{r contrast-diag, echo = FALSE, out.width = '6in', out.height = '6in', fig.cap = "Transitions for the reduced (12-parameter) model. As in Figure 1 in the main text: Sets of connections drawn with the same colours are constrained to identical evolutionary rates (e.g. light gray downward arrows, representing loss of male parental care – all transitions from “pc1” to the corresponding “pc0” state). Top-bottom and left-right transitions, representing loss/gain of parental care and transitions between pair spawning and group spawning, are assumed to be independent of other trait values. Loss/gain of accessory glands (diagonal arrows), which are our primary interest, are all estimated separately (8 different colours for arrows representing loss/gain of accessory glands under the 4 different combinations of the other two traits, parental  care and spawning mode)."}
-knitr::include_graphics("flowfig2.pdf")
+knitr::include_graphics("pix/flowfig2.pdf")
 ```
 
 The transitions denoted A-D all represent gains of accessory glands, under different combinations of male care/spawning mode. Arrows A and B both represent AG gains in states with pair spawning (`sc0`); C and D both represent states in states with group spawning (`sc1`). Thus rate(pair) = (rate(A) + rate(B))/2 is the average rate of AG gain under pair spawning; rate(group) = (rate(C) + rate(D))/2 is the average rate under group spawning; and rate(group)-rate(pair) is the *contrast*, which we can think of as "the effect of group vs pair spawning on the rate of AG gain". We can similarly compute other combinations such as rate(no male care) (`pc0`) = (rate(B) + rate(D))/2; rate(male care)  (`pc1`)  = (rate(A) + rate(C))/2; and contrast(male care) = rate(male care) - rate(no male care).

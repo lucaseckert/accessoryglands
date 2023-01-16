@@ -1,4 +1,4 @@
-source("R/utils.R")
+source("R/pkg_install.R")
 load_pkgs()
 library(targets)
 library(colorspace)

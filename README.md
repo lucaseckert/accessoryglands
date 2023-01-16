@@ -1,6 +1,65 @@
 # accessoryglands
 
-Phylogenetic comparative analysis on the evolution of reproductive accessory glands in fishes.
+Code and data for analyzing the evolution of reproductive accessory glands across fishes. Specifically, we test whether the evolution of accessory glands is driven by other reproductive traits, namely parental care and spawning mode. 
+
+## running the project
+
+### getting started
+
+A recent version of R (i.e. 4.2.0 or higher) and updating your packages is strongly recommended (`update.packages()`). You will probably need to have compilation tools installed on your system, for installing R packages from source.
+
+All the code should run, but compiling everything (including PDF version of the supplementary material) needs a few additional tools: a working LaTeX installation, the [optipng](https://optipng.sourceforge.net/) program, ...
+
+```r
+if (!require("remotes")) install.packages("remotes")
+detach("package:remotes")
+source("R/pkg_install.R")
+install_pkgs()
+```
+
+### running the workflow
+
+These instructions will run all the code and build the supplementary material.
+
+#### within R
+
+To run single-threaded:
+
+```r
+library(targets)
+tar_make()
+```
+
+Or multi-threaded:
+
+```r
+library(targets)
+library(future)
+plan("multicore")
+tar_make_future()
+```
+
+#### via `make`
+
+- `make all` if you have `make` installed.
+
+To load existing products (e.g. for debugging):
+
+```r
+targets::tar_load(everything())
+```
+
+To visualize the workflow:
+
+```r
+targets::tar_visnetwork()
+```
+
+## figures
+
+- figure 1 (flow diagram): `mk_flowfig.R` (needs LaTeX, imagemagick for PDF to PNG conversion)
+- figure 2 (phylogeny): used `diversitree` package, `phytools` for stochastic mapping; overlaid in PowerPoint
+- figure 3: run `figures.R`
 
 ## workflow
 
@@ -46,42 +105,6 @@ Phylogenetic comparative analysis on the evolution of reproductive accessory gla
 - `old`: Miscellaneous old explorations etc.
 - `twotraits`: code for two-trait analyses (comparisons with LE's thesis)
 
-## getting started
-
-```r
-source("R/utils.R")
-install_pkgs()
-```
-
-## making stuff
-
-### within R
-
-To run single-threaded:
-
-```r
-library(targets)
-tar_make()
-```
-
-Or multi-threaded:
-
-```r
-library(targets)
-library(future)
-plan("multicore")
-tar_make_future()
-```
-
-### via `make`
-
-- `make all` if you have `make` installed.
-
-To load existing products (e.g. for debugging):
-
-```r
-tar_load(everything())
-```
 
 google drive [link](https://drive.google.com/drive/folders/1S5KwLDQavshwS8i0e9_g1jRiVUw8rnLO?usp=sharing)
 
