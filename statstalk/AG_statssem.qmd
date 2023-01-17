@@ -1,5 +1,5 @@
 ---
-title: "AG stuff"
+title: "Estimating state-dependent evolutionary rates: parental care, sperm competition, and fish accessory glands"
 format:
   revealjs: 
     slide-number: true
@@ -11,19 +11,25 @@ bibliography: ../corHMM.bib
 \newcommand{\Q}{\mathbf Q}
 \newcommand{\pr}{\textrm{Prob}}
 
+## Acknowledgments
+
+* NSERC ($$$)
+* Lucas Eckert, Sigal Balshine, Jess Miller, John Fitzpatrick
+
 # The evolutionary problem
 
 ## Correlated traits
 
 * How do we analyze correlations in structured data?
-* ... specifically, **phylogenetic** data?
+* ... specifically, **phylogenetic** (tree) data?
 * correlations between **organismal traits**
 * ... specifically, *discrete* traits
 
 ## accessory glands
 
-* glands associated with seminal fluid  
-(in humans, flies, other insects ...)
+
+* "organs involved in reproduction but not directly in the production or release of gametes"
+* typically in males, associated with seminal fluid
 * often associated with **sperm competition**
 * in fish, may also be associated with **male parental care**
 
@@ -31,16 +37,17 @@ bibliography: ../corHMM.bib
 
 ![](../pix/fish_examples.png)
 
-## data
+## data (607 species total)
 
 ![](../pix/fish_ag_phylo.png)
 
 ## associated traits
 
-* **pair** vs. **group spawning** (proxy for sperm competition)
+* **pair** vs. **group spawning**  
+(proxy for sperm competition)
 * presence of **male parental care**
 
-## all data
+## all data {.center}
 
 ![](../pix/phylo_plot-1.png)
 
@@ -52,7 +59,7 @@ bibliography: ../corHMM.bib
    * is the rate of gain/loss of AGs (in)dependent of whether a species (lineage) has group vs pair spawning, or male parental care?
 * likelihood ratio tests for (in)equality of rates
 
-![](../pix/pagel_hyp.png) {width=80%}
+![](../pix/pagel_hyp.png)
 
 ---
 
@@ -115,7 +122,7 @@ From @harmonPhylogenetic2019 (CC-BY-4.0)
 
 * code from `corHMM` package [@corHMM; @beaulieu_hidden_2014]
 
-(picture of LRT)
+![](../pix/lrt_comp.png)
 
 # pause for statistical philosophy
 
@@ -135,11 +142,27 @@ From @harmonPhylogenetic2019 (CC-BY-4.0)
 
 ## table of approaches
 
+![](../pix/statstab.png)
+
+-------------------------------------------------------------
+ Centered   Default           Right Left
+  Header    Aligned         Aligned Aligned
+----------- ------- --------------- -------------------------
+   First    row                12.0 Example of a row that
+                                    spans multiple lines.
+
+  Second    row                 5.0 Here's another one. Note
+                                    the blank line between
+                                    rows.
+-------------------------------------------------------------
+
 ## an approach to a quantitative solution
 
 * **how much** do traits affect rates?
 
 ## contrasts (repeat flow figure)
+
+![](../pix/flowfig.png)
 
 ## contrast matrix
 
