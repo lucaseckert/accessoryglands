@@ -166,6 +166,21 @@ From @harmonPhylogenetic2019 (CC-BY-4.0)
 
 ## contrast matrix
 
+$$
+\left[
+\begin{array}{rrrrrrrr}
+1/4 & 1/4 & 1/4 & 1/4 & . & . & . & . \\
+-1/2 & -1/2 & 1/2 & 1/2 & . & . & . & . \\
+1/2 & -1/2 & -1/2 & 1/2 & . & . & . & . \\
+-1/2 & 1/2 & -1/2 & 1/2 & . & . & . & . \\
+. & . & . & . & 1/4 & 1/4 & 1/4 & 1/4 \\
+. & . & . & . & -1/2 & 1/2 & -1/2 & 1/2 \\
+. & . & . & . & -1/2 & -1/2 & 1/2 & 1/2 \\
+. & . & . & . & 1/2 & -1/2 & -1/2 & 1/2 \\
+\end{array}
+\right]
+$$
+
 # what we ended up with
 
 * assume independence of spawning, parental care transitions  
