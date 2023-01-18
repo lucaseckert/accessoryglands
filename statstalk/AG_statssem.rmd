@@ -200,23 +200,31 @@ $$
 \end{split}
 $$
 
-## pruning algorithm (ex)
+## pruning algorithm example
 
 From @harmonPhylogenetic2019 (CC-BY-4.0)
 
-![](../pix/prune1.png)
+<center>
 
-## pruning algorithm (ex)
+<img src = "../pix/prune1.png" height="400">
+
+</center>
+
+## pruning algorithm example
 
 From @harmonPhylogenetic2019 (CC-BY-4.0)
 
-![](../pix/prune2.png)
+<center>
+
+<img src = "../pix/prune2.png" height="400">
+
+</center>
+
 
 ## pruning algorithm (complete)
 
 * once we get to the **root**, compute $\sum \textrm{Prior(i)} \cdot \pr(i)$
 * now apply your favourite optimization algorithm ...
-
 
 ## LRTs
 
@@ -232,8 +240,9 @@ From @harmonPhylogenetic2019 (CC-BY-4.0)
 
 ## can we do better inference?
 
-* pairwise comparisons are unsatisfying
-* could rank by AIC/BIC/etc. ...
+* pairwise comparisons are unsatisfying (e.g. "the interaction term and the combined effect of sperm competition and the pc × sc interaction are non-significant, all other effects are significant") 
+
+## rank by AIC/BIC/etc. ...
 
 ```{r ictab}
 ag_models <- paste0("ag_model_",
@@ -268,7 +277,7 @@ knitr::kable(atab, digits=2)
 e.g. $\{q_{12}, q_{13}\} = \phi_1; \{q_{13}, q_{24}\}=\phi_2; \ldots$  
 (certain assignments correspond to hypotheses of independence etc.)
 * how many possible models? **Bell numbers** https://oeis.org/A000110  
-($B(12) = 4213597)
+($B(12) = 4213597$)
 * need **reversible-jump** MCMC
 * compare sample frequency of independent- vs dependent-evolution models to null
 
