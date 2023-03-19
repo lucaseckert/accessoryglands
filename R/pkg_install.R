@@ -41,7 +41,7 @@ install_pkgs <- function() {
                           c(rownames(ip),
                             base_pkgs,
                             GH_pkgs))
-    install.packages(to_install)
+    if (length(to_install)>0) install.packages(to_install)
     ## since install_github checks hashes, don't bother checking whether already installed
     lapply(GH_pkgs,  function(x)
         remotes::install_github(paste(x[[1]], x[[2]], sep = "/")))
