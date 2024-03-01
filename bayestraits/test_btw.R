@@ -12,7 +12,7 @@ bayestraits(data = primate.discrete1,
 
 tar_load(treeblock)
 tbmp <- do.call(c, treeblock)
-tbmp <- .compressTipLabel(tbmp)
+tbmp <- ape::.compressTipLabel(tbmp)
 tar_load(ag_compdata_tb)
 dd <- (ag_compdata_tb$data
     %>% mutate(across(c("ag", "pc", "sc"),

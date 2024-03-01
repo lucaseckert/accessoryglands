@@ -1,3 +1,10 @@
+## new (18 July 2023)
+
+* LE: figure out how to run multistate model with disallowed transitions
+* BMB: fight with `btw`, maybe?
+
+## older
+
 ## BMB
 
 * segregate core vs pix packages
