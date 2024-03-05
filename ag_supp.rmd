@@ -343,6 +343,11 @@ we can confirm that the priors on the contrasts (ratio of AG gain/loss rates dep
 )
 ```
 
+```{r}
+
+```
+
+
 # Statistical summaries
 
 This section presents the quantitative results in more detail.

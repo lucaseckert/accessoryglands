@@ -10,7 +10,7 @@ prior.sd <- (ub-lb)/(2*range)
 lb = log(1),
 ub = log(10 * ape::Ntip(ag_compdata$phy))
 ## sum(branch lengths) scaled to 1
-
+```
 
 
 * BMB: try to figure out if R-hat or any other standard MCMC diagnostics are available for BT (other than acceptance rate)
