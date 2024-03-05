@@ -28,6 +28,11 @@ theme_set(theme_bw())
 library(targets)
 knitr::opts_chunk$set(echo = FALSE, dpi = 200, optipng = knitr::hook_optipng)
 options(bitmapType = "cairo")
+## turn off partial-match warnings ...
+options(warnPartialMatchArgs = FALSE,
+          warnPartialMatchAttr = FALSE,
+          warnPartialMatchDollar = FALSE)
+
 ```
 
 <!-- use PNG for heavy graphics to avoid blowing up file size.

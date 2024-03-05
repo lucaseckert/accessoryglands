@@ -1,5 +1,7 @@
 #### BayesTraits Model ####
 
+## run from ???
+
 ## packages
 library(btw)
 library(targets)
@@ -49,14 +51,14 @@ command_vec<- c("1", ## MultiState
                 "Burnin 10000") ## burn-in
 
 ## if you want to run it again 
-## results<-bayestraits(data, trees, command_vec)
+## results <- bayestraits(data, trees, command_vec)
 ## saveRDS(results, file = "bayestraits/bt_model_demo.rds")
 
 ## reading in results
-results<-readRDS("bayestraits/bt_model_demo.rds")
-rates<-results$Log$results
-options<-results$Log$options
-schedule<-results$Schedule$header
+results <- readRDS("bayestraits/bt_model_demo.rds")
+rates <- results$Log$results
+options <- results$Log$options
+schedule <- results$Schedule$header
 
 ## computing contrasts
 contrasts<-mutate(rates, gain_care_effect = ((q37+q48)/2)/((q15+q26)/2),
@@ -80,7 +82,7 @@ select(contrasts, loss_care_effect:loss_interaction) %>%
   pivot_longer(cols=loss_care_effect:loss_interaction, names_to = "contrast") %>% 
   ggplot(aes(x=value, y=contrast))+
   geom_vline(xintercept = 1, linetype="dashed")+
-  geom_violin()+
+  geom_violin(fill = "gray")+
   theme_bw()+
   scale_x_continuous(trans = "log10")
 ## the model would probably benefit from some more restricted priors
@@ -88,8 +90,6 @@ select(contrasts, loss_care_effect:loss_interaction) %>%
 ## checking out the acceptance rate
 summary(schedule)
 ## 30-35 which is within the range the manual suggests is optimal
-
-
 
 #### Rate Descriptions ####
 ## q12 = spawnGain

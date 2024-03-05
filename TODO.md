@@ -1,3 +1,25 @@
+## new (4 Mar 2024)
+
+* BMB: run prior-only model to extract log-mean and log-sd for rate-level priors (also look at correlations)
+
+don't need to
+
+```r
+prior.mean <- (lb+ub)/2
+prior.sd <- (ub-lb)/(2*range)
+lb = log(1),
+ub = log(10 * ape::Ntip(ag_compdata$phy))
+## sum(branch lengths) scaled to 1
+
+
+
+* BMB: try to figure out if R-hat or any other standard MCMC diagnostics are available for BT (other than acceptance rate)
+* soften description of BT vs our stuff
+* LE ??maybe??: run RJMCMC
+* LE: try to run with 'priors only' (RJMCMC)
+* BMB: weighting contrasts
+* LE: what would an example look like of weighted contrasts in a simple case where we had a smaller trait space? 
+
 ## new (18 July 2023)
 
 * LE: figure out how to run multistate model with disallowed transitions
@@ -40,8 +62,7 @@ https://docs.google.com/document/d/1caLrGnvanUawtSbiyjJ8PkL6JkecZX5f/edit?usp=sh
 		
 Baele, Guy, Philippe Lemey, and Stijn Vansteelandt. “Make the Most of Your Samples: Bayes Factor Estimators for High-Dimensional Models of Sequence Evolution.” BMC Bioinformatics 14, no. 1 (March 6, 2013): 85. https://doi.org/10.1186/1471-2105-14-85.
 
-
-- Weight contrasts by state occupancy?
+- weight contrasts by state occupancy?
 - dig out/discuss description of BayesTraits priors?
 - Mention that losses are uncertain/less well estimated because AGs are absent in most of the tree?
 - cleanup/code stuff
