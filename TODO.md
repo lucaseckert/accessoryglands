@@ -1,3 +1,4 @@
+
 ## new (4 Mar 2024)
 
 * BMB: run prior-only model to extract log-mean and log-sd for rate-level priors (also look at correlations)
@@ -62,7 +63,8 @@ https://docs.google.com/document/d/1caLrGnvanUawtSbiyjJ8PkL6JkecZX5f/edit?usp=sh
 		
 Baele, Guy, Philippe Lemey, and Stijn Vansteelandt. “Make the Most of Your Samples: Bayes Factor Estimators for High-Dimensional Models of Sequence Evolution.” BMC Bioinformatics 14, no. 1 (March 6, 2013): 85. https://doi.org/10.1186/1471-2105-14-85.
 
-- weight contrasts by state occupancy?
+
+- Weight contrasts by state occupancy?
 - dig out/discuss description of BayesTraits priors?
 - Mention that losses are uncertain/less well estimated because AGs are absent in most of the tree?
 - cleanup/code stuff
