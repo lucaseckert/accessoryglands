@@ -8,13 +8,14 @@ library(btw)
 library(targets)
 library(tidyverse)
 library(ape)
+library(coda)
 library(bayestestR)
 ## see http://bbolker.github.io/bbmisc/bayes/examples.html
 ## for convergence diagnostics etc.
 ## however, we have to make BT output look like results from
 ##  a stan fit/write appropriate methods ...
 
-pdf("bayestraits-pix.pdf")
+if (!interactive()) pdf("bayestraits-pix.pdf")
 ## loading trees
 tar_load(treeblock)
 trees <- do.call(c, treeblock)
@@ -23,7 +24,8 @@ trees <- .compressTipLabel(trees)
 ## loading data
 
 ## FIXME/TODO: unify ggplots
-##  compare with our results
+##  Compare with our results/side-by-side plots
+##  Bayes diagnostics (R-hat, trace plots ...)
 
 
 ## FIXME: can we automate this?
@@ -59,18 +61,20 @@ summary(data)
 command_vec<- c("1", ## MultiState
                 "2", ## MCMC
                 "ScaleTrees", ## scaling branch lengths to a mean of 0.1
+                ## we scaled sum of branch lengths to 1; since there are >1000 branches in the phylogeny,
+                ## a SUM of 1 == a mean of < 0.001
+                ## -> figure out the scaling factor and change the PriorAll accordingly ...
                 "AddTag Root Erpetoichthys_calabaricus Mugil_liza", ## adding a tag at the root
-                "Fossil Node01 Root 2", ## fossilizing the root
+                "Fossil Node01 Root 2", ## fossilizing the root (fix trait value at root: group spawning, no pc/ag)
                 "Res q14 q16 q17 q18 q23 q25 q27 q28 q32 q35 q36 q38 q41 q45 q46 q47 q52 q53 q54 q58 q61 q63 q64 q67 q71 q72 q74 q76 q81 q82 q83 q85 0", ## impossible rates 
                 "Res q13 q24 q57 q68", ## care gain
                 "Res q31 q42 q75 q86", ## care loss
                 "Res q12 q34 q56 q78", ## spawn gain
                 "Res q21 q43 q65 q87", ## spawn loss
-                "PriorAll lognormal 4.236 1.41", ## setting priors lognormal with mean and sd
+                "PriorAll lognormal 4.236 1.41", ## setting priors lognormal with mean and sd (FIXME: adjust for scaling?)
                 "Iterations 510000", ## iterations, including burn-in
+                ## default thinning = 1000
                 "Burnin 10000") ## burn-in
-
-## FIXME: are we making exactly the same assumptions about rooting etc.?
 
 ## if you want to run it again 
 #results <- bayestraits(data, trees, command_vec)
@@ -82,7 +86,43 @@ rates <- results$Log$results
 options <- results$Log$options
 schedule <- results$Schedule$header
 
+##
+get_chains <- function(results) {
+    chains <- as.mcmc(results$Log$results[,4:59])  ## q** values only
+    cols_disallowed <- which(apply(chains==0, 2, all)) ## forbidden/boring
+    dupes <- c("q24","q57","q68", ## care gain
+               "q42","q75","q86", ## care loss
+               "q34","q56","q78", ## spawn gain
+               "q43","q65","q87" ## spawn loss
+               )
+    cols_dupes <- match(dupes, colnames(chains))
+
+    return(chains[, -c(cols_dupes, cols_disallowed)])
+}
+
+chains1 <- get_chains(results)
+lattice::xyplot(chains1, aspect = "fill", layout = c(4,3),
+                scales = list(y = list(log = 10)))
+
+## FIXME: run bayestraits multiple times with distinct seeds so that
+##  we can calculate Gelman-Rubin diagnostics (R-hat)
+
+raftery.diag(chains1)  ## suggests we have to run longer (~4000 samples == 8 x 500)
+
 ## computing contrasts
+## FIXME: we need to be more careful about computing contrasts,
+##  i.e. on the *log scale* we were computing something (q1 + q2)/2 - (q3 + q4)/2 = m1 - m2
+##  when we exponentiate we get exp(m1)/exp(m2) -- so the ratio is correct
+##  but we should be taking the _geometric mean_ of the rates, not the arithmetic mean
+##  e.g.
+gmean <- function(x, y) sqrt(x*y)  ## equivalent to exp((log(x) + log(y))/2)
+cfun <- function(q1, q2, q3, q4) {
+    gmean(q1,q2)/gmean(q3,q4)
+    ## or exp(
+    ##        (log(q1) + log(q2))/2 -
+    ##        (log(q3) + log(q4))/2
+    ##    ) 
+}
 contrasts<-mutate(rates, gain_care_effect =  ((q37+q48)/2)/((q15+q26)/2),
                          gain_spawn_effect = ((q26+q48)/2)/((q15+q37)/2),
                          gain_interaction =  ((q15+q48)/2)/((q37+q26)/2),
@@ -97,8 +137,10 @@ gg_gain <- select(contrasts, gain_care_effect:gain_interaction) %>%
   geom_vline(xintercept = 1, linetype="dashed")+
   geom_violin(fill="gray")+
   theme_bw()+
-    scale_x_continuous(trans = "log10")
-print(gg_gain)
+    scale_x_continuous(trans = "log10", limits = c(1e-2, 1e2))
+
+print(gg_gain) + labs(title = "gain contrasts, our priors, non-RJ")
+## main issue here: gain_spawn_effect positive rather than negative?
 
 ## loss contrasts
 cdat <- select(contrasts, loss_care_effect:loss_interaction) %>% 
@@ -129,26 +171,26 @@ command_vec_default<- c("1", ## MultiState
 #saveRDS(results_default, file = "bayestraits/bt_model_default.rds")
 
 ## reading in results
-results_default<-readRDS("bayestraits/bt_model_default.rds")
-rates_default<-results_default$Log$results
+results_default <- readRDS("bayestraits/bt_model_default.rds")
+rates_default <- results_default$Log$results
 summary(rates_default)
 
 ## computing contrasts
-contrasts_default<-mutate(rates_default, gain_care_effect = ((q37+q48)/2)/((q15+q26)/2),
+gain_contrasts_default<-mutate(rates_default, gain_care_effect = ((q37+q48)/2)/((q15+q26)/2),
                   gain_spawn_effect = ((q26+q48)/2)/((q15+q37)/2),
                   gain_interaction = ((q15+q48)/2)/((q37+q26)/2),
                   loss_care_effect = ((q73+q84)/2)/((q51+q62)/2),
                   loss_spawn_effect = ((q62+q84)/2)/((q51+q73)/2),
                   loss_interaction = ((q51+q84)/2)/((q73+q62)/2))
 
-cdef_data <- select(contrasts_default, gain_care_effect:gain_interaction) %>% 
+cdef_data <- select(gain_contrasts_default, gain_care_effect:gain_interaction) %>% 
     pivot_longer(cols=gain_care_effect:gain_interaction, names_to = "contrast")
 
 gg_gain %+% cdef_data
 
 #### DATA-LESS MODEL W/ OUR PRIORS ####
 
-data_dataless<-mutate(data, state=12345678)
+data_dataless <- mutate(data, state=12345678)
 summary(data_dataless)
 
 ## command vector
@@ -174,19 +216,16 @@ rates_dataless<-results_dataless$Log$results
 summary(rates_dataless)
 
 ## computing contrasts
-contrasts_dataless<-mutate(rates_dataless, gain_care_effect = ((q37+q48)/2)/((q15+q26)/2),
+all_contrasts_dataless<-mutate(rates_dataless, gain_care_effect = ((q37+q48)/2)/((q15+q26)/2),
                           gain_spawn_effect = ((q26+q48)/2)/((q15+q37)/2),
                           gain_interaction = ((q15+q48)/2)/((q37+q26)/2),
                           loss_care_effect = ((q73+q84)/2)/((q51+q62)/2),
                           loss_spawn_effect = ((q62+q84)/2)/((q51+q73)/2),
                           loss_interaction = ((q51+q84)/2)/((q73+q62)/2))
-select(contrasts_dataless, gain_care_effect:gain_interaction) %>% 
-  pivot_longer(cols=gain_care_effect:gain_interaction, names_to = "contrast") %>% 
-  ggplot(aes(x=value, y=contrast))+
-  geom_vline(xintercept = 1, linetype="dashed")+
-  geom_violin()+
-  theme_bw()+
-  scale_x_continuous(trans = "log10")
+cdef_all_dataless <- select(all_contrasts_dataless, gain_care_effect:gain_interaction) %>% 
+    pivot_longer(cols=gain_care_effect:gain_interaction, names_to = "contrast")
+
+gg_gain %+% cdef_all_dataless
 
 #### RJ DATA-LESS MODEL W/ DEFAULT PRIORS ####
 
@@ -219,13 +258,10 @@ contrasts_rj<-mutate(rates_rj, gain_care_effect = ((q37+q48)/2)/((q15+q26)/2),
                           loss_care_effect = ((q73+q84)/2)/((q51+q62)/2),
                           loss_spawn_effect = ((q62+q84)/2)/((q51+q73)/2),
                           loss_interaction = ((q51+q84)/2)/((q73+q62)/2))
-select(contrasts_rj, gain_care_effect:gain_interaction) %>% 
-  pivot_longer(cols=gain_care_effect:gain_interaction, names_to = "contrast") %>% 
-  ggplot(aes(x=value, y=contrast))+
-  geom_vline(xintercept = 1, linetype="dashed")+
-  geom_violin()+
-  theme_bw()+
-  scale_x_continuous(trans = "log10")
+cdef_rj <- select(contrasts_rj, gain_care_effect:gain_interaction) %>% 
+    pivot_longer(cols=gain_care_effect:gain_interaction, names_to = "contrast")
+
+gg_gain %+% cdef_rj
 
 
 #### Rate Descriptions ####
@@ -287,4 +323,4 @@ select(contrasts_rj, gain_care_effect:gain_interaction) %>%
 ## q87 = spawnLoss
 
 
-dev.off()
+if (!interactive()) dev.off()

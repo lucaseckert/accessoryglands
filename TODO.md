@@ -1,3 +1,19 @@
+## new (19 Apr 2024)
+
+* (BMB) figure out the appropriate scaling of the prior for a mean branch length of 0.1
+    * sum(branch lengths) == mean(branch lengths)*(number of branches)
+	* so need to count number of branches
+* implement multi-chain BT runs (set seeds differently), calculate R-hat etc.
+* fix contrast calculation
+* (gain contrasts, loss contrasts) x (with, w/o data) x (rj and regular) x (our priors, default priors)
+* HIGH priority:
+   * fixing known weirdness (prior scaling, contrast calcs)
+   * figuring out discrepancy between our and BT baseline results
+* LOWER priority:
+   * better Bayes diagnostics (multi-chain etc.)
+   * RJ
+   * workflow cleanup
+
 
 ## new (4 Mar 2024)
 
