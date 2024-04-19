@@ -1,12 +1,18 @@
 #### BayesTraits Model ####
 
-## run from ???
+## run from head directory of repo
+## (for target loading, readRDS)
 
 ## packages
 library(btw)
 library(targets)
 library(tidyverse)
 library(ape)
+library(bayestestR)
+## see http://bbolker.github.io/bbmisc/bayes/examples.html
+## for convergence diagnostics etc.
+## however, we have to make BT output look like results from
+##  a stan fit/write appropriate methods ...
 
 pdf("bayestraits-pix.pdf")
 ## loading trees
@@ -15,9 +21,17 @@ trees <- do.call(c, treeblock)
 trees <- .compressTipLabel(trees)
 
 ## loading data
+
+## FIXME/TODO: unify ggplots
+##  compare with our results
+
+
+## FIXME: can we automate this?
+## (4*ag + 2*pc + sc will work for the non-missing cases ...)
 tar_load(ag_compdata_tb)
 data<-ag_compdata_tb$data %>%
-    mutate(state=factor(case_when((ag==0 & pc==0 & sc==0) ~ 1,
+    mutate(state=factor(case_when(
+    (ag==0 & pc==0 & sc==0) ~ 1,
     (ag==0 & pc==0 & sc==1) ~ 2,
     (ag==0 & pc==1 & sc==0) ~ 3,
     (ag==0 & pc==1 & sc==1) ~ 4,
@@ -55,6 +69,8 @@ command_vec<- c("1", ## MultiState
                 "PriorAll lognormal 4.236 1.41", ## setting priors lognormal with mean and sd
                 "Iterations 510000", ## iterations, including burn-in
                 "Burnin 10000") ## burn-in
+
+## FIXME: are we making exactly the same assumptions about rooting etc.?
 
 ## if you want to run it again 
 #results <- bayestraits(data, trees, command_vec)
@@ -124,13 +140,11 @@ contrasts_default<-mutate(rates_default, gain_care_effect = ((q37+q48)/2)/((q15+
                   loss_care_effect = ((q73+q84)/2)/((q51+q62)/2),
                   loss_spawn_effect = ((q62+q84)/2)/((q51+q73)/2),
                   loss_interaction = ((q51+q84)/2)/((q73+q62)/2))
-select(contrasts_default, gain_care_effect:gain_interaction) %>% 
-  pivot_longer(cols=gain_care_effect:gain_interaction, names_to = "contrast") %>% 
-  ggplot(aes(x=value, y=contrast))+
-  geom_vline(xintercept = 1, linetype="dashed")+
-  geom_violin()+
-  theme_bw()+
-  scale_x_continuous(trans = "log10")
+
+cdef_data <- select(contrasts_default, gain_care_effect:gain_interaction) %>% 
+    pivot_longer(cols=gain_care_effect:gain_interaction, names_to = "contrast")
+
+gg_gain %+% cdef_data
 
 #### DATA-LESS MODEL W/ OUR PRIORS ####
 
