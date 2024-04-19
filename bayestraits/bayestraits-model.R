@@ -8,6 +8,7 @@ library(targets)
 library(tidyverse)
 library(ape)
 
+pdf("bayestraits-pix.pdf")
 ## loading trees
 tar_load(treeblock)
 trees <- do.call(c, treeblock)
@@ -15,25 +16,27 @@ trees <- .compressTipLabel(trees)
 
 ## loading data
 tar_load(ag_compdata_tb)
-data<-ag_compdata_tb$data %>% mutate(state=factor(case_when((ag==0 & pc==0 & sc==0) ~ 1,
-                                                            (ag==0 & pc==0 & sc==1) ~ 2,
-                                                            (ag==0 & pc==1 & sc==0) ~ 3,
-                                                            (ag==0 & pc==1 & sc==1) ~ 4,
-                                                            (ag==1 & pc==0 & sc==0) ~ 5,
-                                                            (ag==1 & pc==0 & sc==1) ~ 6,
-                                                            (ag==1 & pc==1 & sc==0) ~ 7,
-                                                            (ag==1 & pc==1 & sc==1) ~ 8,
-                                                            (ag==0 & pc==0 & sc=="?") ~ 12,
-                                                            (ag==0 & pc==1 & sc=="?") ~ 34,
-                                                            (ag==1 & pc==0 & sc=="?") ~ 56,
-                                                            (ag==1 & pc==1 & sc=="?") ~ 78,
-                                                            (ag==0 & pc=="?" & sc==0) ~ 13,
-                                                            (ag==0 & pc=="?" & sc==1) ~ 24,
-                                                            (ag==1 & pc=="?" & sc==0) ~ 57,
-                                                            (ag==1 & pc=="?" & sc==1) ~ 68,
-                                                            (ag==0 & pc=="?" & sc=="?") ~ 1234,
-                                                            (ag==1 & pc=="?" & sc=="?") ~ 5678))) %>% 
-  select(species,state)
+data<-ag_compdata_tb$data %>%
+    mutate(state=factor(case_when((ag==0 & pc==0 & sc==0) ~ 1,
+    (ag==0 & pc==0 & sc==1) ~ 2,
+    (ag==0 & pc==1 & sc==0) ~ 3,
+    (ag==0 & pc==1 & sc==1) ~ 4,
+    (ag==1 & pc==0 & sc==0) ~ 5,
+    (ag==1 & pc==0 & sc==1) ~ 6,
+    (ag==1 & pc==1 & sc==0) ~ 7,
+    (ag==1 & pc==1 & sc==1) ~ 8,
+    (ag==0 & pc==0 & sc=="?") ~ 12,
+    (ag==0 & pc==1 & sc=="?") ~ 34,
+    (ag==1 & pc==0 & sc=="?") ~ 56,
+    (ag==1 & pc==1 & sc=="?") ~ 78,
+    (ag==0 & pc=="?" & sc==0) ~ 13,
+    (ag==0 & pc=="?" & sc==1) ~ 24,
+    (ag==1 & pc=="?" & sc==0) ~ 57,
+    (ag==1 & pc=="?" & sc==1) ~ 68,
+    (ag==0 & pc=="?" & sc=="?") ~ 1234,
+    (ag==1 & pc=="?" & sc=="?") ~ 5678))) %>% 
+    select(species,state)
+
 summary(data)
 
 #### REAL MODEL ####
@@ -54,13 +57,8 @@ command_vec<- c("1", ## MultiState
                 "Burnin 10000") ## burn-in
 
 ## if you want to run it again 
-<<<<<<< HEAD
-#results<-bayestraits(data, trees, command_vec)
+#results <- bayestraits(data, trees, command_vec)
 #saveRDS(results, file = "bayestraits/bt_model_demo.rds")
-=======
-## results <- bayestraits(data, trees, command_vec)
-## saveRDS(results, file = "bayestraits/bt_model_demo.rds")
->>>>>>> ea75bbbcb6502d8cbe26a38457fe1ffa1e27e1f5
 
 ## reading in results
 results <- readRDS("bayestraits/bt_model_demo.rds")
@@ -69,35 +67,33 @@ options <- results$Log$options
 schedule <- results$Schedule$header
 
 ## computing contrasts
-contrasts<-mutate(rates, gain_care_effect = ((q37+q48)/2)/((q15+q26)/2),
+contrasts<-mutate(rates, gain_care_effect =  ((q37+q48)/2)/((q15+q26)/2),
                          gain_spawn_effect = ((q26+q48)/2)/((q15+q37)/2),
-                         gain_interaction = ((q15+q48)/2)/((q37+q26)/2),
-                         loss_care_effect = ((q73+q84)/2)/((q51+q62)/2),
+                         gain_interaction =  ((q15+q48)/2)/((q37+q26)/2),
+                         loss_care_effect =  ((q73+q84)/2)/((q51+q62)/2),
                          loss_spawn_effect = ((q62+q84)/2)/((q51+q73)/2),
-                         loss_interaction = ((q51+q84)/2)/((q73+q62)/2))
+                         loss_interaction =  ((q51+q84)/2)/((q73+q62)/2))
 
 ## gain contrasts
-select(contrasts, gain_care_effect:gain_interaction) %>% 
+gg_gain <- select(contrasts, gain_care_effect:gain_interaction) %>% 
   pivot_longer(cols=gain_care_effect:gain_interaction, names_to = "contrast") %>% 
   ggplot(aes(x=value, y=contrast))+
   geom_vline(xintercept = 1, linetype="dashed")+
-  geom_violin()+
+  geom_violin(fill="gray")+
   theme_bw()+
-  scale_x_continuous(trans = "log10")
+    scale_x_continuous(trans = "log10")
+print(gg_gain)
 
 ## loss contrasts
-select(contrasts, loss_care_effect:loss_interaction) %>% 
-  pivot_longer(cols=loss_care_effect:loss_interaction, names_to = "contrast") %>% 
-  ggplot(aes(x=value, y=contrast))+
-  geom_vline(xintercept = 1, linetype="dashed")+
-  geom_violin(fill = "gray")+
-  theme_bw()+
-  scale_x_continuous(trans = "log10")
+cdat <- select(contrasts, loss_care_effect:loss_interaction) %>% 
+    pivot_longer(cols=loss_care_effect:loss_interaction, names_to = "contrast")
+
+gg_loss <- gg_gain %+% cdat
+print(gg_loss)
 
 ## checking out the acceptance rate
 summary(schedule)
 
-<<<<<<< HEAD
 #### MODEL W/ DEFAULT PRIORS ####
 
 ## command vector
@@ -217,8 +213,7 @@ select(contrasts_rj, gain_care_effect:gain_interaction) %>%
   theme_bw()+
   scale_x_continuous(trans = "log10")
 
-=======
->>>>>>> ea75bbbcb6502d8cbe26a38457fe1ffa1e27e1f5
+
 #### Rate Descriptions ####
 ## q12 = spawnGain
 ## q13 = careGain
@@ -278,3 +273,4 @@ select(contrasts_rj, gain_care_effect:gain_interaction) %>%
 ## q87 = spawnLoss
 
 
+dev.off()
