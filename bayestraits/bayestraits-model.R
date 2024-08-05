@@ -124,9 +124,11 @@ rates <- results$Log$results
 options <- results$Log$options
 schedule <- results$Schedule$header
 
-##
+## 4:59
+rate_cols <- grep("^q[0-9]+", colnames(results$Log$results))
+
 get_chains <- function(results) {
-    chains <- as.mcmc(results$Log$results[,4:59])  ## q** values only
+    chains <- as.mcmc(results$Log$results[,rate_cols])  ## q** values only
     cols_disallowed <- which(apply(chains==0, 2, all)) ## forbidden/boring
     dupes <- c("q24","q57","q68", ## care gain
                "q42","q75","q86", ## care loss
@@ -144,6 +146,9 @@ lattice::xyplot(chains1, aspect = "fill", layout = c(4,3),
 
 
 raftery.diag(chains1)  ## suggests we have to run longer (~4000 samples == 8 x 500)
+g1 <- geweke.diag(chains1)
+## calculate 2-tailed p-values for geweke diagnostics based on the Z scores
+sort(2*pnorm(abs(g1$z), lower.tail = FALSE))
 
 ## computing contrasts
 ## FIXME: we need to be more careful about computing contrasts,
@@ -152,7 +157,7 @@ raftery.diag(chains1)  ## suggests we have to run longer (~4000 samples == 8 x 5
 ##  but we should be taking the _geometric mean_ of the rates, not the arithmetic mean
 ##  e.g.
 gmean <- function(x, y) sqrt(x*y)  ## equivalent to exp((log(x) + log(y))/2)
-cfun <- function(q1, q2, q3, q4) {
+cfun_nonlog <- function(q1, q2, q3, q4) {
     gmean(q1,q2)/gmean(q3,q4)
     ## or exp(
     ##        (log(q1) + log(q2))/2 -
@@ -160,8 +165,25 @@ cfun <- function(q1, q2, q3, q4) {
     ##    ) 
 }
 
+cfun_log <- function(q1, q2, q3, q4) {
+    (q1 + q2)/2 - (q3 + q4)/2
+}
+
+## LUCAS: decide how to fix this. 
+##   e.g.
+
+## FIX ME !!!
+
+## either (1) convert rates to log-rates, i.e.
+## rates[,rate_cols] <- log(rates[,rate_cols])
+
+##and use code below
+##  (or change everything to cfun_log for compactness)
+## OR (2) use cfun_nonlog below
+
 get_contrasts <- function(rates) {
-    mutate(rates, gain_care_effect = (q37+q48)/2-(q15+q26)/2,
+    mutate(rates,
+           gain_care_effect =   (q37+q48)/2-(q15+q26)/2,
            gain_spawn_effect =  (q26+q48)/2-(q15+q37)/2,
            gain_interaction =   (q15+q48)/2-(q37+q26)/2,
            loss_care_effect =   (q73+q84)/2-(q51+q62)/2,

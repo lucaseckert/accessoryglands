@@ -1,19 +1,23 @@
-## new (19 Apr 2024)
+## new (5 August 2024, aim for 9 August 2024)
 
-* (BMB) figure out the appropriate scaling of the prior for a mean branch length of 0.1
-    * sum(branch lengths) == mean(branch lengths)*(number of branches)
-	* so need to count number of branches
+### important priority
+
+* "fix prior weirdness"
+    * partly done (i.e. prior scaling, but LE will check and write up)
+    * fix scales (i.e. fix contrast calculation, use log vs non-log scale consistently and correctly)
+    * re-run and compare results with ours
+    * PLOT results: (gain contrasts, loss contrasts) x 
+	                (with, w/o data [i.e. prior predictive distributions]) x
+	                (rj and regular) x 
+					(our priors, default BayesTraits priors)
+  ['with data' + 'regular' + 'our priors' should agree with our results]
+  ['w/o data' + 'regular' + 'our priors' should agree with our computed priors for contrasts]
+  
+### lower priority
+
 * implement multi-chain BT runs (set seeds differently), calculate R-hat etc.
-* fix contrast calculation
-* (gain contrasts, loss contrasts) x (with, w/o data) x (rj and regular) x (our priors, default priors)
-* HIGH priority:
-   * fixing known weirdness (prior scaling, contrast calcs)
-   * figuring out discrepancy between our and BT baseline results
-* LOWER priority:
-   * better Bayes diagnostics (multi-chain etc.)
-   * RJ
-   * workflow cleanup
-
+* workflow cleanup (auto-run BT)
+* weight contrasts by occupancy?
 
 ## new (4 Mar 2024)
 
