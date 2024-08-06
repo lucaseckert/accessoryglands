@@ -56,7 +56,7 @@ data <- ag_compdata_tb$data %>%
 
 summary(data)
 
-#### REAL MODEL ####
+#### PRIOR SCALING ####
 
 rate_prior_0 <- rate_prior <- c(4.236, 1.41)
 ## BT scales branch lengths to a *mean* of 0.1 by default
@@ -73,8 +73,11 @@ prior_fac <- (1/n_edge)/0.1
 ## therefore our rates will be *higher* than BT's
 ## therefore we should decrease the priors we give to BT by log(prior_fac)
 ## (-4.79)
-rate_prior[1] <- rate_prior_0[1] + log(prior_fac)
+rate_prior[1] <- rate_prior_0[1] - log(prior_fac)
 prior1 <- sprintf("PriorAll lognormal %f %f", rate_prior[1], rate_prior[2])
+
+
+#### COMMAND FUNCTION ####
 
 ##  q14 q16 q17 q18 q23 q25 q27 q28 q32 q35 q36 q38 q41 q45 q46 q47 q52 q53 q54 q58 q61 q63 q64 q67 q71 q72 q74 q76 q81 q82 q83 q85 0", ## impossible rates 
 zero_rates <- c(14, 16:18, 23, 25, 27:28, 32, 35:36, 38, 41, 45:47, 52:54,
@@ -101,54 +104,8 @@ bt_command <- function(prior = NULL, iterations = 51e4, burnin = 1e4, seed = 101
     return(cvec)
 }
 
-command_vec <- bt_command(prior = prior1)
 
-## run in parallel???
-options(bt_path= "BayesTraitsV4.0.0-Linux")
-options(bt_bin = "BayesTraitsV4")
-
-
-## FIXME: cache this more sensibly
-## FIXME: does this work OK with BT V4?
-## FIXME: split this file
-## FIXME: run bayestraits multiple times with distinct seeds
-## (and possibly shorter chains?) so that
-##  we can calculate Gelman-Rubin diagnostics (R-hat)
-
-## results <- bayestraits(data, trees, command_vec)
-#saveRDS(results, file = "bayestraits/bt_model_demo.rds")
-
-## reading in results
-results <- readRDS("bayestraits/bt_model_demo.rds")
-rates <- results$Log$results
-options <- results$Log$options
-schedule <- results$Schedule$header
-
-## 4:59
-rate_cols <- grep("^q[0-9]+", colnames(results$Log$results))
-
-get_chains <- function(results) {
-    chains <- as.mcmc(results$Log$results[,rate_cols])  ## q** values only
-    cols_disallowed <- which(apply(chains==0, 2, all)) ## forbidden/boring
-    dupes <- c("q24","q57","q68", ## care gain
-               "q42","q75","q86", ## care loss
-               "q34","q56","q78", ## spawn gain
-               "q43","q65","q87" ## spawn loss
-               )
-    cols_dupes <- match(dupes, colnames(chains))
-
-    return(chains[, -c(cols_dupes, cols_disallowed)])
-}
-
-chains1 <- get_chains(results)
-lattice::xyplot(chains1, aspect = "fill", layout = c(4,3),
-                scales = list(y = list(log = 10)))
-
-
-raftery.diag(chains1)  ## suggests we have to run longer (~4000 samples == 8 x 500)
-g1 <- geweke.diag(chains1)
-## calculate 2-tailed p-values for geweke diagnostics based on the Z scores
-sort(2*pnorm(abs(g1$z), lower.tail = FALSE))
+#### CONTRAST FUNCTIONS ####
 
 ## computing contrasts
 ## FIXME: we need to be more careful about computing contrasts,
@@ -165,9 +122,152 @@ cfun_nonlog <- function(q1, q2, q3, q4) {
     ##    ) 
 }
 
-cfun_log <- function(q1, q2, q3, q4) {
-    (q1 + q2)/2 - (q3 + q4)/2
+## function for getting contrasts from rates
+get_contrasts <- function(results) {
+  results$Log$results %>% 
+  mutate(gain_care_effect =   cfun_nonlog(q37,q48,q15,q26),
+         gain_spawn_effect =  cfun_nonlog(q26,q48,q15,q37),
+         gain_interaction =   cfun_nonlog(q15,q48,q37,q26),
+         loss_care_effect =   cfun_nonlog(q73,q84,q51,q62),
+         loss_spawn_effect =  cfun_nonlog(q62,q84,q51,q73),
+         loss_interaction =   cfun_nonlog(q51,q84,q73,q62))
 }
+
+## function for plotting contrasts
+plot_contrasts<-function(contrasts) {
+  contrasts %>% 
+  pivot_longer(cols=gain_care_effect:loss_interaction, names_to = "contrast") %>% 
+  ggplot(aes(x=value, y=contrast))+
+  geom_vline(xintercept = 1, linetype="dashed")+
+  geom_violin(fill="gray")+
+  scale_x_continuous(trans = "log10")+
+  theme_bw()
+  }
+
+
+#### DATA, REGULAR, DEFAULT PRIOS ####
+
+## command vector
+command_vec_data_reg_default<- bt_command(prior = NULL)
+#results_data_reg_default<-bayestraits(data, trees, command_vec_data_reg_default)
+#saveRDS(results_data_reg_default, file = "bayestraits/bt_model_data_reg_default.rds")
+
+## reading in results
+results_data_reg_default <- readRDS("bayestraits/bt_model_data_reg_default.rds")
+
+## computing contrasts
+contrasts_data_reg_default<-get_contrasts(results_data_reg_default)
+
+## plotting
+plot_contrasts(contrasts_data_reg_default)
+
+
+##### DATA, REGULAR, OUR PRIORS ####
+
+## command vector
+command_vec_data_reg_priors<- bt_command(prior = prior1)
+#results_data_reg_priors<-bayestraits(data, trees, command_vec_data_reg_priors)
+#saveRDS(results_data_reg_priors, file = "bayestraits/bt_model_data_reg_priors.rds")
+
+## read in results
+results_data_reg_priors<-readRDS("bayestraits/bt_model_data_reg_priors.rds")
+
+## computing contrasts
+contrasts_data_reg_priors<-get_contrasts(results_data_reg_priors)
+
+## plotting
+plot_contrasts(contrasts_data_reg_priors)
+
+
+#### DATA-LESS, REGULAR, DEFAULT PRIORS ####
+
+## data-less data
+data_dataless <- mutate(data, state=12345678)
+summary(data_dataless)
+
+## command vector
+command_vec_nodata_reg_default<-bt_command(prior = NULL)
+#results_nodata_reg_default<-bayestraits(data_dataless, trees, command_vec_nodata_reg_default)
+#saveRDS(results_nodata_reg_default, file = "bayestraits/bt_model_nodata_reg_default.rds")
+
+## reading results
+results_nodata_reg_default<-readRDS("bayestraits/bt_model_nodata_reg_default.rds")
+
+## contrasts
+contrasts_nodata_reg_default<-get_contrasts(results_nodata_reg_default)
+
+## plotting
+plot_contrasts(contrasts_nodata_reg_default)
+
+
+#### DATA-LESS, REGULAR, OUR PRIORS ####
+
+## command vector
+command_vec_nodata_reg_priors<-bt_command(prior = prior1)
+#results_nodata_reg_priors<-bayestraits(data_dataless, trees, command_vec_nodata_reg_priors)
+#saveRDS(results_nodata_reg_priors, file = "bayestraits/bt_model_nodata_reg_priors.rds")
+
+## reading in results
+results_nodata_reg_priors<-readRDS("bayestraits/bt_model_nodata_reg_priors.rds")
+
+## computing contrasts
+contrasts_nodata_reg_priors<-get_contrasts(results_nodata_reg_priors)
+
+## plotting
+plot_contrasts(contrasts_nodata_reg_priors)
+
+
+#### DIAGNOSTICS ####
+
+## run in parallel???
+options(bt_path= "BayesTraitsV4.0.0-Linux")
+options(bt_bin = "BayesTraitsV4")
+
+## FIXME: cache this more sensibly
+## FIXME: does this work OK with BT V4?
+## FIXME: split this file
+## FIXME: run bayestraits multiple times with distinct seeds
+## (and possibly shorter chains?) so that
+##  we can calculate Gelman-Rubin diagnostics (R-hat)
+
+## reading in results
+results <- readRDS("bayestraits/bt_model_demo.rds")
+rates <- results$Log$results
+options <- results$Log$options
+schedule <- results$Schedule$header
+
+## 4:59
+rate_cols <- grep("^q[0-9]+", colnames(results$Log$results))
+
+get_chains <- function(results) {
+  chains <- as.mcmc(results$Log$results[,rate_cols])  ## q** values only
+  cols_disallowed <- which(apply(chains==0, 2, all)) ## forbidden/boring
+  dupes <- c("q24","q57","q68", ## care gain
+             "q42","q75","q86", ## care loss
+             "q34","q56","q78", ## spawn gain
+             "q43","q65","q87" ## spawn loss
+  )
+  cols_dupes <- match(dupes, colnames(chains))
+  
+  return(chains[, -c(cols_dupes, cols_disallowed)])
+}
+
+chains1 <- get_chains(results)
+lattice::xyplot(chains1, aspect = "fill", layout = c(4,3),
+                scales = list(y = list(log = 10)))
+
+
+raftery.diag(chains1)  ## suggests we have to run longer (~4000 samples == 8 x 500)
+g1 <- geweke.diag(chains1)
+## calculate 2-tailed p-values for geweke diagnostics based on the Z scores
+sort(2*pnorm(abs(g1$z), lower.tail = FALSE))
+
+
+#### OLD CODE ####
+
+# cfun_log <- function(q1, q2, q3, q4) {
+#     (q1 + q2)/2 - (q3 + q4)/2
+# }
 
 ## LUCAS: decide how to fix this. 
 ##   e.g.
@@ -181,17 +281,15 @@ cfun_log <- function(q1, q2, q3, q4) {
 ##  (or change everything to cfun_log for compactness)
 ## OR (2) use cfun_nonlog below
 
-get_contrasts <- function(rates) {
-    mutate(rates,
-           gain_care_effect =   (q37+q48)/2-(q15+q26)/2,
-           gain_spawn_effect =  (q26+q48)/2-(q15+q37)/2,
-           gain_interaction =   (q15+q48)/2-(q37+q26)/2,
-           loss_care_effect =   (q73+q84)/2-(q51+q62)/2,
-           loss_spawn_effect =  (q62+q84)/2-(q51+q73)/2,
-           loss_interaction =   (q51+q84)/2-(q73+q62)/2)
-}
-
-contrasts <- get_contrasts(rates)
+# get_contrasts <- function(rates) {
+#     mutate(rates,
+#            gain_care_effect =   (q37+q48)/2-(q15+q26)/2,
+#            gain_spawn_effect =  (q26+q48)/2-(q15+q37)/2,
+#            gain_interaction =   (q15+q48)/2-(q37+q26)/2,
+#            loss_care_effect =   (q73+q84)/2-(q51+q62)/2,
+#            loss_spawn_effect =  (q62+q84)/2-(q51+q73)/2,
+#            loss_interaction =   (q51+q84)/2-(q73+q62)/2)
+# }
 
 ## gain contrasts
 gg_gain <- select(contrasts, gain_care_effect:gain_interaction) %>% 
@@ -200,65 +298,20 @@ gg_gain <- select(contrasts, gain_care_effect:gain_interaction) %>%
   geom_vline(xintercept = 1, linetype="dashed")+
   geom_violin(fill="gray")+
   theme_bw()+
-    scale_x_continuous(trans = "log10", limits = c(1e-2, 1e2))
+  scale_x_continuous(trans = "log10", limits = c(1e-2, 1e2))
 
 print(gg_gain) + labs(title = "gain contrasts, our priors, non-RJ")
 ## main issue here: gain_spawn_effect positive rather than negative?
 
 ## loss contrasts
 cdat <- select(contrasts, loss_care_effect:loss_interaction) %>% 
-    pivot_longer(cols=loss_care_effect:loss_interaction, names_to = "contrast")
+  pivot_longer(cols=loss_care_effect:loss_interaction, names_to = "contrast")
 
 gg_loss <- gg_gain %+% cdat
 print(gg_loss)
 
 ## checking out the acceptance rate
 summary(schedule)
-
-#### MODEL W/ DEFAULT PRIORS ####
-
-## command vector
-command_vec_default<- bt_command(prior = NULL)
-#results_default<-bayestraits(data, trees, command_vec_default)
-#saveRDS(results_default, file = "bayestraits/bt_model_default.rds")
-
-## reading in results
-results_default <- readRDS("bayestraits/bt_model_default.rds")
-rates_default <- results_default$Log$results
-summary(rates_default)
-
-## computing contrasts
-gain_contrasts_default <- get_contrasts(rates_default)
-
-cdef_data <- select(gain_contrasts_default, gain_care_effect:gain_interaction) %>% 
-    pivot_longer(cols=gain_care_effect:gain_interaction, names_to = "contrast")
-
-gg_gain %+% cdef_data
-
-#### DATA-LESS MODEL W/ OUR PRIORS ####
-
-data_dataless <- mutate(data, state=12345678)
-summary(data_dataless)
-
-## command vector
-command_vec_dataless <- 
-#results_dataless<-bayestraits(data_dataless, trees, command_vec_dataless)
-#saveRDS(results_dataless, file = "bayestraits/bt_model_dataless.rds")
-
-## reading in results
-results_dataless<-readRDS("bayestraits/bt_model_dataless.rds")
-rates_dataless<-results_dataless$Log$results
-summary(rates_dataless)
-
-## computing contrasts
-all_contrasts_dataless <- get_contrasts(rates_dataless)
-
-cdef_all_dataless <- select(all_contrasts_dataless, gain_care_effect:gain_interaction) %>% 
-    pivot_longer(cols=gain_care_effect:gain_interaction, names_to = "contrast")
-
-gg_gain %+% cdef_all_dataless
-
-#### RJ DATA-LESS MODEL W/ DEFAULT PRIORS ####
 
 ## command vector
 command_vec_rj <- get_command(prior = "RevJump uniform 0 100")
@@ -273,12 +326,11 @@ summary(rates_rj)
 ## computing contrasts
 contrasts_rj <- get_contrasts(rates_rj)
 cdef_rj <- select(contrasts_rj, gain_care_effect:gain_interaction) %>% 
-    pivot_longer(cols=gain_care_effect:gain_interaction, names_to = "contrast")
+  pivot_longer(cols=gain_care_effect:gain_interaction, names_to = "contrast")
 
 gg_gain %+% cdef_rj
 
-
-#### Rate Descriptions ####
+#### RATE DESCRIPTIONS ####
 ## q12 = spawnGain
 ## q13 = careGain
 ## q14 = 0
