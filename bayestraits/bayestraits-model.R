@@ -332,6 +332,42 @@ g1 <- geweke.diag(chains1)
 ## calculate 2-tailed p-values for geweke diagnostics based on the Z scores
 sort(2*pnorm(abs(g1$z), lower.tail = FALSE))
 
+##### WEIGHTING ####
+
+## we simulate character histories with simmap, supplying our model
+## from that we get the amount of time spent in each state (1-8)
+## we call the time spent in state 1 "time1" and so on
+
+## g mean written the long way:
+## exp( ((log(q12)*(1/2)) + (log(q34)*(1/2))) )
+## sub first (1/2) to (time1/(time1+time3)) 
+
+## function to get weighted mean
+gmean_weighted <- function(q12, q34, time1, time3) {
+  exp(
+    (log(q12)*
+    (time1/(time1+time3))) +
+    (log(q34)*
+    (time3/(time1+time3))) 
+     )
+}
+
+## weighted contrasts
+cfun_nonlog_weighted <- function(q12, q34, q56, q78, time1, time3, time5, time7) {
+  gmean(q12,q34,time1,time3)/gmean(q56,q78,time5,time7)
+}
+
+## function for getting weighted contrasts from rates
+get_contrasts_weighted <- function(results) {
+  results$Log$results %>% 
+    mutate(gain_care_effect =   cfun_nonlog(q37,q48,q15,q26,time3,time4,time1,time2),
+           gain_spawn_effect =  cfun_nonlog(q26,q48,q15,q37,time2,time4,time1,time3),
+           gain_interaction =   cfun_nonlog(q15,q48,q37,q26,time1,time4,time3,time2),
+           loss_care_effect =   cfun_nonlog(q73,q84,q51,q62,time7,time8,time5,time6),
+           loss_spawn_effect =  cfun_nonlog(q62,q84,q51,q73,time6,time8,time5,time7),
+           loss_interaction =   cfun_nonlog(q51,q84,q73,q62,time5,time8,time7,time6))
+}
+
 
 #### OLD CODE ####
 
