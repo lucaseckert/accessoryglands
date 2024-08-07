@@ -73,8 +73,9 @@ prior_fac <- (1/n_edge)/0.1
 ## therefore our rates will be *higher* than BT's
 ## therefore we should decrease the priors we give to BT by log(prior_fac)
 ## (-4.79)
-rate_prior[1] <- rate_prior_0[1] - log(prior_fac)
+rate_prior[1] <- exp(rate_prior_0[1] + log(prior_fac))
 prior1 <- sprintf("PriorAll lognormal %f %f", rate_prior[1], rate_prior[2])
+prior2 <- sprintf("RevJump lognormal %f %f", rate_prior[1], rate_prior[2])
 
 
 #### COMMAND FUNCTION ####
@@ -135,13 +136,15 @@ get_contrasts <- function(results) {
 
 ## function for plotting contrasts
 plot_contrasts<-function(contrasts) {
+  df_name <- deparse(substitute(contrasts))
   contrasts %>% 
   pivot_longer(cols=gain_care_effect:loss_interaction, names_to = "contrast") %>% 
   ggplot(aes(x=value, y=contrast))+
   geom_vline(xintercept = 1, linetype="dashed")+
   geom_violin(fill="gray")+
   scale_x_continuous(trans = "log10")+
-  theme_bw()
+  theme_bw()+
+  ggtitle(df_name)
   }
 
 
@@ -215,6 +218,73 @@ contrasts_nodata_reg_priors<-get_contrasts(results_nodata_reg_priors)
 
 ## plotting
 plot_contrasts(contrasts_nodata_reg_priors)
+
+
+#### DATA, RJ, DEFAULT ####
+
+## command vector
+command_vec_data_rj_default<-bt_command(prior = "RevJump uniform 0 100")
+#results_data_rj_default<-bayestraits(data, trees, command_vec_data_rj_default)
+#saveRDS(results_data_rj_default, file = "bayestraits/bt_model_data_rj_default.rds")
+
+## reading in results
+results_data_rj_default<-readRDS("bayestraits/bt_model_data_rj_default.rds")
+
+## computing contrasts
+contrasts_data_rj_default<-get_contrasts(results_data_rj_default)
+
+## plotting
+plot_contrasts(contrasts_data_rj_default)
+
+#### DATA-LESS, RJ, DEFAULT ####
+
+## command vector
+command_vec_nodata_rj_default<-bt_command(prior = "RevJump uniform 0 100")
+#results_nodata_rj_default<-bayestraits(data_dataless, trees, command_vec_nodata_rj_default)
+#saveRDS(results_nodata_rj_default, file = "bayestraits/bt_model_nodata_rj_default.rds")
+
+## reading in results
+results_nodata_rj_default<-readRDS("bayestraits/bt_model_nodata_rj_default.rds")
+
+## computing contrasts
+contrasts_nodata_rj_default<-get_contrasts(results_nodata_rj_default)
+
+## plotting
+plot_contrasts(contrasts_nodata_rj_default)
+
+
+#### DATA, RJ, OUR PRIORS ####
+
+## command vector
+command_vec_data_rj_priors<-bt_command(prior = prior2)
+#results_data_rj_priors<-bayestraits(data, trees, command_vec_data_rj_priors)
+#saveRDS(results_data_rj_priors, file = "bayestraits/bt_model_data_rj_priors.rds")
+
+## reading in results
+results_data_rj_priors<-readRDS("bayestraits/bt_model_data_rj_priors.rds")
+
+## computing contrasts
+contrasts_data_rj_priors<-get_contrasts(results_data_rj_priors)
+
+## plotting
+plot_contrasts(contrasts_data_rj_priors)
+
+
+#### DATA-LESS, RJ, OUR PRIORS ####
+
+## command vector
+command_vec_nodata_rj_priors<-bt_command(prior = prior2)
+#results_nodata_rj_priors<-bayestraits(data_dataless, trees, command_vec_nodata_rj_priors)
+#saveRDS(results_nodata_rj_priors, file = "bayestraits/bt_model_nodata_rj_priors.rds")
+
+## reading in results
+results_nodata_rj_priors<-readRDS("bayestraits/bt_model_nodata_rj_priors.rds")
+
+## computing contrasts
+contrasts_nodata_rj_priors<-get_contrasts(results_nodata_rj_priors)
+
+## plotting
+plot_contrasts(contrasts_nodata_rj_priors)
 
 
 #### DIAGNOSTICS ####
