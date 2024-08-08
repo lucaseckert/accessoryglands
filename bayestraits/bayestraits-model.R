@@ -52,7 +52,7 @@ data <- ag_compdata_tb$data %>%
     (ag==1 & pc=="?" & sc==1) ~ 68,
     (ag==0 & pc=="?" & sc=="?") ~ 1234,
     (ag==1 & pc=="?" & sc=="?") ~ 5678))) %>% 
-    select(species,state)
+    dplyr::select(species,state)
 
 summary(data)
 
@@ -148,7 +148,7 @@ plot_contrasts<-function(contrasts) {
   }
 
 
-#### DATA, REGULAR, DEFAULT PRIOS ####
+#### DATA, REGULAR, DEFAULT PRIORS ####
 
 ## command vector
 command_vec_data_reg_default<- bt_command(prior = NULL)
@@ -368,6 +368,7 @@ get_contrasts_weighted <- function(results) {
            loss_interaction =   cfun_nonlog(q51,q84,q73,q62,time5,time8,time7,time6))
 }
 
+q()
 
 #### OLD CODE ####
 
@@ -398,7 +399,7 @@ get_contrasts_weighted <- function(results) {
 # }
 
 ## gain contrasts
-gg_gain <- select(contrasts, gain_care_effect:gain_interaction) %>% 
+gg_gain <- dplyr::select(contrasts, gain_care_effect:gain_interaction) %>% 
   pivot_longer(cols=gain_care_effect:gain_interaction, names_to = "contrast") %>% 
   ggplot(aes(x=value, y=contrast))+
   geom_vline(xintercept = 1, linetype="dashed")+
@@ -410,7 +411,7 @@ print(gg_gain) + labs(title = "gain contrasts, our priors, non-RJ")
 ## main issue here: gain_spawn_effect positive rather than negative?
 
 ## loss contrasts
-cdat <- select(contrasts, loss_care_effect:loss_interaction) %>% 
+cdat <- dplyr::select(contrasts, loss_care_effect:loss_interaction) %>% 
   pivot_longer(cols=loss_care_effect:loss_interaction, names_to = "contrast")
 
 gg_loss <- gg_gain %+% cdat
@@ -431,7 +432,7 @@ summary(rates_rj)
 
 ## computing contrasts
 contrasts_rj <- get_contrasts(rates_rj)
-cdef_rj <- select(contrasts_rj, gain_care_effect:gain_interaction) %>% 
+cdef_rj <- dplyr::select(contrasts_rj, gain_care_effect:gain_interaction) %>% 
   pivot_longer(cols=gain_care_effect:gain_interaction, names_to = "contrast")
 
 gg_gain %+% cdef_rj

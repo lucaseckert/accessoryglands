@@ -48,3 +48,4 @@ install_pkgs <- function() {
     return(invisible(NULL))
 }
 
+## remotes::install_github("YuLab-SMU/yulab.utils")
