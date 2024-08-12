@@ -920,3 +920,89 @@ if (require("tikzDevice")) {
 ##     system(sprintf("sed '%d i %s' %s", line = , str, file))
 ## }
 
+
+get_chains <- function(results, ret_val = c("data.frame", "mcmc", "mcmc.list"), xcols = c("chain", "Iteration")) {
+    ret_val <- match.arg(ret_val)
+    rate_cols <- grep("^q[0-9]+", colnames(results$Log$results), value = TRUE)
+    chains <- results$Log$results[,c(xcols, rate_cols)]  ## q** values only
+    cols_disallowed <- which(apply(chains==0, 2, all)) ## forbidden/boring
+    dupes <- c("q24","q57","q68", ## care gain
+               "q42","q75","q86", ## care loss
+               "q34","q56","q78", ## spawn gain
+               "q43","q65","q87" ## spawn loss
+               )
+    cols_dupes <- match(dupes, colnames(chains))
+    res <- chains[, -c(cols_dupes, cols_disallowed)]
+    res <- switch(ret_val,
+                  mcmc = as.mcmc(res[!names(res) %in% xcols]),
+                  mcmc.list = as.mcmc.list(lapply(split(res[!names(res) %in% xcols], res$chain), mcmc)),
+                  res)
+    return(res)
+}
+
+
+diagnostic_posterior.mcmcx <- function (posterior, diagnostic = "all", parameters = NULL, ...) {
+
+    ## ugly ugly ugly
+    is_list <- inherits(posterior, "mcmc.list")
+    if (is_list) {
+        posterior.list <- posterior
+        posterior <- as.mcmc(do.call(rbind, posterior))
+    }
+
+    if (!is.null(parameters)) warning("ignoring parameters arg")
+
+    params <- insight::find_parameters(posterior, parameters = parameters)
+    if (is.null(diagnostic)) {
+        return(data.frame(Parameter = params))
+    }
+    diagnostic <- match.arg(diagnostic, c("ESS", "Rhat", "MCSE", 
+                                          "all"), several.ok = TRUE)
+    d_orig <- diagnostic
+    if ("all" %in% diagnostic) {
+        diagnostic <- c("ESS", "MCSE")
+        if (is_list) diagnostic <- c(diagnostic, "Rhat")
+    }
+    insight::check_if_installed("coda")
+    all_params <- insight::find_parameters(posterior, flatten = TRUE)
+    diagnostic_df <- data.frame(Parameter = all_params, stringsAsFactors = FALSE)
+    if ("ESS" %in% diagnostic) {
+        diagnostic_df$ESS <- effective_sample(posterior, effects = effects)$ESS
+    }
+    if ("MCSE" %in% diagnostic) {
+        diagnostic_df$MCSE <- mcse(posterior, effects = effects)$MCSE
+    }
+    if ("Rhat" %in% diagnostic) {
+        if (!is_list) {
+            warning("multiple chains not present (object is not 'mcmc.list'), skipping ESS")
+        } else {
+            gd <- gelman.diag(posterior.list)
+            diagnostic_df$Rhat <- gd$psrf[,"Point est."]
+            diagnostic_df$Rhat_upr <- gd$psrf[,"Upper C.I."]
+        }
+    }
+    diagnostic_df <- diagnostic_df[!sapply(diagnostic_df, function(x) all(is.na(x)))]
+    diagnostic_df[diagnostic_df$Parameter %in% all_params, ]
+}
+
+diagnostic_posterior.mcmc <- diagnostic_posterior.mcmc.list <- diagnostic_posterior.mcmcx
+
+effective_sample.mcmc <- function (model, ...)  {
+    es <- coda::effectiveSize(model)
+    data.frame(Parameter = names(es), ESS = unname(es))
+}
+
+mcse.mcmc <- function(model, ...) {
+    require("coda")
+    ss <- summary(model)$statistics
+    data.frame(Parameter = rownames(ss), MCSE = ss[,"Time-series SE"])
+}
+
+## testing
+## xx <- readRDS(file.path("bayestraits", all_model_results[[1]]))
+## m <- get_chains(xx, ret_val = "mcmc")
+## mm <- get_chains(xx, ret_val = "mcmc.list")
+## effective_sample(m)
+## diagnostic_posterior(m)
+## diagnostic_posterior(mm)
+

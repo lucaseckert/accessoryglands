@@ -10,10 +10,26 @@ library(btw)
 library(targets)
 library(ape)
 library(dplyr)
-##
+
+## needed for testing only
 
 library(ggplot2); theme_set(theme_bw())
 library(tidyr)
+get_chains <- function(results, ret_val = c("data.frame", "mcmc"), xcols = c("chain", "Iteration")) {
+    ret_val <- match.arg(ret_val)
+    rate_cols <- grep("^q[0-9]+", colnames(results$Log$results), value = TRUE)
+    chains <- results$Log$results[,c(xcols, rate_cols)]  ## q** values only
+    cols_disallowed <- which(apply(chains==0, 2, all)) ## forbidden/boring
+    dupes <- c("q24","q57","q68", ## care gain
+               "q42","q75","q86", ## care loss
+               "q34","q56","q78", ## spawn gain
+               "q43","q65","q87" ## spawn loss
+               )
+    cols_dupes <- match(dupes, colnames(chains))
+    res <- chains[, -c(cols_dupes, cols_disallowed)]
+    if (ret_val == "mcmc") res <- as.mcmc(res)
+    return(res)
+}
 
 ## see http://bbolker.github.io/bbmisc/bayes/examples.html
 ## for convergence diagnostics etc.
@@ -162,7 +178,7 @@ bt_run <- function(data = NULL, trees = NULL, prior = NULL, dir = "bayestraits",
     results <- list(Log = list(options = all_res[[1]]$Log$options, ## same opts for all chains
                                results = do.call(rbind, lapply(seq_along(all_res), function(i) data.frame(chain = i, all_res[[i]]$Log$results)))
                                ))
-    results[["time"]] <- lapply(all_res, function(x) attributes(x, "time"))
+    results[["time"]] <- lapply(all_res, function(x) attr(x, "time"))
     for (c in c("Schedule", "Stones", "AncStates", "OutputTrees")) {
         results[[c]] <- lapply(all_res, function(x) x[[c]])
     }
@@ -180,9 +196,11 @@ r1 <- bt_run(data = tdata, trees, fn = "bt_model_data_reg_default.rds", verbose 
 ## check
 r1B <- readRDS("bayestraits/bt_model_data_reg_default.rds")
 r1B_L <- (r1B
-    |>  select(c(starts_with("q")))
+    |> get_chains()
     |> tidyr::pivot_longer(-c(chain, Iteration))
 )
+ggplot(r1B_L, aes(Iteration, value, colour = factor(chain))) + geom_line() + facet_wrap(~name, scale = "free") +
+    scale_y_log10()
 
 ##### TDATA, REGULAR, OUR PRIORS ####
 
