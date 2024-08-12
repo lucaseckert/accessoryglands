@@ -213,7 +213,7 @@ system.time(
 results_data_reg_default <- readRDS("bayestraits/bt_model_data_reg_default.rds")
 
 ## computing contrasts
-contrasts_data_reg_default<-get_contrasts(results_data_reg_default)
+contrasts_data_reg_default <- get_contrasts(results_data_reg_default)
 
 ## plotting
 plot_contrasts(contrasts_data_reg_default)

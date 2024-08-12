@@ -22,3 +22,11 @@ ag_supp.pdf: ag_supp.rmd
 
 clean:
 	rm -f *.aux *.log *.Rout *.tikz
+
+get-bt:
+	wget http://www.evolution.reading.ac.uk/BayesTraitsV4.0.0/Files/BayesTraitsV4.0.0-Linux.tar.gz
+	wget http://www.evolution.reading.ac.uk/BayesTraitsV4.0.0/Files/BayesTraitsV4.0.0-Linux-Threaded.tar.gz
+	tar zxvf BayesTraitsV4.0.0-Linux.tar.gz
+	tar zxvf BayesTraitsV4.0.0-Linux-Threaded.tar.gz
+	rm BayesTraitsV4.0.0*.tar.gz
+
