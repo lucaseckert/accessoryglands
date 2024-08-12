@@ -12,7 +12,9 @@
 					(our priors, default BayesTraits priors)
   ['with data' + 'regular' + 'our priors' should agree with our results]
   ['w/o data' + 'regular' + 'our priors' should agree with our computed priors for contrasts]
-  
+
+* troubleshoot RJ results ...
+
 ### lower priority
 
 * implement multi-chain BT runs (set seeds differently), calculate R-hat etc.

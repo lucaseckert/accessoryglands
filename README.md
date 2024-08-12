@@ -128,6 +128,8 @@ from binary:
 
 ```r
 download.file("http://www.evolution.reading.ac.uk/BayesTraitsV4.0.0/Files/BayesTraitsV4.0.0-Linux.tar.gz", destfile = "btv4.tgz")
+download.file("http://www.evolution.reading.ac.uk/BayesTraitsV4.0.0/Files/BayesTraitsV4.0.0-Linux-Threaded.tar.gz", destfile = "btv4t.tgz")
+system("tar ztvf btv4.tgz")
 untar("btv4.tgz")
 unlink("btv4.tgz")
 ```

@@ -10,6 +10,7 @@ library(tidyverse)
 library(ape)
 library(coda)
 library(bayestestR)
+library(ggplot2); theme_set(theme_bw())
 ## see http://bbolker.github.io/bbmisc/bayes/examples.html
 ## for convergence diagnostics etc.
 ## however, we would have to make BT output look like results from
@@ -28,10 +29,58 @@ trees <- .compressTipLabel(trees)
 ##  Bayes diagnostics (R-hat, trace plots ...)
 
 
-## FIXME: can we automate this?
-## (4*ag + 2*pc + sc will work for the non-missing cases ...)
 tar_load(ag_compdata_tb)
 
+get_chains <- function(results) {
+    ## 4:59
+    rate_cols <- grep("^q[0-9]+", colnames(results$Log$results))
+    chains <- as.mcmc(results$Log$results[,rate_cols])  ## q** values only
+    cols_disallowed <- which(apply(chains==0, 2, all)) ## forbidden/boring
+    dupes <- c("q24","q57","q68", ## care gain
+               "q42","q75","q86", ## care loss
+               "q34","q56","q78", ## spawn gain
+               "q43","q65","q87" ## spawn loss
+               )
+    cols_dupes <- match(dupes, colnames(chains))
+  
+    return(chains[, -c(cols_dupes, cols_disallowed)])
+}
+
+## this is clever and extensible but longer than the brute-force original ...
+codefun <- function(ag, pc, sc) {
+    ## octal coding (more or less) by position
+    v <- c(ag, pc, sc)
+    f <- function(z) sum(c(4,2,1)*as.numeric(z)) + 1
+    nq <- sum(v=="?")
+    ## replace *first* ? with i
+    ssub <- function(i, x) {
+        x[which(x=="?")[1]] <- i
+        return(x)
+    }
+    if (nq ==0) return(f(v))
+    if (nq ==1) {
+        return(as.numeric(
+            paste0(f(ssub(0, v)),
+                   f(ssub(1,v)))
+        ))
+    }
+    ## handle nq==2 case cleverly (mapping over 0/1 combos) or by brute force?
+    ## could use sub() to substitute 0/1 for *first* ?, then *second* ? ...
+    fsub <- function(i,j, x) {
+        f(ssub(j, ssub(i, x)))
+    }
+    return(as.numeric(
+        paste0(fsub(0,0,v),
+               fsub(0,1,v),
+               fsub(1,0,v),
+               fsub(1,1,v))
+    ))
+}
+
+codefun(0, "?", 0)
+codefun(0, "?", "?")
+    
+    
 data <- ag_compdata_tb$data %>%
     mutate(state=factor(case_when(
     (ag==0 & pc==0 & sc==0) ~ 1,
@@ -84,7 +133,7 @@ prior2 <- sprintf("RevJump lognormal %f %f", rate_prior[1], rate_prior[2])
 zero_rates <- c(14, 16:18, 23, 25, 27:28, 32, 35:36, 38, 41, 45:47, 52:54,
                 58, 61, 63:64, 67, 71:72, 74, 76, 81:83, 85)
 qz <- paste("q", zero_rates, sep ="", collapse = " ")
-bt_command <- function(prior = NULL, iterations = 51e4, burnin = 1e4, seed = 101) {
+bt_command <- function(prior = NULL, iterations = 51e4, burnin = 1e4, seed = 101, cores = NULL) {
     cvec <- c("1", ## MultiState
               "2", ## MCMC
               "ScaleTrees", ## scaling branch lengths to a mean of 0.1
@@ -102,6 +151,7 @@ bt_command <- function(prior = NULL, iterations = 51e4, burnin = 1e4, seed = 101
                sprintf("Burnin %d", burnin),
                sprintf("Seed %d", seed)
                )
+    if (!is.null(cores)) cvec <- c(cvec, sprintf("Cores %d", cores))
     return(cvec)
 }
 
@@ -151,8 +201,12 @@ plot_contrasts<-function(contrasts) {
 #### DATA, REGULAR, DEFAULT PRIORS ####
 
 ## command vector
-command_vec_data_reg_default<- bt_command(prior = NULL)
-#results_data_reg_default<-bayestraits(data, trees, command_vec_data_reg_default)
+options(bt_path = "BayesTraitsV4.0.0-Linux-Threaded", bt_bin = "BayesTraitsV4")
+command_vec_data_reg_default<- bt_command(prior = NULL, cores = 4)
+
+system.time(
+    results_data_reg_default <- bayestraits(data, trees, command_vec_data_reg_default)
+)
 #saveRDS(results_data_reg_default, file = "bayestraits/bt_model_data_reg_default.rds")
 
 ## reading in results
@@ -192,6 +246,7 @@ summary(data_dataless)
 command_vec_nodata_reg_default<-bt_command(prior = NULL)
 #results_nodata_reg_default<-bayestraits(data_dataless, trees, command_vec_nodata_reg_default)
 #saveRDS(results_nodata_reg_default, file = "bayestraits/bt_model_nodata_reg_default.rds")
+
 
 ## reading results
 results_nodata_reg_default<-readRDS("bayestraits/bt_model_nodata_reg_default.rds")
@@ -286,6 +341,20 @@ contrasts_nodata_rj_priors<-get_contrasts(results_nodata_rj_priors)
 ## plotting
 plot_contrasts(contrasts_nodata_rj_priors)
 
+getfun <- function(fn) { readRDS(file.path("bayestraits", fn)) |> get_contrasts() }
+all_model_results <- list.files(path="bayestraits", pattern = "bt_model_(no)?data*") |>
+    setdiff(c("bt_model_demo.rds", "bt_model_dataless.rds"))
+names(all_model_results) <- gsub("(bt_model_|\\.rds)", "", all_model_results) ## map_dfr hack
+all_results <- purrr::map_dfr(all_model_results, getfun, .id = "model_run")                                                  
+
+ar_long <- (all_results
+    |> select(c("model_run", matches("(interaction|effect)$")))
+    |> pivot_longer(-model_run)
+    |> separate(model_run, into = c("data", "method", "priors"))
+)
+
+ggplot(ar_long, aes(x = value, y = interaction(priors, data))) + geom_violin(fill = "gray") +
+    facet_grid(method~name) + scale_x_log10()
 
 #### DIAGNOSTICS ####
 
@@ -306,21 +375,7 @@ rates <- results$Log$results
 options <- results$Log$options
 schedule <- results$Schedule$header
 
-## 4:59
-rate_cols <- grep("^q[0-9]+", colnames(results$Log$results))
 
-get_chains <- function(results) {
-  chains <- as.mcmc(results$Log$results[,rate_cols])  ## q** values only
-  cols_disallowed <- which(apply(chains==0, 2, all)) ## forbidden/boring
-  dupes <- c("q24","q57","q68", ## care gain
-             "q42","q75","q86", ## care loss
-             "q34","q56","q78", ## spawn gain
-             "q43","q65","q87" ## spawn loss
-  )
-  cols_dupes <- match(dupes, colnames(chains))
-  
-  return(chains[, -c(cols_dupes, cols_disallowed)])
-}
 
 chains1 <- get_chains(results)
 lattice::xyplot(chains1, aspect = "fill", layout = c(4,3),
