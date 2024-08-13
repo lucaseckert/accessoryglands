@@ -23,10 +23,14 @@ ag_supp.pdf: ag_supp.rmd
 clean:
 	rm -f *.aux *.log *.Rout *.tikz
 
-get-bt:
-	wget http://www.evolution.reading.ac.uk/BayesTraitsV4.0.0/Files/BayesTraitsV4.0.0-Linux.tar.gz
-	wget http://www.evolution.reading.ac.uk/BayesTraitsV4.0.0/Files/BayesTraitsV4.0.0-Linux-Threaded.tar.gz
-	tar zxvf BayesTraitsV4.0.0-Linux.tar.gz
-	tar zxvf BayesTraitsV4.0.0-Linux-Threaded.tar.gz
-	rm BayesTraitsV4.0.0*.tar.gz
+## http://www.evolution.reading.ac.uk/BayesTraitsV4.1.2/Files/BayesTraitsV4.1.2-Linux.tar.gz
 
+BTVER=4.1.2
+get-bt:
+	wget http://www.evolution.reading.ac.uk/BayesTraitsV$(BTVER)/Files/BayesTraitsV$(BTVER)-Linux.tar.gz
+	- wget http://www.evolution.reading.ac.uk/BayesTraitsV$(BTVER)/Files/BayesTraitsV$(BTVER)-Linux-Threaded.tar.gz
+	tar zxvf BayesTraitsV$(BTVER)-Linux.tar.gz
+	- tar zxvf BayesTraitsV$(BTVER)-Linux-Threaded.tar.gz
+	rm BayesTraitsV$(BTVER)*.tar.gz
+## - means 'ignore errors'
+## what else? <XF86AudioMute> is undefined [15 times]

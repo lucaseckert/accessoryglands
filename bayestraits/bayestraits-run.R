@@ -1,6 +1,10 @@
 #### BayesTraits Model ####
 
-options(bayestraits.cores = NULL)
+## command vector
+## use '-Threaded' for threaded executable (grabs **all** cores on Pop!OS)
+options(bt_path = "BayesTraitsV4.0.0-Linux", bt_bin = "BayesTraitsV4")
+
+options(bayestraits.cores = 6)
 ## uses *all* cores on Pop!OS ... ??
 ## run from head directory of repo
 ## (for target loading, readRDS)
@@ -188,9 +192,6 @@ bt_run <- function(data = NULL, trees = NULL, prior = NULL, dir = "bayestraits",
 
 #### DATA, REGULAR, DEFAULT PRIORS ####
 
-## command vector
-## use '-Threaded' for threaded executable (grabs **all** cores on Pop!OS)
-options(bt_path = "BayesTraitsV4.0.0-Linux", bt_bin = "BayesTraitsV4")
 r1 <- bt_run(data = tdata, trees, fn = "bt_model_data_reg_default.rds", verbose = TRUE)
 
 ## check
