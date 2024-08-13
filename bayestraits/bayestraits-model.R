@@ -14,7 +14,7 @@ library(ggplot2); theme_set(theme_bw())
 
 source("R/utils.R")
 
-if (!interactive()) pdf("bayestraits-pix.pdf")
+if (!interactive()) pdf("bayestraits-pix.pdf", width = 16, height = 10)
 
 ## FIXME/TODO: unify ggplots
 ##  Compare with our results/side-by-side plots
@@ -91,13 +91,15 @@ diag_plot <- all_diag_L |> ggplot(aes(x = value, y = Parameter, colour = method,
     scale_shape_manual(values = c(1, 16, 2, 17))  + ## open/closed x round/triangle
     scale_colour_manual(values = c("black", "red"))
 
-print(diag_plot)
+print(diag_plot + labs(title = "diagnostics for all runs (reg + RJ)"))
 
 ## results basically make sense
 ## * rj [red] is awful (low ESS, high R-hat most of the time) [trace plots will illustrate this even more strongly]
 
 ## get rid of RJ so we can focus on non-RJ
-print(diag_plot %+% filter(all_diag_L, method == "reg"))
+print(diag_plot %+% filter(all_diag_L, method == "reg") +
+      labs(title = "diagnostics for 'reg' runs only"))
+      
 
 ## * nodata [triangles] gives high MCSE across the board (higher for default priors than ours)
 ## * worst R-hats are for priors.nodata (we probably don't care)
@@ -110,7 +112,7 @@ chains_long <- (all_chains
 chains_1 <- ggplot(chains_long, aes(Iteration, value, colour = factor(chain))) +
     facet_grid(name ~ model_run, scale = "free_y") + geom_line() +
     scale_y_log10()
-print(chains_1)
+print(chains_1 + labs(title = "trace plots for raw rates ('q' params)"))
 
 chains_long_c <- (all_results
     |> select(c("model_run", "chain", "Iteration", matches("(interaction|effect)$")))
@@ -119,14 +121,17 @@ chains_long_c <- (all_results
 )
 
 ## trace plots of contrasts
-chains_1 %+% chains_long_c
+chains_1 %+% chains_long_c + labs(title = "trace plots for contrasts (log scale)")
 ## without log scale
-chains_1 %+% chains_long_c + scale_y_continuous()
+chains_1 %+% chains_long_c + scale_y_continuous() + labs(title = "trace plots for contrasts (non-log scale)")
 
 ## show all posterior distributions
 
-ggplot(chains_long_c, aes(x = value, y = interaction(priors, data))) + geom_violin(fill = "gray") +
-    facet_grid(method~name) + scale_x_log10()
+ggplot(chains_long_c, aes(x = value, y = interaction(priors, data))) + geom_violin(aes(fill = factor(data)), alpha = 0.5) +
+    facet_grid(method~name) + scale_x_log10() + theme(panel.spacing = grid::unit(0, "lines")) +
+    scale_fill_manual(values = c("green", "blue")) +
+    labs(title = "posterior distributions for all contrasts & runs") +
+    geom_vline(xintercept = 1.0, lty = 2)
 
 
 
