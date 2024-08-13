@@ -1,5 +1,11 @@
 #### BayesTraits Model analysis ####
 
+## see http://bbolker.github.io/bbmisc/bayes/examples.html
+## for more info on convergence diagnostics etc.
+
+## TO DO: improved (Vehtari et al.) R-hat?
+## improved trace plots (rank-based) ?
+
 ## run from head directory of repo
 ## (for target loading, readRDS)
 

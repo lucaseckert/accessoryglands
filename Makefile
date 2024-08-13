@@ -25,6 +25,7 @@ clean:
 
 ## http://www.evolution.reading.ac.uk/BayesTraitsV4.1.2/Files/BayesTraitsV4.1.2-Linux.tar.gz
 
+## From http://www.evolution.reading.ac.uk/BayesTraitsV4.1.2/BayesTraitsV4.1.2.html: "The threaded versions are no longer being supplied as binaries but can be built via the source code. New threaded methods are under development."
 BTVER=4.1.2
 get-bt:
 	wget http://www.evolution.reading.ac.uk/BayesTraitsV$(BTVER)/Files/BayesTraitsV$(BTVER)-Linux.tar.gz
@@ -33,4 +34,3 @@ get-bt:
 	- tar zxvf BayesTraitsV$(BTVER)-Linux-Threaded.tar.gz
 	rm BayesTraitsV$(BTVER)*.tar.gz
 ## - means 'ignore errors'
-## what else? <XF86AudioMute> is undefined [15 times]

@@ -1,8 +1,10 @@
 #### BayesTraits Model ####
 
 ## command vector
-## use '-Threaded' for threaded executable (grabs **all** cores on Pop!OS)
-options(bt_path = "BayesTraitsV4.0.0-Linux", bt_bin = "BayesTraitsV4")
+## use '-Threaded' for threaded executable, specify number of cores
+##  (will grab *all* cores if using threaded and not careful!)
+options(bt_path = "BayesTraitsV4.0.0-Linux-Threaded",
+        bt_bin = "BayesTraitsV4")
 
 options(bayestraits.cores = 6)
 ## uses *all* cores on Pop!OS ... ??
@@ -19,26 +21,8 @@ library(dplyr)
 
 library(ggplot2); theme_set(theme_bw())
 library(tidyr)
-get_chains <- function(results, ret_val = c("data.frame", "mcmc"), xcols = c("chain", "Iteration")) {
-    ret_val <- match.arg(ret_val)
-    rate_cols <- grep("^q[0-9]+", colnames(results$Log$results), value = TRUE)
-    chains <- results$Log$results[,c(xcols, rate_cols)]  ## q** values only
-    cols_disallowed <- which(apply(chains==0, 2, all)) ## forbidden/boring
-    dupes <- c("q24","q57","q68", ## care gain
-               "q42","q75","q86", ## care loss
-               "q34","q56","q78", ## spawn gain
-               "q43","q65","q87" ## spawn loss
-               )
-    cols_dupes <- match(dupes, colnames(chains))
-    res <- chains[, -c(cols_dupes, cols_disallowed)]
-    if (ret_val == "mcmc") res <- as.mcmc(res)
-    return(res)
-}
 
-## see http://bbolker.github.io/bbmisc/bayes/examples.html
-## for convergence diagnostics etc.
-## however, we would have to make BT output look like results from
-##  a stan fit/write appropriate methods ...
+source("R/utils.R") ## for get_chains
 
 ## loading trees
 tar_load(treeblock)
@@ -134,6 +118,7 @@ prior_fac <- (1/n_edge)/0.1
 rate_prior[1] <- exp(rate_prior_0[1] + log(prior_fac))
 prior1 <- sprintf("PriorAll lognormal %f %f", rate_prior[1], rate_prior[2])
 prior2 <- sprintf("RevJump lognormal %f %f", rate_prior[1], rate_prior[2])
+prior3 <- sprintf("RevJump exp 10")
 
 #### COMMAND FUNCTION ####
 
@@ -142,7 +127,7 @@ zero_rates <- c(14, 16:18, 23, 25, 27:28, 32, 35:36, 38, 41, 45:47, 52:54,
                 58, 61, 63:64, 67, 71:72, 74, 76, 81:83, 85)
 qz <- paste("q", zero_rates, sep ="", collapse = " ")
 
-bt_command <- function(prior = NULL, iterations = 51e4, burnin = 1e4, seed = 101, cores = getOption("bayestrait.cores", NULL)) {
+bt_command <- function(prior = NULL, iterations = 51e4, burnin = 1e4, seed = 101, cores = getOption("bayestraits.cores", 1)) {
     cvec <- c("1", ## MultiState
               "2", ## MCMC
               "ScaleTrees", ## scaling branch lengths to a mean of 0.1
@@ -238,3 +223,12 @@ r7 <- bt_run(prior = prior2,
 
 r8 <- bt_run(prior = prior2,
              data = data_dataless, trees, fn = "bt_model_nodata_rj_priors.rds", verbose = TRUE)
+
+## ALTERNATIVE RJ prior (exp(10))
+
+## based on trace plots, seems just as bad as the other RJ+data options
+## diagnostic plots fail because ESS calculation fails (Chol inversion)
+if (FALSE) {
+    r9 <- bt_run(prior = prior3,
+              data = tdata, trees, fn = "bt_model_data_rj_prior-exp10.rds", verbose = TRUE)
+}
