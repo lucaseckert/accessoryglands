@@ -28,12 +28,7 @@ if (!interactive()) pdf("bayestraits-pix.pdf", width = 16, height = 10)
 
 #### CONTRAST FUNCTIONS ####
 
-## computing contrasts
-## FIXME: we need to be more careful about computing contrasts,
-##  i.e. on the *log scale* we were computing something (q1 + q2)/2 - (q3 + q4)/2 = m1 - m2
-##  when we exponentiate we get exp(m1)/exp(m2) -- so the ratio is correct
-##  but we should be taking the _geometric mean_ of the rates, not the arithmetic mean
-##  e.g.
+## computing contrasts - from rates to geometric mean ratios
 gmean <- function(x, y) sqrt(x*y)  ## equivalent to exp((log(x) + log(y))/2)
 cfun_nonlog <- function(q1, q2, q3, q4) {
     gmean(q1,q2)/gmean(q3,q4)
@@ -73,7 +68,7 @@ read_contrasts <- function(fn) { readRDS(file.path("bayestraits", fn)) |> get_co
 read_chains <- function(fn) { readRDS(file.path("bayestraits", fn)) |> get_chains() }
 read_chains_list <- function(fn) { readRDS(file.path("bayestraits", fn)) |> get_chains("mcmc.list") }
 
-all_model_results <- list.files(path="bayestraits", pattern = "bt_model_(no)?data_.*")
+all_model_results <- list.files(path="bayestraits", pattern = "bt_model_(no)?data_(reg|rj)_(default|priors).*")
 ## should have a 2 x 2 x 2 result ({data, nodata} * {reg, rj} * {default, priors})
 stopifnot(length(all_model_results) == 8)
 
@@ -120,9 +115,19 @@ chains_1 <- ggplot(chains_long, aes(Iteration, value, colour = factor(chain))) +
     scale_y_log10()
 print(chains_1 + labs(title = "trace plots for raw rates ('q' params)"))
 
+    |> pivot_longer(starts_with("q"))
+)
+
+pivot_contrasts <- function(x) {
+    (x
+        |> select(c(any_of(c("model_run", "chain", "Iteration")),
+                    matches("(interaction|effect)$")))
+        |> pivot_longer(matches("(interaction|effect)"))
+    )
+}
+
 chains_long_c <- (all_results
-    |> select(c("model_run", "chain", "Iteration", matches("(interaction|effect)$")))
-    |> pivot_longer(matches("(interaction|effect)"))
+    |> pivot_contrasts()
     |> separate(model_run, into = c("data", "method", "priors"), remove = FALSE)
 )
 
@@ -140,6 +145,40 @@ ggplot(chains_long_c, aes(x = value, y = interaction(priors, data))) + geom_viol
     geom_vline(xintercept = 1.0, lty = 2)
 
 
+## exploring experiments
+
+## ex_fn <- "bt_model_data_rj_prior-exp10-long.rds"
+ex_fn <- "bt_model_data_rj_prior2-exp10-long.rds"
+ex_chain <- read_chains(ex_fn)
+ex_contrasts <- read_contrasts(ex_fn)
+
+ex_chain_L <- (ex_chain
+    ## |> slice(seq(1, nrow(ex_chain), by = 10))
+    |> pivot_longer(starts_with("q"))
+)
+
+## mostly, sort of, OK except for q26
+gg_excontrasts <- ggplot(ex_chain_L, aes(Iteration, value+1e-4)) +
+    geom_line() +
+    scale_y_log10() +
+    facet_wrap(~name, scale = "free") + geom_line() +
+    labs(title = "trace plots for raw rates ('q' params)")
+print(gg_excontrasts)
+gg_excontrasts %+% filter(ex_chain_L, name == "q48")
+
+gg_violin <- ggplot(ex_chain_L, aes(value+1e-4, name)) + geom_violin(fill = "gray")
+print(gg_violin)
+
+gg_violin %+% filter(ex_chain_L, name == "q48")
+filter(ex_chain_L, name == "q48") |>
+    ggplot(aes(x=value)) + geom_histogram(bins=100) +
+    ## log10 doesn't really make sense but ...
+    scale_y_log10()
+
+## geom-mean contrasts don't work well when rates are sometimes
+##  set to zero
+ggplot(pivot_contrasts(ex_contrasts),
+       aes(value, name)) + geom_violin(fill = "gray")
 
 ## raftery.diag(chains1)  ## suggests we have to run longer (~4000 samples == 8 x 500)
 ## g1 <- geweke.diag(chains1)
@@ -168,7 +207,7 @@ gmean_weighted <- function(q12, q34, time1, time3) {
 
 ## weighted contrasts
 cfun_nonlog_weighted <- function(q12, q34, q56, q78, time1, time3, time5, time7) {
-  gmean(q12,q34,time1,time3)/gmean(q56,q78,time5,time7)
+    gmean(q12,q34,time1,time3)/gmean(q56,q78,time5,time7)
 }
 
 ## function for getting weighted contrasts from rates
@@ -185,73 +224,6 @@ get_contrasts_weighted <- function(results) {
 if (!interactive()) dev.off()
 q()
 
-
-#### OLD CODE ####
-
-# cfun_log <- function(q1, q2, q3, q4) {
-#     (q1 + q2)/2 - (q3 + q4)/2
-# }
-
-## LUCAS: decide how to fix this. 
-##   e.g.
-
-## FIX ME !!!
-
-## either (1) convert rates to log-rates, i.e.
-## rates[,rate_cols] <- log(rates[,rate_cols])
-
-##and use code below
-##  (or change everything to cfun_log for compactness)
-## OR (2) use cfun_nonlog below
-
-# get_contrasts <- function(rates) {
-#     mutate(rates,
-#            gain_care_effect =   (q37+q48)/2-(q15+q26)/2,
-#            gain_spawn_effect =  (q26+q48)/2-(q15+q37)/2,
-#            gain_interaction =   (q15+q48)/2-(q37+q26)/2,
-#            loss_care_effect =   (q73+q84)/2-(q51+q62)/2,
-#            loss_spawn_effect =  (q62+q84)/2-(q51+q73)/2,
-#            loss_interaction =   (q51+q84)/2-(q73+q62)/2)
-# }
-
-## gain contrasts
-gg_gain <- dplyr::select(contrasts, gain_care_effect:gain_interaction) %>% 
-  pivot_longer(cols=gain_care_effect:gain_interaction, names_to = "contrast") %>% 
-  ggplot(aes(x=value, y=contrast))+
-  geom_vline(xintercept = 1, linetype="dashed")+
-  geom_violin(fill="gray")+
-  theme_bw()+
-  scale_x_continuous(trans = "log10", limits = c(1e-2, 1e2))
-
-print(gg_gain) + labs(title = "gain contrasts, our priors, non-RJ")
-## main issue here: gain_spawn_effect positive rather than negative?
-
-## loss contrasts
-cdat <- dplyr::select(contrasts, loss_care_effect:loss_interaction) %>% 
-  pivot_longer(cols=loss_care_effect:loss_interaction, names_to = "contrast")
-
-gg_loss <- gg_gain %+% cdat
-print(gg_loss)
-
-## checking out the acceptance rate
-summary(schedule)
-
-## command vector
-command_vec_rj <- get_command(prior = "RevJump uniform 0 100")
-#results_rj<-bayestraits(data_dataless, trees, command_vec_rj)
-#saveRDS(results_rj, file = "bayestraits/bt_model_rj.rds")
-
-## reading in results
-results_rj<-readRDS("bayestraits/bt_model_rj.rds")
-rates_rj<-results_rj$Log$results
-summary(rates_rj)
-
-## computing contrasts
-contrasts_rj <- get_contrasts(rates_rj)
-cdef_rj <- dplyr::select(contrasts_rj, gain_care_effect:gain_interaction) %>% 
-  pivot_longer(cols=gain_care_effect:gain_interaction, names_to = "contrast")
-
-gg_gain %+% cdef_rj
 
 #### RATE DESCRIPTIONS ####
 ## q12 = spawnGain

@@ -1,13 +1,25 @@
 #### BayesTraits Model ####
 
+## should modularize this some more:
+##   allow path/bin/cores to be set externally
+##   split into individual `make` or `targets` targets so they
+##    can be (re)run separately if necessary
+
+## FIXME/TODO:
+##  * finish testing/considering RJ results
+##     * compare posterior dist of rates (rather than contrasts),
+##       to avoid dealing with log-scale contrasts involving zero?
+##  * simmap? time-weighted contrasts?
+##  * Compare BT 'regular' with our results/side-by-side plots
+##  * more Bayes diagnostics - improved R-hat? rank-histogram plots from
+##     bayestestR?
+
 ## command vector
 ## use '-Threaded' for threaded executable, specify number of cores
-##  (will grab *all* cores if using threaded and not careful!)
 options(bt_path = "BayesTraitsV4.0.0-Linux-Threaded",
         bt_bin = "BayesTraitsV4")
 
-options(bayestraits.cores = 6)
-## uses *all* cores on Pop!OS ... ??
+options(bayestraits.cores = 16)
 ## run from head directory of repo
 ## (for target loading, readRDS)
 
@@ -30,11 +42,6 @@ trees <- do.call(c, treeblock)
 trees <- .compressTipLabel(trees)
 
 ## loading data
-
-## FIXME/TODO: unify ggplots
-##  Compare with our results/side-by-side plots
-##  Bayes diagnostics (R-hat, trace plots ...)
-
 
 tar_load(ag_compdata_tb)
 
@@ -127,7 +134,12 @@ zero_rates <- c(14, 16:18, 23, 25, 27:28, 32, 35:36, 38, 41, 45:47, 52:54,
                 58, 61, 63:64, 67, 71:72, 74, 76, 81:83, 85)
 qz <- paste("q", zero_rates, sep ="", collapse = " ")
 
-bt_command <- function(prior = NULL, iterations = 51e4, burnin = 1e4, seed = 101, cores = getOption("bayestraits.cores", 1)) {
+bt_command <- function(prior = NULL,
+                       iterations = 51e4,
+                       burnin = 1e4,
+                       sample = 1,
+                       seed = 101,
+                       cores = getOption("bayestraits.cores", 1)) {
     cvec <- c("1", ## MultiState
               "2", ## MCMC
               "ScaleTrees", ## scaling branch lengths to a mean of 0.1
@@ -143,7 +155,8 @@ bt_command <- function(prior = NULL, iterations = 51e4, burnin = 1e4, seed = 101
     cvec <-  c(cvec,
                sprintf("Iterations %d", iterations),
                sprintf("Burnin %d", burnin),
-               sprintf("Seed %d", seed)
+               sprintf("Seed %d", seed),
+               sprintf("Sample %d", sample)  ## thinning
                )
     if (!is.null(cores)) cvec <- c(cvec, sprintf("Cores %d", cores))
     return(cvec)
@@ -152,7 +165,8 @@ bt_command <- function(prior = NULL, iterations = 51e4, burnin = 1e4, seed = 101
 ## running in parallel via parLapply etc. would be tricky because of hard-coded output files -- would
 ##  need to figure out how to get btw::bayestraits() to disambiguate/send them different places
 bt_run <- function(data = NULL, trees = NULL, prior = NULL, dir = "bayestraits",
-                   fn = "", chains = 4, seed0 = 100, verbose = FALSE, ...) {
+                   fn = "", chains = 4, seed0 = 100, verbose = FALSE,
+                   ...) {
     all_res <- lapply(seq(chains),
                       function(i) {
                           if (verbose) cat("chain ", i, "\n")
@@ -230,5 +244,30 @@ r8 <- bt_run(prior = prior2,
 ## diagnostic plots fail because ESS calculation fails (Chol inversion)
 if (FALSE) {
     r9 <- bt_run(prior = prior3,
-              data = tdata, trees, fn = "bt_model_data_rj_prior-exp10.rds", verbose = TRUE)
+                 data = tdata, trees, fn = "bt_model_data_rj_prior-exp10.rds", verbose = TRUE)
+
+    ## looking better?
+    r10 <- bt_run(prior = prior3,
+                  chains = 1,
+                  data = tdata,
+                  trees,
+                  fn = "bt_model_data_rj_prior-exp10-long.rds",
+                  verbose = TRUE,
+                  ## passed to bt_command:
+                  iterations = 1e7,
+                  sample = 100
+                  )
+
+    ## maybe we can't allow priors with likelihood zero 
+    r11 <- bt_run(prior = prior2,
+                  chains = 4,
+                  data = tdata,
+                  trees,
+                  fn = "bt_model_data_rj_prior2-exp10-long.rds",
+                  verbose = TRUE,
+                  ## passed to bt_command:
+                  iterations = 1e7,
+                  sample = 100
+                  )
+
 }
