@@ -163,19 +163,23 @@ ex_chain_L <- (ex_chain
 
 ## mostly, sort of, OK except for q26
 gg_excontrasts <- ggplot(ex_chain_L, aes(Iteration, value+1e-4)) +
-    geom_line() +
+    geom_line(aes(colour = factor(chain))) +
     scale_y_log10() +
-    facet_wrap(~name, scale = "free") + geom_line() +
+    facet_wrap(~name, scale = "free") +
     labs(title = "trace plots for raw rates ('q' params)")
 print(gg_excontrasts)
 
 ## just one ...
 gg_excontrasts %+% filter(ex_chain_L, name == "q48")
 
-gg_violin <- ggplot(ex_chain_L, aes(value+1e-4, name)) + geom_violin(fill = "gray")
+gg_violin <- ggplot(ex_chain_L, aes(value+1e-4, name)) +
+    geom_violin(aes(fill = factor(chain)), alpha = 0.5, position = "identity",
+                bw = 0.05)
 print(gg_violin)
 
+## not quite what I wanted ...
 gg_violin %+% filter(ex_chain_L, name == "q48")
+
 filter(ex_chain_L, name == "q48") |>
     ggplot(aes(x=value)) +
     geom_histogram(bins = 100) +
