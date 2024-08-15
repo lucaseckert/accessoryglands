@@ -6,6 +6,9 @@
 ## TO DO: improved (Vehtari et al.) R-hat?
 ## improved trace plots (rank-based) ?
 
+## compare RJ posteriors (for rates, not log-contrasts) with
+##  'regular' and ours
+
 ## run from head directory of repo
 ## (for target loading, readRDS)
 
