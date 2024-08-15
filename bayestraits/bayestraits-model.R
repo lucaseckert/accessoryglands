@@ -148,9 +148,13 @@ ggplot(chains_long_c, aes(x = value, y = interaction(priors, data))) + geom_viol
 ## exploring experiments
 
 ## ex_fn <- "bt_model_data_rj_prior-exp10-long.rds"
-ex_fn <- "bt_model_data_rj_prior2-exp10-long.rds"
+ex_fn <- "bt_model_data_rj_prior2-long.rds"
 ex_chain <- read_chains(ex_fn)
-ex_contrasts <- read_contrasts(ex_fn)
+## thin a bit more
+nn <- nrow(ex_chain)
+ss <- seq(1, nrow(ex_chain), by = nn %/% 4800)
+ex_chain <- ex_chain |> slice(ss)
+ex_contrasts <- read_contrasts(ex_fn) |> slice(ss)
 
 ex_chain_L <- (ex_chain
     ## |> slice(seq(1, nrow(ex_chain), by = 10))
@@ -164,6 +168,8 @@ gg_excontrasts <- ggplot(ex_chain_L, aes(Iteration, value+1e-4)) +
     facet_wrap(~name, scale = "free") + geom_line() +
     labs(title = "trace plots for raw rates ('q' params)")
 print(gg_excontrasts)
+
+## just one ...
 gg_excontrasts %+% filter(ex_chain_L, name == "q48")
 
 gg_violin <- ggplot(ex_chain_L, aes(value+1e-4, name)) + geom_violin(fill = "gray")
@@ -171,9 +177,16 @@ print(gg_violin)
 
 gg_violin %+% filter(ex_chain_L, name == "q48")
 filter(ex_chain_L, name == "q48") |>
-    ggplot(aes(x=value)) + geom_histogram(bins=100) +
-    ## log10 doesn't really make sense but ...
+    ggplot(aes(x=value)) +
+    geom_histogram(bins = 100) +
+    ## log10 doesn't really make sense but it shows what I want ...
     scale_y_log10()
+
+filter(ex_chain_L, name == "q48") |>
+    ggplot(aes(x=value)) +
+    geom_density(bw=0.01) + 
+    ## log10 doesn't really make sense but it shows what I want ...
+    scale_y_log10(limits = c(1e-3, NA))
 
 ## geom-mean contrasts don't work well when rates are sometimes
 ##  set to zero

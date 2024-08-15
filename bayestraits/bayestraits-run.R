@@ -263,7 +263,7 @@ if (FALSE) {
                   chains = 4,
                   data = tdata,
                   trees,
-                  fn = "bt_model_data_rj_prior2-exp10-long.rds",
+                  fn = "bt_model_data_rj_prior2-long.rds",
                   verbose = TRUE,
                   ## passed to bt_command:
                   iterations = 1e7,
