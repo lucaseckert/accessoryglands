@@ -125,7 +125,7 @@ prior_fac <- (1/n_edge)/0.1
 rate_prior[1] <- exp(rate_prior_0[1] + log(prior_fac))
 prior1 <- sprintf("PriorAll lognormal %f %f", rate_prior[1], rate_prior[2])
 prior2 <- sprintf("RevJump lognormal %f %f", rate_prior[1], rate_prior[2])
-prior3 <- sprintf("RevJump exp 10")
+prior3 <- sprintf("RevJump exp 10") ## match 'traditional' RJ prior
 
 #### COMMAND FUNCTION ####
 
@@ -141,7 +141,7 @@ bt_command <- function(prior = NULL,
                        seed = 101,
                        cores = getOption("bayestraits.cores", 1)) {
     cvec <- c("1", ## MultiState
-              "2", ## MCMC
+             "2", ## MCMC
               "ScaleTrees", ## scaling branch lengths to a mean of 0.1
               "AddTag Root Erpetoichthys_calabaricus Mugil_liza", ## adding a tag at the root
               "Fossil Node01 Root 2", ## fossilizing the root (fix trait value at root: group spawning, no pc/ag)
@@ -258,12 +258,22 @@ if (FALSE) {
                   sample = 100
                   )
 
-    ## maybe we can't allow priors with likelihood zero 
     r11 <- bt_run(prior = prior2,
                   chains = 4,
                   data = tdata,
                   trees,
                   fn = "bt_model_data_rj_prior2-long.rds",
+                  verbose = TRUE,
+                  ## passed to bt_command:
+                  iterations = 1e7,
+                  sample = 100
+                  )
+    
+    r12 <- bt_run(prior = prior2,
+                  chains = 4,
+                  data = data_dataless,
+                  trees,
+                  fn = "bt_model_nodata_rj_prior2-long.rds",
                   verbose = TRUE,
                   ## passed to bt_command:
                   iterations = 1e7,

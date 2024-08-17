@@ -242,6 +242,24 @@ get_contrasts_weighted <- function(results) {
 }
 
 if (!interactive()) dev.off()
+
+##
+tar_load(ag_mcmc_tb)
+colnames(ag_mcmc_tb[[1]])
+name_match <- c(loss.sc="q21",
+                loss.pc="q42",  ## also q86
+                loss.ag_pc0_sc0 = "q51",
+                gain.sc = "q12",  ## also q87
+                loss.ag_pc0_sc1  = "q62",
+                gain.pc = "q13",
+                loss.ag_pc1_sc0 = "q73",
+                loss.ag_pc1_sc1 = "q84",
+                gain.ag_pc0_sc0 = "q15",
+                gain.ag_pc0_sc1 = "q26",
+                gain.ag_pc1_sc0 = "q37",
+                gain.ag_pc1_sc1 = "q48")
+
+## compare rates with RJ rates
 q()
 
 
@@ -300,6 +318,8 @@ q()
 ## q83 = 0
 ## q84 = ag1-0_pc1_sc1
 ## q85 = 0
+
+## are these duplicates/restricted??
 ## q86 = careLoss
 ## q87 = spawnLoss
 
