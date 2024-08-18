@@ -65,6 +65,8 @@ plot_contrasts <- function(contrasts) {
   ggtitle(df_name)
 }
 
+
+prior_fac <- 1/1212  ## derived 
 #### DATA, REGULAR, DEFAULT PRIORS ####
 
 read_contrasts <- function(fn) { readRDS(file.path("bayestraits", fn)) |> get_contrasts() }
@@ -246,7 +248,7 @@ if (!interactive()) dev.off()
 ##
 tar_load(ag_mcmc_tb)
 colnames(ag_mcmc_tb[[1]])
-name_match <- c(loss.sc="q21",
+name_match_vec <- c(loss.sc="q21",
                 loss.pc="q42",  ## also q86
                 loss.ag_pc0_sc0 = "q51",
                 gain.sc = "q12",  ## also q87
@@ -258,8 +260,28 @@ name_match <- c(loss.sc="q21",
                 gain.ag_pc0_sc1 = "q26",
                 gain.ag_pc1_sc0 = "q37",
                 gain.ag_pc1_sc1 = "q48")
+name_match_df <- tibble(rate_bt = name_match_vec,
+                        rate_us = names(name_match_vec))
 
 ## compare rates with RJ rates
+
+tar_load(contr_long_ag_mcmc_tb)
+tar_load(ag_mcmc_tb)
+aa <- ag_mcmc_tb[[1]]
+as.tibble.mcmc <- function(x) {
+    x2 <- unclass(x)
+    attr(x2, "mcpar") <- NULL
+    x2 |> as_tibble(rownames = "iteration")
+}
+
+(                                   
+    ag_mcmc_tb 
+    |> purrr::map_dfr(as.tibble.mcmc, .id = "chain")
+    |> tidyr::pivot_longer(-c(chain, iteration), names_to = "rate")
+    |> full_join(name_match
+)
+
+## what do we want? prior_contr_ci, ag_contr_gainloss
 q()
 
 

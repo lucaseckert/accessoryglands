@@ -1,31 +1,19 @@
-## new (5 August 2024, aim for 9 August 2024)
+## new 17 August 2024
 
-### important priority
+### 
 
-* "fix prior weirdness"
-    * partly done (i.e. prior scaling, but LE will check and write up)
-    * fix scales (i.e. fix contrast calculation, use log vs non-log scale consistently and correctly)
-    * re-run and compare results with ours
-    * PLOT results: (gain contrasts, loss contrasts) x 
-	                (with, w/o data [i.e. prior predictive distributions]) x
-	                (rj and regular) x 
-					(our priors, default BayesTraits priors)
-  ['with data' + 'regular' + 'our priors' should agree with our results]
-  ['w/o data' + 'regular' + 'our priors' should agree with our computed priors for contrasts]
+* BayesTraits comparisons
+   * back-transform rates scale
+* compare RJ results:
+   * scale RJ results to match
+   * run diagnostics, etc.
+   * compare RJ (data, priors-only) to ours/BT 'regular' (supplement)
 
-* troubleshoot RJ results ...
 
 ### lower priority
 
-* implement multi-chain BT runs (set seeds differently), calculate R-hat etc.
 * workflow cleanup (auto-run BT)
 * weight contrasts by occupancy?
-
-## new (4 Mar 2024)
-
-* BMB: run prior-only model to extract log-mean and log-sd for rate-level priors (also look at correlations)
-
-don't need to
 
 ```r
 prior.mean <- (lb+ub)/2

@@ -106,7 +106,8 @@ summary(tdata)
 
 #### PRIOR SCALING ####
 
-## where is this from???
+## where is this from??? presumably described/justified in original
+##  writeup?
 rate_prior_0 <- rate_prior <- c(4.236, 1.41)
 ## BT scales branch lengths to a *mean* of 0.1 by default
 
