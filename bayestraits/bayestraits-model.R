@@ -23,106 +23,182 @@ library(ggplot2); theme_set(theme_bw())
 
 source("R/utils.R")
 
-if (!interactive()) pdf("bayestraits-pix.pdf", width = 16, height = 10)
+name_match_vec <- c(loss.sc="q21",
+                loss.pc="q31",
+                loss.ag_pc0_sc0 = "q51",
+                gain.sc = "q12",  ## also q87
+                loss.ag_pc0_sc1  = "q62",
+                gain.pc = "q13",
+                loss.ag_pc1_sc0 = "q73",
+                loss.ag_pc1_sc1 = "q84",
+                gain.ag_pc0_sc0 = "q15",
+                gain.ag_pc0_sc1 = "q26",
+                gain.ag_pc1_sc0 = "q37",
+                gain.ag_pc1_sc1 = "q48")
+name_match_df <- tibble(rate = name_match_vec,
+                        rate_us = names(name_match_vec))
 
-## FIXME/TODO: unify ggplots
-##  Compare with our results/side-by-side plots
-##  Bayes diagnostics (R-hat, trace plots ...)
+## rename BT runs to match our names
+fix_names <- function(x) {
+        (x
+            |> full_join(name_match_df, by = "rate")
+            |> select(-rate)
+            |> rename(rate = "rate_us")
+        )
+}
 
 #### CONTRAST FUNCTIONS ####
 
-## computing contrasts - from rates to geometric mean ratios
-gmean <- function(x, y) sqrt(x*y)  ## equivalent to exp((log(x) + log(y))/2)
-cfun_nonlog <- function(q1, q2, q3, q4) {
-    gmean(q1,q2)/gmean(q3,q4)
-    ## or exp(
-    ##        (log(q1) + log(q2))/2 -
-    ##        (log(q3) + log(q4))/2
-    ##    ) 
-}
 
-## function for getting contrasts from rates
-get_contrasts <- function(results) {
-  results$Log$results %>% 
-  mutate(gain_care_effect =   cfun_nonlog(q37,q48,q15,q26),
-         gain_spawn_effect =  cfun_nonlog(q26,q48,q15,q37),
-         gain_interaction =   cfun_nonlog(q15,q48,q37,q26),
-         loss_care_effect =   cfun_nonlog(q73,q84,q51,q62),
-         loss_spawn_effect =  cfun_nonlog(q62,q84,q51,q73),
-         loss_interaction =   cfun_nonlog(q51,q84,q73,q62))
-}
-
-## function for plotting contrasts
-plot_contrasts <- function(contrasts) {
-  df_name <- deparse(substitute(contrasts))
-  contrasts %>% 
-  pivot_longer(cols=gain_care_effect:loss_interaction, names_to = "contrast") %>% 
-  ggplot(aes(x=value, y=contrast))+
-  geom_vline(xintercept = 1, linetype="dashed")+
-  geom_violin(fill="gray")+
-  scale_x_continuous(trans = "log10")+
-  theme_bw()+
-  ggtitle(df_name)
-}
-
-
-prior_fac <- 1/1212  ## derived 
-#### DATA, REGULAR, DEFAULT PRIORS ####
-
-read_contrasts <- function(fn) { readRDS(file.path("bayestraits", fn)) |> get_contrasts() }
-read_chains <- function(fn) { readRDS(file.path("bayestraits", fn)) |> get_chains() }
+## read in three different formats (raw rates; rates as list of chains; contrasts)
+read_chains <- function(fn)      { readRDS(file.path("bayestraits", fn)) |> get_chains() }
 read_chains_list <- function(fn) { readRDS(file.path("bayestraits", fn)) |> get_chains("mcmc.list") }
+read_contrasts <- function(fn)   { readRDS(file.path("bayestraits", fn)) |> get_contrasts() }
 
-all_model_results <- list.files(path="bayestraits", pattern = "bt_model_(no)?data_(reg|rj)_(default|priors).*")
-## should have a 2 x 2 x 2 result ({data, nodata} * {reg, rj} * {default, priors})
-stopifnot(length(all_model_results) == 8)
+if (!interactive()) pdf("bayestraits-pix.pdf", width = 16, height = 10)
 
+## FIXME/TODO:
+##  Compare with our results/side-by-side plots
+
+
+prior_fac <- 1/1212  ## derived from scaling ratio of our vs BayesTraits trees (see bayestraits-run.R)
+
+all_model_results <- list.files(path="bayestraits",
+                                pattern = "bt_model_(no)?data_(reg|rj)_(default|prior)")
 names(all_model_results) <- gsub("(bt_model_|\\.rds)", "", all_model_results)
+## should have a 2 x 2 x 2 result ({data, nodata} * {reg, rj} * {default, priors}) + 2
+## we know 'short' RJ results are no good, drop them
+all_model_results <- all_model_results[grep("rj_(priors|default)", names(all_model_results), invert = TRUE)]
+stopifnot(length(all_model_results) == 6L)
+
+no_rj <- grep("_reg_", names(all_model_results))
+
 ## full info: parameters + contrasts
-all_results <- purrr::map_dfr(all_model_results, read_contrasts, .id = "model_run")
+all_results <- purrr::map_dfr(all_model_results[no_rj], read_contrasts, .id = "model_run")
 ## q* parameters only
 all_chains <- purrr::map_dfr(all_model_results, read_chains, .id = "model_run")
 ## diagnostics for each model
-all_diag <- purrr::map_dfr(all_model_results,
+
+all_diag <- (purrr::map_dfr(all_model_results,
                            function(x) { read_chains_list(x) |> diagnostic_posterior() },
                            .id = "model_run")
+    |> rename(rate = "Parameter")
+    |> fix_names()
+)
+
+### load previous results
+
+## what do we need to do to match BT and our results?
+##  (1) match names of contrasts/rates
+##  (2) rescale rates/contrasts
+
+tar_load(ag_mcmc_tb)
+tar_load(contr_long_ag_mcmc_tb)
+
+
+pivot_ours <- function(mcmc, nm = "ours") {
+    (as.mcmc(mcmc) 
+        |> as_tibble()
+        |> mutate(iteration = seq(n()))
+        |> pivot_longer(-iteration, names_to = "rate")
+    )
+}
+add_info <- function(x) x |> mutate(data = "data", method = "ours", priors = "priors", .before = 1)
+
+our_chains <-    (map_dfr(ag_mcmc_tb, pivot_ours, .id = "chain")
+    |> add_info()
+    |> mutate(across(chain, as.numeric))
+)
+              
+
+our_contrasts <- contr_long_ag_mcmc_tb |> add_info()
 
 ## plot diagnostics
-all_diag_L <- all_diag |> pivot_longer(-c(model_run, Parameter)) |>
-    separate(model_run, into = c("data", "method", "priors"))
+all_diag_L <- (
+    all_diag
+    |> pivot_longer(-c(model_run, rate))
+    |> separate(model_run, into = c("data", "method", "priors"), sep = "_")
+    |> mutate(across(priors, \(x) stringr::str_replace(x, "prior2-long", "priors")))
+)
 
-diag_plot <- all_diag_L |> ggplot(aes(x = value, y = Parameter, colour = method, shape = interaction(priors, data))) +
+diag_plot <- all_diag_L |> ggplot(aes(x = value, y = rate, colour = method, shape = interaction(priors, data))) +
     geom_point(size=5) +
     facet_wrap(~name, scale = "free") +
     scale_shape_manual(values = c(1, 16, 2, 17))  + ## open/closed x round/triangle
     scale_colour_manual(values = c("black", "red"))
 
-print(diag_plot + labs(title = "diagnostics for all runs (reg + RJ)"))
+print(diag_plot + labs(title = "diagnostics for all runs (reg + RJ long)"))
 
 ## results basically make sense
-## * rj [red] is awful (low ESS, high R-hat most of the time) [trace plots will illustrate this even more strongly]
+## ESS for RJ runs are high because they're **very long**. R-hat for q26 is bad
+##   because it's practically always zero (this is ag0-1_pc0_sc1, gain of accessory
+##  glands when 'no male parental care' + 'group spawning' (maybe very rare state?)
 
 ## get rid of RJ so we can focus on non-RJ
 print(diag_plot %+% filter(all_diag_L, method == "reg") +
       labs(title = "diagnostics for 'reg' runs only"))
       
-
 ## * nodata [triangles] gives high MCSE across the board (higher for default priors than ours)
 ## * worst R-hats are for priors.nodata (we probably don't care)
 
-
 ## trace plots for raw rate parameters ('q')
 chains_long <- (all_chains
-    |> pivot_longer(starts_with("q"))
+    |> pivot_longer(starts_with("q"), names_to = "rate")
+    |> fix_names()
 )
-chains_1 <- ggplot(chains_long, aes(Iteration, value, colour = factor(chain))) +
-    facet_grid(name ~ model_run, scale = "free_y") + geom_line() +
+
+gg_chains_1 <- ggplot(chains_long, aes(Iteration, value, colour = factor(chain))) +
+    facet_grid(rate ~ model_run, scale = "free") + geom_line() +
     scale_y_log10()
-print(chains_1 + labs(title = "trace plots for raw rates ('q' params)"))
 
-    |> pivot_longer(starts_with("q"))
+print(gg_chains_1 + labs(title = "trace plots for raw rates ('q' params)") +
+      ## https://stackoverflow.com/questions/48892826/rotate-strip-text-in-ggplot2
+      theme(strip.text.y.right = element_text(angle = 0)))
+
+## 
+chains_long_2 <- (chains_long
+    |> separate(model_run, into = c("data", "method", "priors"), sep = "_", remove = FALSE)
+    |> mutate(across(priors, \(x) stringr::str_replace(x, "prior2-long", "priors")))
 )
 
+## log scale, but add min-value; narrower bandwidth for violin plots (adjust = 0.3)
+gg_rate_violins <- ggplot(chains_long_2, aes(x = 1e-5 + value, y = interaction(priors, data))) +
+    geom_violin(aes(fill = factor(data)), alpha = 0.5, adjust = 0.3) +
+    facet_grid(method~rate, scale = "free_y", space = "free") +
+    scale_x_log10() +
+    theme(panel.spacing = grid::unit(0, "lines")) +
+    scale_fill_manual(values = c("green", "blue")) +
+    labs(title = "posterior distributions for all rates & runs", x="rate (+ min value)",
+         y = "") +
+    geom_vline(xintercept = 1.0, lty = 2)
+
+chains_long_3 <- (
+    chains_long_2
+    ## |> mutate(across(value, ~ . / prior_fac))
+    |> bind_rows(our_chains)
+)
+
+sum_chains <- (chains_long_3
+    |> filter(data == "data")
+    |> group_by(method, priors, rate)
+    |> summarise(across(value, mean))
+    |> arrange(rate)
+    |> group_by(rate)
+    |> mutate(across(value, ~ .[method == "ours"]/.))
+    |> filter(method == "reg")
+)
+print(sum_chains)
+## BT mean rates are 2-20 times ours, not 1/prior_fac (1212x) ?
+## maybe we can just compare p-values??
+
+## FIXME: reverse legend order?
+## divide into two blocks (gain/loss) for legibility
+print(gg_rate_violins %+% filter(chains_long_3, grepl("gain", rate)))
+print(gg_rate_violins %+% filter(chains_long_3, grepl("loss", rate)))
+
+
+
+## contrasts: only for non-RJ examples
 pivot_contrasts <- function(x) {
     (x
         |> select(c(any_of(c("model_run", "chain", "Iteration")),
@@ -137,12 +213,21 @@ chains_long_c <- (all_results
 )
 
 ## trace plots of contrasts
-chains_1 %+% chains_long_c + labs(title = "trace plots for contrasts (log scale)")
+print(chains_1 %+% chains_long_c + labs(title = "trace plots for contrasts (log scale)"))
 ## without log scale
-chains_1 %+% chains_long_c + scale_y_continuous() + labs(title = "trace plots for contrasts (non-log scale)")
+## print(chains_1 %+% chains_long_c + scale_y_continuous() + labs(title = "trace plots for contrasts (non-log scale)"))
 
 ## show all posterior distributions
+ggplot(chains_long_c, aes(x = value, y = interaction(priors, data))) +
+    geom_violin(aes(fill = factor(data)), alpha = 0.5) +
+    facet_grid(method~name) + scale_x_log10() + theme(panel.spacing = grid::unit(0, "lines")) +
+    scale_fill_manual(values = c("green", "blue")) +
+    labs(title = "posterior distributions for all contrasts & runs") +
+    geom_vline(xintercept = 1.0, lty = 2)
 
+chains_long_comb <- bind_rows(chains_long_c,
+                              
+## show posterior distributions for *rates*
 ggplot(chains_long_c, aes(x = value, y = interaction(priors, data))) + geom_violin(aes(fill = factor(data)), alpha = 0.5) +
     facet_grid(method~name) + scale_x_log10() + theme(panel.spacing = grid::unit(0, "lines")) +
     scale_fill_manual(values = c("green", "blue")) +
@@ -153,18 +238,6 @@ ggplot(chains_long_c, aes(x = value, y = interaction(priors, data))) + geom_viol
 ## exploring experiments
 
 ## ex_fn <- "bt_model_data_rj_prior-exp10-long.rds"
-ex_fn <- "bt_model_data_rj_prior2-long.rds"
-ex_chain <- read_chains(ex_fn)
-## thin a bit more
-nn <- nrow(ex_chain)
-ss <- seq(1, nrow(ex_chain), by = nn %/% 4800)
-ex_chain <- ex_chain |> slice(ss)
-ex_contrasts <- read_contrasts(ex_fn) |> slice(ss)
-
-ex_chain_L <- (ex_chain
-    ## |> slice(seq(1, nrow(ex_chain), by = 10))
-    |> pivot_longer(starts_with("q"))
-)
 
 ## mostly, sort of, OK except for q26
 gg_excontrasts <- ggplot(ex_chain_L, aes(Iteration, value+1e-4)) +
@@ -245,41 +318,6 @@ get_contrasts_weighted <- function(results) {
 
 if (!interactive()) dev.off()
 
-##
-tar_load(ag_mcmc_tb)
-colnames(ag_mcmc_tb[[1]])
-name_match_vec <- c(loss.sc="q21",
-                loss.pc="q42",  ## also q86
-                loss.ag_pc0_sc0 = "q51",
-                gain.sc = "q12",  ## also q87
-                loss.ag_pc0_sc1  = "q62",
-                gain.pc = "q13",
-                loss.ag_pc1_sc0 = "q73",
-                loss.ag_pc1_sc1 = "q84",
-                gain.ag_pc0_sc0 = "q15",
-                gain.ag_pc0_sc1 = "q26",
-                gain.ag_pc1_sc0 = "q37",
-                gain.ag_pc1_sc1 = "q48")
-name_match_df <- tibble(rate_bt = name_match_vec,
-                        rate_us = names(name_match_vec))
-
-## compare rates with RJ rates
-
-tar_load(contr_long_ag_mcmc_tb)
-tar_load(ag_mcmc_tb)
-aa <- ag_mcmc_tb[[1]]
-as.tibble.mcmc <- function(x) {
-    x2 <- unclass(x)
-    attr(x2, "mcpar") <- NULL
-    x2 |> as_tibble(rownames = "iteration")
-}
-
-(                                   
-    ag_mcmc_tb 
-    |> purrr::map_dfr(as.tibble.mcmc, .id = "chain")
-    |> tidyr::pivot_longer(-c(chain, iteration), names_to = "rate")
-    |> full_join(name_match
-)
 
 ## what do we want? prior_contr_ci, ag_contr_gainloss
 q()
