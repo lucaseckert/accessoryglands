@@ -250,6 +250,27 @@ ggplot(chains_long_c_2, aes(x = value, y = interaction(priors, data))) +
     labs(title = "posterior distributions for all contrasts & runs") +
     geom_vline(xintercept = 1.0, lty = 2)
                               
+## confidence intervals and p-values
+
+(chains_long_c_2
+    |> filter(data == "data")
+    |> group_by(name,method)
+    |> summarise(
+           lwr = quantile(value, 0.025),
+           med = median(value),
+           upr = quantile(value, 0.975),
+           pval = 2*min(mean(value<1), mean(value>1)))
+)
+
+(contr_long_ag_mcmc_tb
+    |> filter(rate!="netgain", contrast != "intercept")
+    |> group_by(contrast, rate)
+    |> summarise(
+           lwr = quantile(value, 0.025),
+           med = median(value),
+           upr = quantile(value, 0.975),
+           pval = 2*min(mean(value<0), mean(value>0)))
+)
 
 ## raftery.diag(chains1)  ## suggests we have to run longer (~4000 samples == 8 x 500)
 ## g1 <- geweke.diag(chains1)
@@ -358,6 +379,4 @@ q()
 ## are these duplicates/restricted??
 ## q86 = careLoss
 ## q87 = spawnLoss
-
-
 
