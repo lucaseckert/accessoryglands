@@ -21,6 +21,8 @@ library(coda)
 library(bayestestR)
 library(ggplot2); theme_set(theme_bw())
 
+min_val <- 1e-4 ## for plotting traces etc.: zeros lost
+
 source("R/utils.R")
 
 name_match_vec <- c(loss.sc="q21",
@@ -92,6 +94,7 @@ all_diag <- (purrr::map_dfr(all_model_results,
 ##  (1) match names of contrasts/rates
 ##  (2) rescale rates/contrasts
 
+tar_load(ag_priorsamp)
 tar_load(ag_mcmc_tb)
 tar_load(contr_long_ag_mcmc_tb)
 
@@ -103,15 +106,34 @@ pivot_ours <- function(mcmc, nm = "ours") {
         |> pivot_longer(-iteration, names_to = "rate")
     )
 }
-add_info <- function(x) x |> mutate(data = "data", method = "ours", priors = "priors", .before = 1)
+add_info <- function(x,data = "data") {
+    x |>
+        mutate(data = data, method = "ours", priors = "priors", .before = 1)
+}
 
 our_chains <-    (map_dfr(ag_mcmc_tb, pivot_ours, .id = "chain")
     |> add_info()
     |> mutate(across(chain, as.numeric))
 )
-              
 
-our_contrasts <- contr_long_ag_mcmc_tb |> add_info()
+our_priors <-    (map_dfr(ag_priorsamp, pivot_ours, .id = "chain")
+    |> add_info(data = "nodata")
+    |> mutate(across(chain, as.numeric))
+)
+
+
+our_contrasts <- (contr_long_ag_mcmc_tb
+    |> add_info()
+    |> filter(contrast != "intercept")
+    |> filter(!grepl("netgain", rate))
+    |> mutate(across(contrast,
+                     ~ case_when(. == "pc" ~ "care_effect",
+                               . == "sc" ~ "spawn_effect",
+                               . == "pcxsc" ~ "interaction")),
+              name = sprintf("%s_%s", rate, contrast))
+)
+
+
 
 ## plot diagnostics
 all_diag_L <- (
@@ -147,7 +169,7 @@ chains_long <- (all_chains
     |> fix_names()
 )
 
-gg_chains_1 <- ggplot(chains_long, aes(Iteration, value, colour = factor(chain))) +
+gg_chains_1 <- ggplot(chains_long, aes(Iteration, value+min_val, colour = factor(chain))) +
     facet_grid(rate ~ model_run, scale = "free") + geom_line() +
     scale_y_log10()
 
@@ -162,13 +184,13 @@ chains_long_2 <- (chains_long
 )
 
 ## log scale, but add min-value; narrower bandwidth for violin plots (adjust = 0.3)
-gg_rate_violins <- ggplot(chains_long_2, aes(x = 1e-5 + value, y = interaction(priors, data))) +
-    geom_violin(aes(fill = factor(data)), alpha = 0.5, adjust = 0.3) +
+gg_rate_violins <- ggplot(chains_long_2, aes(x = min_val + value, y = interaction(priors, data))) +
+    geom_violin(aes(fill = factor(data)), alpha = 0.5, adjust = 0.4) +
     facet_grid(method~rate, scale = "free_y", space = "free") +
     scale_x_log10() +
     theme(panel.spacing = grid::unit(0, "lines")) +
     scale_fill_manual(values = c("green", "blue")) +
-    labs(title = "posterior distributions for all rates & runs", x="rate (+ min value)",
+    labs(x="rate (+ min value)",
          y = "") +
     geom_vline(xintercept = 1.0, lty = 2)
 
@@ -176,6 +198,7 @@ chains_long_3 <- (
     chains_long_2
     ## |> mutate(across(value, ~ . / prior_fac))
     |> bind_rows(our_chains)
+    |> bind_rows(our_priors)
 )
 
 sum_chains <- (chains_long_3
@@ -193,10 +216,10 @@ print(sum_chains)
 
 ## FIXME: reverse legend order?
 ## divide into two blocks (gain/loss) for legibility
-print(gg_rate_violins %+% filter(chains_long_3, grepl("gain", rate)))
-print(gg_rate_violins %+% filter(chains_long_3, grepl("loss", rate)))
-
-
+print(gg_rate_violins %+% filter(chains_long_3, grepl("gain", rate)) +
+      labs(title = "posterior distributions for all rates & runs: GAINS"))
+print(gg_rate_violins %+% filter(chains_long_3, grepl("loss", rate)) +
+      labs(title = "posterior distributions for all rates & runs: LOSSES"))
 
 ## contrasts: only for non-RJ examples
 pivot_contrasts <- function(x) {
@@ -213,67 +236,20 @@ chains_long_c <- (all_results
 )
 
 ## trace plots of contrasts
-print(chains_1 %+% chains_long_c + labs(title = "trace plots for contrasts (log scale)"))
+print(gg_chains_1 %+% (chains_long_c |> rename(rate = "name")) + labs(title = "trace plots for contrasts (log scale)"))
 ## without log scale
 ## print(chains_1 %+% chains_long_c + scale_y_continuous() + labs(title = "trace plots for contrasts (non-log scale)"))
 
+chains_long_c_2 <- bind_rows(chains_long_c, our_contrasts)
 ## show all posterior distributions
-ggplot(chains_long_c, aes(x = value, y = interaction(priors, data))) +
+ggplot(chains_long_c_2, aes(x = value, y = interaction(priors, data))) +
     geom_violin(aes(fill = factor(data)), alpha = 0.5) +
-    facet_grid(method~name) + scale_x_log10() + theme(panel.spacing = grid::unit(0, "lines")) +
+    facet_grid(method~name, scale = "free_y", space = "free") +
+    scale_x_log10() + theme(panel.spacing = grid::unit(0, "lines")) +
     scale_fill_manual(values = c("green", "blue")) +
     labs(title = "posterior distributions for all contrasts & runs") +
     geom_vline(xintercept = 1.0, lty = 2)
-
-chains_long_comb <- bind_rows(chains_long_c,
                               
-## show posterior distributions for *rates*
-ggplot(chains_long_c, aes(x = value, y = interaction(priors, data))) + geom_violin(aes(fill = factor(data)), alpha = 0.5) +
-    facet_grid(method~name) + scale_x_log10() + theme(panel.spacing = grid::unit(0, "lines")) +
-    scale_fill_manual(values = c("green", "blue")) +
-    labs(title = "posterior distributions for all contrasts & runs") +
-    geom_vline(xintercept = 1.0, lty = 2)
-
-
-## exploring experiments
-
-## ex_fn <- "bt_model_data_rj_prior-exp10-long.rds"
-
-## mostly, sort of, OK except for q26
-gg_excontrasts <- ggplot(ex_chain_L, aes(Iteration, value+1e-4)) +
-    geom_line(aes(colour = factor(chain))) +
-    scale_y_log10() +
-    facet_wrap(~name, scale = "free") +
-    labs(title = "trace plots for raw rates ('q' params)")
-print(gg_excontrasts)
-
-## just one ...
-gg_excontrasts %+% filter(ex_chain_L, name == "q48")
-
-gg_violin <- ggplot(ex_chain_L, aes(value+1e-4, name)) +
-    geom_violin(aes(fill = factor(chain)), alpha = 0.5, position = "identity",
-                bw = 0.05)
-print(gg_violin)
-
-## not quite what I wanted ...
-gg_violin %+% filter(ex_chain_L, name == "q48")
-
-filter(ex_chain_L, name == "q48") |>
-    ggplot(aes(x=value)) +
-    geom_histogram(bins = 100) +
-    ## log10 doesn't really make sense but it shows what I want ...
-    scale_y_log10()
-
-filter(ex_chain_L, name == "q48") |>
-    ggplot(aes(x=value)) +
-    geom_density(bw=0.01) + 
-    ## log10 doesn't really make sense but it shows what I want ...
-    scale_y_log10(limits = c(1e-3, NA))
-
-## geom-mean contrasts don't work well when rates are sometimes
-##  set to zero
-ggplot(pivot_contrasts(ex_contrasts),
-       aes(value, name)) + geom_violin(fill = "gray")
 
 ## raftery.diag(chains1)  ## suggests we have to run longer (~4000 samples == 8 x 500)
 ## g1 <- geweke.diag(chains1)
