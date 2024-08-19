@@ -65,23 +65,23 @@ if (!interactive()) pdf("bayestraits-pix.pdf", width = 16, height = 10)
 
 prior_fac <- 1/1212  ## derived from scaling ratio of our vs BayesTraits trees (see bayestraits-run.R)
 
-all_model_results <- list.files(path="bayestraits",
+all_bt_model_results <- list.files(path="bayestraits",
                                 pattern = "bt_model_(no)?data_(reg|rj)_(default|prior)")
-names(all_model_results) <- gsub("(bt_model_|\\.rds)", "", all_model_results)
+names(all_bt_model_results) <- gsub("(bt_model_|\\.rds)", "", all_bt_model_results)
 ## should have a 2 x 2 x 2 result ({data, nodata} * {reg, rj} * {default, priors}) + 2
 ## we know 'short' RJ results are no good, drop them
-all_model_results <- all_model_results[grep("rj_(priors|default)", names(all_model_results), invert = TRUE)]
-stopifnot(length(all_model_results) == 6L)
+all_bt_model_results <- all_bt_model_results[grep("rj_(priors|default)", names(all_bt_model_results), invert = TRUE)]
+stopifnot(length(all_bt_model_results) == 6L)
 
-no_rj <- grep("_reg_", names(all_model_results))
+no_rj <- grep("_reg_", names(all_bt_model_results))
 
 ## full info: parameters + contrasts
-all_results <- purrr::map_dfr(all_model_results[no_rj], read_contrasts, .id = "model_run")
+all_bt_results <- purrr::map_dfr(all_bt_model_results[no_rj], read_contrasts, .id = "model_run")
 ## q* parameters only
-all_chains <- purrr::map_dfr(all_model_results, read_chains, .id = "model_run")
+all_bt_chains <- purrr::map_dfr(all_bt_model_results, read_chains, .id = "model_run")
 ## diagnostics for each model
 
-all_diag <- (purrr::map_dfr(all_model_results,
+all_bt_diag <- (purrr::map_dfr(all_bt_model_results,
                            function(x) { read_chains_list(x) |> diagnostic_posterior() },
                            .id = "model_run")
     |> rename(rate = "Parameter")
@@ -97,6 +97,7 @@ all_diag <- (purrr::map_dfr(all_model_results,
 tar_load(ag_priorsamp)
 tar_load(ag_mcmc_tb)
 tar_load(contr_long_ag_mcmc_tb)
+tar_load(contr_long_ag_priorsamp)
 
 
 pivot_ours <- function(mcmc, nm = "ours") {
@@ -121,29 +122,32 @@ our_priors <-    (map_dfr(ag_priorsamp, pivot_ours, .id = "chain")
     |> mutate(across(chain, as.numeric))
 )
 
+proc_contrasts <- function(x, data = "data") {
+    (x
+        |> add_info(data = data)
+        |> filter(contrast != "intercept")
+        |> filter(!grepl("netgain", rate))
+        |> mutate(across(contrast,
+                         ~ case_when(. == "pc" ~ "care_effect",
+                                     . == "sc" ~ "spawn_effect",
+                                     . == "pcxsc" ~ "interaction")),
+                  name = sprintf("%s_%s", rate, contrast))
+        |> mutate(across(value, exp))
+    )
+}
 
-our_contrasts <- (contr_long_ag_mcmc_tb
-    |> add_info()
-    |> filter(contrast != "intercept")
-    |> filter(!grepl("netgain", rate))
-    |> mutate(across(contrast,
-                     ~ case_when(. == "pc" ~ "care_effect",
-                               . == "sc" ~ "spawn_effect",
-                               . == "pcxsc" ~ "interaction")),
-              name = sprintf("%s_%s", rate, contrast))
-)
-
-
+our_cpriors <- proc_contrasts(contr_long_ag_priorsamp, data = "nodata")
+our_contrasts <- proc_contrasts(contr_long_ag_mcmc_tb)
 
 ## plot diagnostics
-all_diag_L <- (
-    all_diag
+all_bt_diag_L <- (
+    all_bt_diag
     |> pivot_longer(-c(model_run, rate))
     |> separate(model_run, into = c("data", "method", "priors"), sep = "_")
     |> mutate(across(priors, \(x) stringr::str_replace(x, "prior2-long", "priors")))
 )
 
-diag_plot <- all_diag_L |> ggplot(aes(x = value, y = rate, colour = method, shape = interaction(priors, data))) +
+diag_plot <- all_bt_diag_L |> ggplot(aes(x = value, y = rate, colour = method, shape = interaction(priors, data))) +
     geom_point(size=5) +
     facet_wrap(~name, scale = "free") +
     scale_shape_manual(values = c(1, 16, 2, 17))  + ## open/closed x round/triangle
@@ -157,14 +161,16 @@ print(diag_plot + labs(title = "diagnostics for all runs (reg + RJ long)"))
 ##  glands when 'no male parental care' + 'group spawning' (maybe very rare state?)
 
 ## get rid of RJ so we can focus on non-RJ
-print(diag_plot %+% filter(all_diag_L, method == "reg") +
-      labs(title = "diagnostics for 'reg' runs only"))
+if (FALSE) {
+    print(diag_plot %+% filter(all_bt_diag_L, method == "reg") +
+          labs(title = "diagnostics for 'reg' runs only"))
+}
       
 ## * nodata [triangles] gives high MCSE across the board (higher for default priors than ours)
 ## * worst R-hats are for priors.nodata (we probably don't care)
 
 ## trace plots for raw rate parameters ('q')
-chains_long <- (all_chains
+chains_long <- (all_bt_chains
     |> pivot_longer(starts_with("q"), names_to = "rate")
     |> fix_names()
 )
@@ -216,10 +222,11 @@ print(sum_chains)
 
 ## FIXME: reverse legend order?
 ## divide into two blocks (gain/loss) for legibility
+title_head <- "prior and posterior distributions for all rates & runs:"
 print(gg_rate_violins %+% filter(chains_long_3, grepl("gain", rate)) +
-      labs(title = "posterior distributions for all rates & runs: GAINS"))
+      labs(title = paste(title_head, "GAINS")))
 print(gg_rate_violins %+% filter(chains_long_3, grepl("loss", rate)) +
-      labs(title = "posterior distributions for all rates & runs: LOSSES"))
+      labs(title = paste(title_head, "LOSSES")))
 
 ## contrasts: only for non-RJ examples
 pivot_contrasts <- function(x) {
@@ -230,7 +237,7 @@ pivot_contrasts <- function(x) {
     )
 }
 
-chains_long_c <- (all_results
+chains_long_c <- (all_bt_results
     |> pivot_contrasts()
     |> separate(model_run, into = c("data", "method", "priors"), remove = FALSE)
 )
@@ -240,37 +247,59 @@ print(gg_chains_1 %+% (chains_long_c |> rename(rate = "name")) + labs(title = "t
 ## without log scale
 ## print(chains_1 %+% chains_long_c + scale_y_continuous() + labs(title = "trace plots for contrasts (non-log scale)"))
 
-chains_long_c_2 <- bind_rows(chains_long_c, our_contrasts)
+chains_long_c_2 <- (
+    bind_rows(chains_long_c, our_contrasts, our_cpriors)
+    |> mutate(across(data, ~factor(., levels = c("nodata", "data"))))
+)
 ## show all posterior distributions
 ggplot(chains_long_c_2, aes(x = value, y = interaction(priors, data))) +
     geom_violin(aes(fill = factor(data)), alpha = 0.5) +
     facet_grid(method~name, scale = "free_y", space = "free") +
-    scale_x_log10() + theme(panel.spacing = grid::unit(0, "lines")) +
+    scale_x_log10() +
+    theme(panel.spacing = grid::unit(0, "lines")) +
     scale_fill_manual(values = c("green", "blue")) +
     labs(title = "posterior distributions for all contrasts & runs") +
     geom_vline(xintercept = 1.0, lty = 2)
                               
 ## confidence intervals and p-values
 
-(chains_long_c_2
-    |> filter(data == "data")
-    |> group_by(name,method)
+Signif <- function(pv) symnum(pv, corr = FALSE, na = FALSE, 
+                 cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1), 
+                 symbols = c("***", "**", "*", ".", " "))
+
+csum <- (chains_long_c_2
+    |> group_by(name,method, data)
     |> summarise(
            lwr = quantile(value, 0.025),
+           lwr50 = quantile(value, 0.25),
            med = median(value),
            upr = quantile(value, 0.975),
-           pval = 2*min(mean(value<1), mean(value>1)))
+           upr50 = quantile(value, 0.75),
+           pval = 2*min(mean(value<1), mean(value>1)),
+           psym = as.character(Signif(pval)),
+           .groups = "drop")
 )
 
-(contr_long_ag_mcmc_tb
-    |> filter(rate!="netgain", contrast != "intercept")
-    |> group_by(contrast, rate)
-    |> summarise(
-           lwr = quantile(value, 0.025),
-           med = median(value),
-           upr = quantile(value, 0.975),
-           pval = 2*min(mean(value<0), mean(value>0)))
+(csum
+    |> select(name, method, data, pval)
+    |> pivot_wider(names_from = method, values_from = pval)
 )
+
+
+pd <- position_dodge(width = 0.25)
+ggplot(csum, aes(y = name, x = med, colour = method)) +
+    geom_pointrange(aes(xmin = lwr, xmax = upr),
+                    position = pd) +
+    geom_pointrange(aes(xmin = lwr50, xmax = upr50), linewidth = 2,
+                    position = pd) +
+    scale_x_log10() +
+    facet_wrap(~data) +
+    scale_colour_manual(values = c("darkgreen", "blue")) +
+    geom_vline(xintercept = 1, lty = 2) +
+    expand_limits(x=100) +
+    geom_text(aes(x = 100, label = psym), size = 10, position = position_dodge(width = 0.5),
+              show.legend = FALSE) +
+    labs(x="contrast", y = "", title = "50% and 95% CIs for contrasts (prior and posterior)")
 
 ## raftery.diag(chains1)  ## suggests we have to run longer (~4000 samples == 8 x 500)
 ## g1 <- geweke.diag(chains1)
