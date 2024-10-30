@@ -1,6 +1,12 @@
 # accessoryglands
 
-Code and data for analyzing the evolution of reproductive accessory glands across fishes. Specifically, we test whether the evolution of accessory glands is driven by other reproductive traits, namely parental care and spawning mode. 
+Code and data for analyzing the evolution of reproductive accessory glands across fishes. Specifically, we test whether the evolution of accessory glands is dri
+ven by other reproductive traits, namely parental care and spawning mode. 
+
+## links to google docs (paper, reviews)
+
+* [Paper](https://docs.google.com/document/d/1FNkwmk10zVr0JsVE-MQFGx3KTDwVGb_5/edit?usp=sharing&ouid=115557938223853461511&rtpof=true&sd=true)
+* [Reviews](https://docs.google.com/document/d/1lFINfk6MAp4aWHuRLsmeCnVAQIKnBAQNNs2hFEsy5Ls/edit?usp=sharing)
 
 ## running the project
 
