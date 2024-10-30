@@ -1,63 +1,72 @@
 #### Artiodactyl BT ####
 
 ## packages
+library(tidyverse)
 library(btw)
+
+## bt path
+options(bt_path = ".",
+        bt_bin = "BayesTraitsV3")
 
 ## data
 dat <- read.table("bayestraits/Artiodactyl.txt")
 tt <- ape::read.nexus("bayestraits/Artiodactyl.trees") ## 500 trees
 
-## trying it the normal way
+## MCMC with exp 10 prior, default length and burnin
 command_vec<-c("1","2","PriorAll exp 10")
-r<-bayestraits(data = dat, tree = tt, commands = command_vec) ## cant find BT
+mcmc_run<-bayestraits(data = dat, tree = tt, commands = command_vec)
 
-## trying it with our functions
-## command function
-bt_command <- function(prior = NULL,
-                       iterations = 51e4,
-                       burnin = 1e4,
-                       sample = 1,
-                       seed = 101,
-                       cores = getOption("bayestraits.cores", 1)) {
-  cvec <- c("1", ## MultiState
-            "2", ## MCMC
-  )
-  if (!is.null(prior)) cvec <- c(cvec, prior)
-  cvec <-  c(cvec,
-             sprintf("Iterations %d", iterations),
-             sprintf("Burnin %d", burnin),
-             sprintf("Seed %d", seed),
-             sprintf("Sample %d", sample)  ## thinning
-  )
-  if (!is.null(cores)) cvec <- c(cvec, sprintf("Cores %d", cores))
-  return(cvec)
-}
+## save or read in run
+#saveRDS(mcmc_run, file = "bayestraits/artio_bt_mcmc.RDS")
+mcmc_run<-readRDS("bayestraits/artio_bt_mcmc.RDS")
 
-## run function
-bt_run <- function(data = NULL, trees = NULL, prior = NULL, dir = "bayestraits",
-                   fn = "", chains = 4, seed0 = 100, verbose = FALSE,
-                   ...) {
-  all_res <- lapply(seq(chains),
-                    function(i) {
-                      if (verbose) cat("chain ", i, "\n")
-                      command <- bt_command(prior = prior, ...,
-                                            seed = seed0 + i)
-                      tt <- system.time(
-                        res <- bayestraits(data, trees, command)
-                      )
-                      attr(res, "time") <- tt
-                      return(res)
-                    })
-  results <- list(Log = list(options = all_res[[1]]$Log$options, ## same opts for all chains
-                             results = do.call(rbind, lapply(seq_along(all_res), function(i) data.frame(chain = i, all_res[[i]]$Log$results)))
-  ))
-  results[["time"]] <- lapply(all_res, function(x) attr(x, "time"))
-  for (c in c("Schedule", "Stones", "AncStates", "OutputTrees")) {
-    results[[c]] <- lapply(all_res, function(x) x[[c]])
-  }
-  if (nchar(fn) > 0) saveRDS(results, file = file.path(dir, fn))
-  return(results)
-}
+## ML for each tree
+command_vec_ml<-c("1","1")
+ml_run<-bayestraits(data = dat, tree = tt, commands = command_vec_ml)
 
-## run
-r <- bt_run(prior = "PriorAll exp 10", data = dat, trees = tt, verbose = TRUE) ## error
+## save or read in run
+#saveRDS(ml_run, file = "bayestraits/artio_bt_ml.RDS")
+ml_run<-readRDS("bayestraits/artio_bt_ml.RDS")
+
+## get results
+mcmc_results<-mcmc_run$Log$results
+ml_results<-ml_run$Log$results
+
+## plot rates?
+mcmc_results %>% select(starts_with("q")) %>% 
+  pivot_longer(everything()) %>% 
+  ggplot(aes(x=name, y=value))+
+  geom_boxplot()+
+  theme_bw()
+
+ml_results %>% select(starts_with("q")) %>% 
+  pivot_longer(everything()) %>% 
+  ggplot(aes(x=name, y=value))+
+  geom_boxplot()+
+  theme_bw()
+
+## or to match with figure in manual, V3 page 21, looks pretty similar
+mcmc_results %>% select(starts_with("q")) %>% 
+  pivot_longer(everything()) %>% 
+  ggplot(aes(x=value))+
+  geom_histogram(binwidth = 1)+
+  theme_bw()+
+  facet_wrap(~name)
+
+## parameter restriction example
+mcmc_ind<-bayestraits(data = dat, tree = tt,
+                      commands = c("1","2","PriorAll exp 10","Stones 100 1000"))
+mcmc_dep<-bayestraits(data = dat, tree = tt,
+                      commands = c("1","2","PriorAll exp 10","Stones 100 1000",
+                                   "Restrict qDG qGD"))
+
+## save/read results
+#saveRDS(mcmc_ind, file = "bayestraits/artio_bt_mcmc_ind.RDS")
+#saveRDS(mcmc_dep, file = "bayestraits/artio_bt_mcmc_dep.RDS")
+mcmc_ind<-readRDS("bayestraits/artio_bt_mcmc_ind.RDS")
+mcmc_dep<-readRDS("bayestraits/artio_bt_mcmc_dep.RDS")
+
+## get BF
+loglik_ind<-mcmc_ind$Stones$logMarLH # -8.775 in manual, -8.715 here
+loglik_dep<-mcmc_dep$Stones$logMarLH # -8.296 in manual, -8.270 here
+bf<-2*(loglik_ind-loglik_dep) # -0.957 in manual, -0.889 here
