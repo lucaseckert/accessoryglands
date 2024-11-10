@@ -1,3 +1,10 @@
+## new 6 Nov 2024
+
+* rework Figure 1
+* review of BayesTraits approaches
+* figure out BayesTrait equivalents?
+* clean/document/condense
+
 ## new 17 August 2024
 
 ### 
