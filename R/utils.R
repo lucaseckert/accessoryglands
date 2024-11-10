@@ -768,7 +768,9 @@ latex_mat <- function(m, align = "r") {
 }
 
 mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
-                       nmag = 0.04, with_labs = FALSE) {
+                       nmag = 0.04, with_labs = FALSE,
+                       fancy_colours = FALSE,
+                       old_labs = FALSE, ...) {
     M <- model$solution
     R <- model$args.list$rate
     dimnames(R) <- dimnames(M)
@@ -783,7 +785,12 @@ mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
     updown <- outer(ag_labs, ag_labs, "==")
     up_down_ind <- sort(unique(R[!is.na(R) & updown])) ## c(1,2,4,6) 
     col_vec1[up_down_ind] <- gray(c(0, 0.3, 0.6, 0.9))
-    col_vec1[-up_down_ind] <- qualitative_hcl(8)
+    ## other arrows: make them all the same colour ...
+    if (fancy_colours) {
+        col_vec1[-up_down_ind] <- qualitative_hcl(8)
+    } else {
+        col_vec1[-up_down_ind] <- gplots::col2hex("firebrick")
+    }
     C1 <- c(R)
     C1 <- col_vec1[C1] ## map colors to indices
     dim(C1) <- dim(R)
@@ -874,14 +881,37 @@ mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
          colnames(R) <- colnames(R2) <- gsub("_", ".", colnames(R))
     }
 
+    
+
     mkplot <- function(mat = R, C = C1) {
-        plotmat(mat, pos = pos2, xlim = c(-3,3),
+        nms <- rownames(R)
+        dimnames(R) <- list(rep("", nrow(R)), rep("", ncol(R)))
+        p <- plotmat(mat, pos = pos2, xlim = c(-3,3),
                 ## arr.lwd = sqrt(M/50),
                 box.type = "ellipse", box.prop = 0.5,
                 arr.lcol = C, arr.col = C,
                 arr.nudge.x = Nx,
                 arr.nudge.y = Ny,
-                latex = tikz)
+                latex = tikz, ...)
+
+        rwid <- mean(p$rect[,"xright"] - p$rect[,"xleft"])
+        xpos <- pos2[,"xval"]
+        ypos <- pos2[,"yval"]
+        vals <- gsub("[^0-9]", "", nms) |>
+            strsplit("") |>
+            do.call(what=rbind)
+        vals2 <- gsub("[0-9]", "", nms) |>
+            strsplit("_") |>
+            do.call(what=rbind)
+        colfun <- function(x) ifelse(x == "0", "white", "gray")
+        pfun <- function(offset, v, lab) {
+            points(xpos+offset, ypos, pch = 21, col = "black",
+                   bg = colfun(v), cex = 4)
+            text(xpos+offset, ypos, lab, cex = 0.75)
+        }
+        pfun(-0.05, vals[,1], lab = vals2[,1] )
+        pfun(0, vals[,2], lab = vals2[,2])
+        pfun(0.05, vals[,3], lab = vals2[,3])
     }
     
     if (!with_labs) {

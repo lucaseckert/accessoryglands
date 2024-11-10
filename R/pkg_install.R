@@ -3,7 +3,7 @@
 CRAN_core_pkgs <- c("abind", "bbmle", "bookdown", "broom.mixed", "caper", "coda", 
                     "colorspace", "corHMM", "cowplot", "diagram", "diversitree", 
                     "emdbook", "fishtree", "GGally", "ggmosaic", "ggnewscale", "ggthemes", 
-                    "glue", "hues", "igraph", "latticeExtra", "Matrix", 
+                    "glue", "gplots", "hues", "igraph", "latticeExtra", "Matrix", 
                     "nloptr", "numDeriv", "patchwork", "phangorn", "phytools", "ramcmc",
                     "remotes", "tarchetypes", "targets", "tidyverse", "visNetwork")
 
