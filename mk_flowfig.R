@@ -1,4 +1,5 @@
 source("R/pkg_install.R")
+## install_pkgs() if necessary
 source("R/utils.R")
 load_pkgs()
 library(targets)
@@ -8,10 +9,10 @@ tar_load(ag_model_pcsc)
 library(diagram)
 source("R/plotmat.R") ## hacked version for nudging arrows
 
-f_args <- list(shadow.size=0, arr.type = "triangle")
+f_args <- list(shadow.size=0, arr.type = "triangle", arr.length = 0.25, arr.width = 0.2, box.lcol = "cornflowerblue")
 
-## devs <- c("pdf", "svg", "png", "tikz")
-devs <- "tikz"  ## all we really need
+devs <- c("pdf", "svg", "png", "tikz")
+## devs <- "tikz"  ## all we really need
 for (o in devs) {
     f <- get(o)
     f(sprintf("flowfig.%s", o));

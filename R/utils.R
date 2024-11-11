@@ -770,7 +770,8 @@ latex_mat <- function(m, align = "r") {
 mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
                        nmag = 0.04, with_labs = FALSE,
                        fancy_colours = FALSE,
-                       old_labs = FALSE, ...) {
+                       old_labs = FALSE,
+                       hack_labs = TRUE, ...) {
     M <- model$solution
     R <- model$args.list$rate
     dimnames(R) <- dimnames(M)
@@ -884,7 +885,7 @@ mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
     
 
     mkplot <- function(mat = R, C = C1) {
-        nms <- rownames(R)
+        nms <- rownames(R) |> gsub(pattern = "sc", replacement = "sm")
         dimnames(R) <- list(rep("", nrow(R)), rep("", ncol(R)))
         p <- plotmat(mat, pos = pos2, xlim = c(-3,3),
                 ## arr.lwd = sqrt(M/50),
