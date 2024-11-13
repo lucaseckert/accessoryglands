@@ -9,14 +9,17 @@ tar_load(ag_model_pcsc)
 library(diagram)
 source("R/plotmat.R") ## hacked version for nudging arrows
 
-f_args <- list(shadow.size=0, arr.type = "triangle", arr.length = 0.25, arr.width = 0.2, box.lcol = "cornflowerblue")
+f_args <- list(shadow.size=0, arr.type = "triangle", arr.length = 0.25, arr.width = 0.2, box.col = "cadetblue1", box.lcol = NA)
+
+do.call(mk_flowfig, f_args)
 
 devs <- c("pdf", "svg", "png", "tikz")
 ## devs <- "tikz"  ## all we really need
 for (o in devs) {
     f <- get(o)
     f(sprintf("flowfig.%s", o));
-    do.call(mk_flowfig, c(list(tikz = (o=="tikz")), f_args)); dev.off()
+    do.call(mk_flowfig, c(list(tikz = (o=="tikz")), f_args))
+    dev.off()
     f(sprintf("flowfig2.%s", o))
     mk_flowfig(with_labs = TRUE,
                do.call(mk_flowfig, c(list(tikz = (o=="tikz"),

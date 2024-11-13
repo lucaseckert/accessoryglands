@@ -1,15 +1,15 @@
-## BMB hacked version with arr.nudge.x, arr.nudge.y args
+## BMB hacked version with arr.nudge.x, arr.nudge.y args, arr.lty arg
 
 ##==============================================================================
 # plotmat: plots transition matrices
 ##==============================================================================
 
 plotmat <- function(A, pos=NULL, curve=NULL, name=NULL, absent=0,
-     relsize=1, lwd=2, lcol="black", box.size=0.1, box.type ="circle",
+     relsize=1, lwd=2, lty = 1, lcol="black", box.size=0.1, box.type ="circle",
      box.prop =1, box.col="white", box.lcol=lcol, box.lwd=lwd,
      shadow.size = 0.01, shadow.col="grey", dr=0.01, dtext= 0.3,
      self.lwd=1, self.cex=1, self.shiftx=box.size, self.shifty=NULL,
-     self.arrpos=NULL, arr.lwd=lwd, arr.lcol=lcol, arr.tcol = lcol,
+     self.arrpos=NULL, arr.lwd=lwd, arr.lty=lty, arr.lcol=lcol, arr.tcol = lcol,
      arr.col="black",
      arr.type="curved", arr.pos=0.5, arr.length=0.4, arr.width=arr.length/2,
      endhead=FALSE, mx=0.0, my=0.0, box.cex=1, 
@@ -84,10 +84,13 @@ plotmat <- function(A, pos=NULL, curve=NULL, name=NULL, absent=0,
     curve   <- matrix(nrow=ncomp, ncol=ncomp, curve)
   if (length(arr.pos)==1)
     arr.pos <- matrix(nrow=ncomp, ncol=ncomp, arr.pos)
+  if (length(arr.lty)==1)
+    arr.lty <- matrix(nrow=ncomp, ncol=ncomp, arr.lty)
 
   arrwidth  <- arr.width        # can be a matrix...
   arrlength <- arr.length
   arrlwd    <- arr.lwd
+  arrlty    <- arr.lty
   arrlcol   <- arr.lcol
   arrtcol   <- arr.tcol
   arrcol    <- arr.col
@@ -158,6 +161,7 @@ plotmat <- function(A, pos=NULL, curve=NULL, name=NULL, absent=0,
       arr.width  <- arrwidth[ii[1], ii[2]]
       arr.length <- arrlength[ii[1], ii[2]]
       arr.lwd    <- arrlwd[ii[1], ii[2]]
+      arr.lty    <- arrlty[ii[1], ii[2]]
       arr.lcol   <- arrlcol[ii[1], ii[2]]
       arr.col    <- arrcol[ii[1], ii[2]]
       arr.tcol   <- arrtcol[ii[1], ii[2]]
@@ -196,7 +200,7 @@ plotmat <- function(A, pos=NULL, curve=NULL, name=NULL, absent=0,
         Arrows(ell[1,1], ell[1,2],
                ell[nrow(ell),1], ell[nrow(ell),2],
                arr.col=arr.col, lcol=arr.lcol, arr.length=arr.length*0.5,
-               arr.width=arr.width, lwd=arr.lwd, arr.type=arr.type)
+               arr.width=arr.width, lwd=arr.lwd, lty=arr.lty, arr.type=arr.type)
         DD   <- rbind(DD, c(ell[nrow(ell), 1], ell[nrow(ell), 2]))
 
         if(cex.txt>0 && txt!= "")
@@ -219,7 +223,8 @@ plotmat <- function(A, pos=NULL, curve=NULL, name=NULL, absent=0,
 
        adj   <- c(xadj, yadj)
        if (ry==0)   {    # straight line
-         mid1<-straightarrow (from=pos2, to=pos1, lwd=arr.lwd,
+           mid1<-straightarrow (from=pos2, to=pos1, lwd=arr.lwd,
+                                lty=arr.lty,
                               arr.type=arr.type, arr.length=arr.length,
                               arr.pos=arrpos, arr.width=arr.width,
                               arr.col=arr.col, lcol=arr.lcol, 
@@ -263,13 +268,13 @@ plotmat <- function(A, pos=NULL, curve=NULL, name=NULL, absent=0,
          
            plotellipse(rx=dst/2, ry=ry, mid=mid + c(nudge.x, nudge.y),
                        angle=angle, from=From,
-                     to=To, lwd=arr.lwd, dr=dr, lcol=arr.lcol)
+                     to=To, lwd=arr.lwd, lty = arr.lty, dr=dr, lcol=arr.lcol)
          ell <- getellipse(rx=dst/2, ry=ry, mid=mid, angle=angle,
                          from=1.001*meanpi, to=0.999*meanpi, dr=-0.002)
          Arrows(ell[1,1] + nudge.x, ell[1,2] + nudge.y,
                   ell[nrow(ell),1] + nudge.x, ell[nrow(ell),2] + nudge.y,
                 arr.col=arr.col,lcol=arr.lcol,  code=1, arr.length=arr.length,
-                arr.width=arr.width, lwd=arr.lwd, arr.type=arr.type)
+                arr.width=arr.width, lwd=arr.lwd, lty = arr.lty, arr.type=arr.type)
          DD <- rbind(DD, c(ell[nrow(ell),1], ell[nrow(ell),2]))
          ell <- getellipse(rx=dst/2, ry=ry+drad, mid=mid, angle=angle,
                            from=meanpi, to=meanpi)

@@ -771,11 +771,14 @@ mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
                        nmag = 0.04, with_labs = FALSE,
                        fancy_colours = FALSE,
                        old_labs = FALSE,
-                       hack_labs = TRUE, ...) {
+                       hack_labs = TRUE,
+                       fancy_arrows = TRUE, ...) {
     M <- model$solution
     R <- model$args.list$rate
     dimnames(R) <- dimnames(M)
     col_vec1 <- rep(NA, max(R)-1)
+    lty_vec1 <- rep(NA, max(R)-1)
+
     R[R==max(R)] <- NA
 
     ## constrained model colour vectors
@@ -796,6 +799,16 @@ mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
     C1 <- col_vec1[C1] ## map colors to indices
     dim(C1) <- dim(R)
 
+    if (fancy_arrows) {
+        lty_vec1[up_down_ind] <- 2:5
+        lty_vec1[-up_down_ind] <- 1
+        L1 <- c(R)
+        L1 <- lty_vec1[L1] ## map line types to indices
+        dim(L1) <- dim(R)
+    } else {
+        L1 <- 1
+    }
+    
     ## pc-only model
     col_vec2 <- col_vec1
     pc_pairs <- list(c(5, 6), c(7, 8), c(1, 2), c(3, 4))
@@ -884,13 +897,13 @@ mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
 
     
 
-    mkplot <- function(mat = R, C = C1) {
+    mkplot <- function(mat = R, C = C1, L = L1) {
         nms <- rownames(R) |> gsub(pattern = "sc", replacement = "sm")
         dimnames(R) <- list(rep("", nrow(R)), rep("", ncol(R)))
         p <- plotmat(mat, pos = pos2, xlim = c(-3,3),
                 ## arr.lwd = sqrt(M/50),
                 box.type = "ellipse", box.prop = 0.5,
-                arr.lcol = C, arr.col = C,
+                arr.lcol = C, arr.col = C, arr.lty = L,
                 arr.nudge.x = Nx,
                 arr.nudge.y = Ny,
                 latex = tikz, ...)
