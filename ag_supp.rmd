@@ -315,7 +315,7 @@ fix_all_ci <- function(x, levels = NULL) {
     if (!is.null(levels)) {
         ## reorder levels as above
         x <- (x
-            %>%  mutate(across(term, factor, levels = levels))
+            %>%  mutate(across(term, \(x) factor(x, levels = levels)))
         )
     }
     return(x)
