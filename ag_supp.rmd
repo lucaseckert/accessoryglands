@@ -14,6 +14,8 @@ output:
     number_sections: true
 ---
 
+\renewcommand{\thefigure}{S\arabic{figure}}
+
 <!-- disable code folding entirely if not building as HTML? --  'r ifelse(knitr::is_html_output(),"hide", ...)' -->
 <!-- **fix me**: reimplement as [target markdown](https://books.ropensci.org/targets/markdown.html#markdown) ? -->
 
@@ -42,6 +44,20 @@ tar_load(all_contr_ci)
 tar_load(ag_compdata)
 ```
 
+# Literature search terms
+
+## Accessory gland search terms
+
+[species name] OR [family name] OR accessory OR gland OR seminal OR vesicle OR testicular OR duct OR testes OR reproductive OR reproduction OR morphology OR anatomy OR histology
+
+## Parental care and mating behaviour search terms
+
+[species name] OR [family name] OR parental OR care OR reproduction OR reproductive OR spawn OR brood OR paternal OR mating OR breed OR reproduce
+
+## ART search terms
+
+[species name] OR [family name] OR sperm OR competition OR alternative OR reproductive OR tactic OR sneaker OR satellite OR guarder OR parental OR territorial OR bourgeois OR fertilize OR female OR mimic OR type OR male OR group OR spawning OR phase
+
 # Descriptive statistics
 
 ## Data
@@ -65,8 +81,8 @@ tar_load(ag_compdata)
 tar_load(ag_compdata)
 tar_load(ag_compdata_tb)
 barplot_trans <- (. 
-  %>% mutate(across(c(pc, sc), factor, levels = c(0:1, "?")))
-  %>% mutate(across(ag, factor, levels = 1:0)) ## reverse order to get ag=1 on top of bars
+  %>% mutate(across(c(pc, sc), \(x) factor(x, levels = c(0:1, "?")))
+  %>% mutate(across(ag, \(x) factor(x, levels = 1:0))) ## reverse order to get ag=1 on top of bars
 )
 
 bar_data <- (purrr::map_dfr(list(fishphylo = ag_compdata$data,
