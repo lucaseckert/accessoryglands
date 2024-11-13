@@ -1,6 +1,11 @@
 library("targets")
 library("tarchetypes")
 library("tidyverse")
+library("crew")
+
+tar_option_set(
+  controller = crew_controller_local(workers = 4)
+)
 source("R/utils.R")
 source("R/pkg_install.R")
 source("R/functions.R")

@@ -1,7 +1,7 @@
 ## only package needed before starting this is remotes
 
 CRAN_core_pkgs <- c("abind", "bbmle", "bookdown", "broom.mixed", "caper", "coda", 
-                    "colorspace", "corHMM", "cowplot", "diagram", "diversitree", 
+                    "colorspace", "corHMM", "cowplot", "crew", "diagram", "diversitree", 
                     "emdbook", "fishtree", "GGally", "ggmosaic", "ggnewscale", "ggthemes", 
                     "glue", "gplots", "hues", "igraph", "latticeExtra", "Matrix", 
                     "nloptr", "numDeriv", "patchwork", "phangorn", "phytools", "ramcmc",
