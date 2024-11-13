@@ -9,7 +9,11 @@ tar_load(ag_model_pcsc)
 library(diagram)
 source("R/plotmat.R") ## hacked version for nudging arrows
 
-f_args <- list(shadow.size=0, arr.type = "triangle", arr.length = 0.25, arr.width = 0.2, box.col = "cadetblue1", box.lcol = NA)
+f_args <- list(shadow.size=0,
+               arr.type = "triangle", arr.length = 0.25, arr.width = 0.2,
+               box.col = "white"
+               ##box.col = "cadetblue1", box.lcol = NA
+              )
 
 do.call(mk_flowfig, f_args)
 

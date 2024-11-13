@@ -19,7 +19,7 @@ output:
 <!-- disable code folding entirely if not building as HTML? --  'r ifelse(knitr::is_html_output(),"hide", ...)' -->
 <!-- **fix me**: reimplement as [target markdown](https://books.ropensci.org/targets/markdown.html#markdown) ? -->
 
-```{r setup, include = FALSE}
+```{r setup}
 source("R/utils.R")
 source("R/mcmc.R")
 source("R/functions.R")
@@ -31,6 +31,11 @@ library(targets)
 knitr::opts_chunk$set(echo = FALSE, dpi = 200, optipng = knitr::hook_optipng)
 options(bitmapType = "cairo")
 ```
+
+```{r mcmc_pairs_flag, cache = TRUE}
+include_mcmc_pairs <- FALSE
+```
+
 
 <!-- use PNG for heavy graphics to avoid blowing up file size.
   -- see https://bookdown.org/yihui/rmarkdown-cookbook/optipng.html for info on installing OptiPNG-->
@@ -60,8 +65,9 @@ tar_load(ag_compdata)
 
 # Descriptive statistics
 
-## Data
+**Note**: throughout the trait describing spawning mode (pair spawning vs. {group spawning or ART}) is described as "sc" (because we think of this trait has a proxy for sperm competition); "sm" is used in the main paper.
 
+## Data
 	
 ```{r mosaic, eval=FALSE, include=FALSE}
 ## cool but useless
@@ -726,12 +732,14 @@ monitor(aa2)
 pairs(as.matrix(ag_mcmc0), gap = 0, pch = ".")
 ```
 
-```{r bayes_pairs2, fig.width=10, fig.height=10, cache=TRUE}
-tar_load(mc_pairsplots_0)
-knitr::include_graphics('pix/mcmc_pairs_0.png')
+```{r bayes_pairs2, fig.width=10, fig.height=10, cache=TRUE, dependson = "mcmc_pairs_flag"}
+if (include_mcmc_pairs) {
+    tar_load(mc_pairsplots_0)
+    knitr::include_graphics('pix/mcmc_pairs_0.png')
+}
 ```
 
-Contour levels are: 50%, 80% 90%, 95% (largest) highest posterior density regions.
+<!-- Contour levels are: 50%, 80% 90%, 95% (largest) highest posterior density regions. -->
 
 
 ## Treeblock model (12 parameters)
@@ -750,9 +758,11 @@ aa2 <- aperm(aa,c(1,3,2), resize=TRUE)
 monitor(aa2)
 ```
 
-```{r bayes_pairs_tb, fig.width=10, fig.height=10, cache=TRUE}
-tar_load(mc_pairsplots_tb)
-knitr::include_graphics('pix/mcmc_pairs_tb.png')
+```{r bayes_pairs_tb, fig.width=10, fig.height=10, cache=TRUE, dependson = "mcmc_pairs_flag"}
+if (include_mcmc_pairs) {
+    tar_load(mc_pairsplots_tb)
+    knitr::include_graphics('pix/mcmc_pairs_tb.png')
+}
 ```
 
 ## Full model (24 parameters)
@@ -778,9 +788,11 @@ aa2 <- aperm(aa,c(1,3,2), resize=TRUE)
 monitor(aa2)
 ```
 
-```{r bayes_pairs_full, fig.width=10, fig.height=10, cache=TRUE}
-tar_load(mc_pairsplots_full)
-knitr::include_graphics('pix/mcmc_pairs_full.png')
+```{r bayes_pairs_full, fig.width=10, fig.height=10, cache=TRUE, dependson = "mcmc_pairs_flag"}
+if (include_mcmc_pairs) {
+    tar_load(mc_pairsplots_full)
+    knitr::include_graphics('pix/mcmc_pairs_full.png')
+}
 ```
 
 ## No gain/loss priors
@@ -797,9 +809,11 @@ aa2 <- aperm(aa,c(1,3,2), resize=TRUE)
 monitor(aa2)
 ```
 
-```{r bayes_pairs_tb_nogainloss, fig.width=10, fig.height=10, cache=TRUE}
-tar_load(mc_pairsplots_tb_nogainloss)
-knitr::include_graphics('pix/mcmc_pairs_tb_nogainloss.png')
+```{r bayes_pairs_tb_nogainloss, fig.width=10, fig.height=10, cache=TRUE, dependson = "mcmc_pairs_flag"}
+if (include_mcmc_pairs) {
+    tar_load(mc_pairsplots_tb_nogainloss)
+    knitr::include_graphics('pix/mcmc_pairs_tb_nogainloss.png')
+}
 ```
 
 # References
