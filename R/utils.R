@@ -915,7 +915,7 @@ mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
             strsplit("") |>
             do.call(what=rbind)
         vals2 <- gsub("[0-9]", "", nms) |>
-            strsplit("_") |>
+            strsplit("[_.]") |>
             do.call(what=rbind)
         colfun <- function(x) ifelse(x == "0", "white", "gray")
         pfun <- function(offset, v, lab) {
@@ -926,6 +926,7 @@ mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
         pfun(-0.05, vals[,1], lab = vals2[,1] )
         pfun(0, vals[,2], lab = vals2[,2])
         pfun(0.05, vals[,3], lab = vals2[,3])
+        return(p)
     }
     
     if (!with_labs) {

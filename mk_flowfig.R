@@ -16,15 +16,18 @@ do.call(mk_flowfig, f_args)
 devs <- c("pdf", "svg", "png", "tikz")
 ## devs <- "tikz"  ## all we really need
 for (o in devs) {
+    cat(o, "\n")
     f <- get(o)
+    cat("making flowfig\n")
     f(sprintf("flowfig.%s", o));
     do.call(mk_flowfig, c(list(tikz = (o=="tikz")), f_args))
     dev.off()
+    cat("making flowfig2\n")
     f(sprintf("flowfig2.%s", o))
-    mk_flowfig(with_labs = TRUE,
-               do.call(mk_flowfig, c(list(tikz = (o=="tikz"),
-                                          with_labs = TRUE),
-                                     f_args))); dev.off()
+    do.call(mk_flowfig, c(list(tikz = (o=="tikz"),
+                               with_labs = TRUE),
+                          f_args))
+    dev.off()
 }
 for (f in c("flowfig", "flowfig2")) {
     system(sprintf("pdflatex %s.tikz; convert -density 300 %s.pdf %s.png",
