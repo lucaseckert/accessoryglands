@@ -81,7 +81,7 @@ tar_load(ag_compdata)
 tar_load(ag_compdata)
 tar_load(ag_compdata_tb)
 barplot_trans <- (. 
-  %>% mutate(across(c(pc, sc), \(x) factor(x, levels = c(0:1, "?")))
+  %>% mutate(across(c(pc, sc), \(x) factor(x, levels = c(0:1, "?"))))
   %>% mutate(across(ag, \(x) factor(x, levels = 1:0))) ## reverse order to get ag=1 on top of bars
 )
 

@@ -772,7 +772,8 @@ mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
                        fancy_colours = FALSE,
                        old_labs = FALSE,
                        hack_labs = TRUE,
-                       fancy_arrows = TRUE, ...) {
+                       fancy_arrows = TRUE,
+                       simple_gray = TRUE, ...) {
     M <- model$solution
     R <- model$args.list$rate
     dimnames(R) <- dimnames(M)
@@ -787,8 +788,12 @@ mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
     ## up_down_ind == all arrows between equal ag*
     ag_labs <- substr(colnames(R), 1, 3)
     updown <- outer(ag_labs, ag_labs, "==")
-    up_down_ind <- sort(unique(R[!is.na(R) & updown])) ## c(1,2,4,6) 
-    col_vec1[up_down_ind] <- gray(c(0, 0.3, 0.6, 0.9))
+    up_down_ind <- sort(unique(R[!is.na(R) & updown])) ## c(1,2,4,6)
+    if (!simple_gray) {
+        col_vec1[up_down_ind] <- gray(c(0, 0.3, 0.6, 0.9))
+    } else {
+        col_vec1[up_down_ind] <- gray(c(0, 0.6, 0, 0.6))
+    }
     ## other arrows: make them all the same colour ...
     if (fancy_colours) {
         col_vec1[-up_down_ind] <- qualitative_hcl(8)
@@ -800,7 +805,11 @@ mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
     dim(C1) <- dim(R)
 
     if (fancy_arrows) {
-        lty_vec1[up_down_ind] <- 2:5
+        if (simple_gray) {
+            lty_vec1[up_down_ind] <- c(2, 2, 1, 1)
+        } else {
+            lty_vec1[up_down_ind] <- c(2:5)
+        }
         lty_vec1[-up_down_ind] <- 1
         L1 <- c(R)
         L1 <- lty_vec1[L1] ## map line types to indices
