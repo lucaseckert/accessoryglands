@@ -789,6 +789,13 @@ mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
     ag_labs <- substr(colnames(R), 1, 3)
     updown <- outer(ag_labs, ag_labs, "==")
     up_down_ind <- sort(unique(R[!is.na(R) & updown])) ## c(1,2,4,6)
+
+    ## identify transitions corresponding to losses
+    svec <- sapply(c(3,7,11), \(i) substr(colnames(R), i, i)) # 0 0 0 etc.
+    ## number of positive states
+    posstate <- rowSums(svec == "1")
+    loss_ind <- sort(unique(c(na.omit(R[outer(posstate, posstate, "<")]))))
+    
     if (!simple_gray) {
         col_vec1[up_down_ind] <- gray(c(0, 0.3, 0.6, 0.9))
     } else {
@@ -805,12 +812,13 @@ mk_flowfig <- function(model = ag_model_pcsc, tikz = FALSE,
     dim(C1) <- dim(R)
 
     if (fancy_arrows) {
+        lty_vec1[] <- 1
         if (simple_gray) {
-            lty_vec1[up_down_ind] <- c(2, 2, 1, 1)
+            lty_vec1[loss_ind] <- 2
         } else {
             lty_vec1[up_down_ind] <- c(2:5)
         }
-        lty_vec1[-up_down_ind] <- 1
+
         L1 <- c(R)
         L1 <- lty_vec1[L1] ## map line types to indices
         dim(L1) <- dim(R)
