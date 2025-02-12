@@ -26,8 +26,8 @@ run_slow <- function() {
 }
 
 corhmm_models <- c("full", "pcsc", "pc", "sc", "indep")
-mcmc_runs <- c("0", "tb", "full", "tb_nogainloss")
-mcmc_runs_12 <- c("0", "tb", "tb_nogainloss")  ## 12-parameter models only
+mcmc_runs <- c("0", "tb", "full", "tb_nogainloss", "tb_nomiss")
+mcmc_runs_12 <- c("0", "tb", "tb_nogainloss", "tb_nomiss")  ## 12-parameter models only
 
 ## TO DEBUG: set tar_option_set(debug = "target_name"); tar_make(callr_function = NULL), e.g.
 ## tar_option_set(debug = "ag_pcsc_pars")
@@ -87,6 +87,11 @@ data_input_targets <- tar_plan(
     tar_target(
         ag_compdata_tb,
         get_ag_data(full_ag_data, phylo = treeblock[[1]])
+    ),
+
+    tar_target(
+        ag_compdata_tb_nomiss,
+        get_ag_data(full_ag_data, phylo = treeblock[[1]], include_missing = FALSE)
     )
 )  ## end data_input_targets
 
@@ -214,6 +219,23 @@ list(data_input_targets,
                        )
                 )
         }),
+    tar_target(
+        ## FIXME: DRY (via tar_map) and/or don't bother with 'fishphylo' fit?
+        ag_model_tb_nomiss, {
+            augment_model(
+                ## FIXME: quietly?
+                ## (drop node labels for one part)
+                corHMM(phy = ag_compdata_tb_nomiss$phy,
+                       data = ag_compdata_tb_nomiss$data,
+                       rate.cat = 1,
+                       rate.mat = ag_statemat_pcsc,
+                       root.p = root.p,
+                       lower = 0.1,                             ## 0.1 transitions per tree
+                       upper = 100 * ape::Ntip(ag_compdata$phy) ## 100 transitions per species
+                       )
+                )
+        }),
+
 
     ## fit corHMM model with priors (MAP estimation)
     tar_target(ag_model_pcsc_prior,
@@ -350,9 +372,11 @@ list(data_input_targets,
                      makeSimmap(phy, data, solution, rate.cat, nSim = 100, nCores = 5))
           purrr::map_dfr(sm, ~ get_state_occ_prop(.[["maps"]])) %>% setNames(state_names(ag_compdata$data[,-1]))
         }),
+    ## full list of models (with useful names)
     tar_target(
         mod_list,
         (tibble::lst(ag_model_pcsc, ag_model_pcsc_prior, ag_mcmc_0, ag_mcmc_tb, ag_mcmc_tb_nogainloss,
+                     ag_mcmc_tb_nomiss,
                      ag_priorsamp)
             %>% setNames(gsub("ag_", "", names(.)))
         )
@@ -446,6 +470,22 @@ list(data_input_targets,
                ),
     tar_target(ag_mcmc_tb_nogainloss,
                corhmm_mcmc(ag_model_tb,
+                           p_args=list(nllfun = make_nllfun(ag_model_tb, treeblock = treeblock),
+                                       ## sum(edge length) scaled to 1
+                                       lb = log(1),
+                                       ub = log(10 * ape::Ntip(ag_compdata_tb$phy))
+                                       ),
+                           n_cores = 8,
+                           n_chains = 8,
+                           n_burnin =  4000,
+                           n_iter =  84000,
+                           n_thin = 10,
+                           seed = 101),
+               cue = run_slow()
+               ),
+    ## FIXME: DRY!
+    tar_target(ag_mcmc_tb_nomiss,
+               corhmm_mcmc(ag_model_tb_nomiss,
                            p_args=list(nllfun = make_nllfun(ag_model_tb, treeblock = treeblock),
                                        ## sum(edge length) scaled to 1
                                        lb = log(1),

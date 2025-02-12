@@ -1,5 +1,5 @@
 setup:
-	Rscript -e "source('R/utils.R'); options('repos'='https://cloud.r-project.org'); install_pkgs()"
+	Rscript -e "source('R/pkg_install.R'); options('repos'='https://cloud.r-project.org'); install_pkgs()"
 
 all:
 	Rscript -e "library(targets); library(future); plan('multicore'); tar_make_future()"

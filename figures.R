@@ -8,6 +8,7 @@ theme_set(theme_bw())
 library(targets)
 library(phytools)
 library(diversitree)
+options(rlib_warning_verbosity = "verbose")
 
 ## FIXME: reconcile themes/DRY?
 
@@ -151,11 +152,11 @@ ag_contr_gainloss  <-  (purrr::map_dfr(list(fishphylo=contr_long_ag_mcmc0,
                                           prior = contr_long_ag_priorsamp),
                                      filter, rate != "netgain",
                                      .id = "phylo")
-                      %>% mutate(across(phylo, factor,
-                                        levels=rev(c("prior","treeblock","fishphylo"))))
-                      ## but we only care about treeblock for the paper
-                      %>% filter(phylo == "treeblock")
-                      %>% filter(contrast != "intercept")
+    %>% mutate(across(phylo,
+                      function(x) factor(x, levels=rev(c("prior","treeblock","fishphylo")))))
+    ## but we only care about treeblock for the paper
+    %>% filter(phylo == "treeblock")
+    %>% filter(contrast != "intercept")
 )
 
 ag_contr_gainloss$rate <- factor(ag_contr_gainloss$rate, levels = c("loss","gain"))
@@ -233,7 +234,7 @@ gg_sc <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colour = ra
                ## width by trial and error; not sure what determines this?
                position = position_dodge(width=0.875),
                colour = "black",
-               size = 1) +
+               linewidth = 1) +
   geom_vline(xintercept = 1, lty = 2) +
   scale_x_log10(labels = function(x) format(x, scientific = FALSE)) +
   zmargin +
@@ -244,7 +245,7 @@ gg_sc <- ggplot(ag_contr_gainloss, aes(x = exp(value), y = contrast, colour = ra
                    limits=c("pcxsc","sc","pc"))+
   labs(x="Proportional Difference in Rates", y="")+
   theme(panel.grid = element_blank(),
-        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        panel.border = element_rect(colour = "black", fill=NA, linewidth=1),
         axis.text = element_text(size = 24, color = "black"),
         axis.title.x = element_text(size = 32),
         axis.text.y = element_text(size = 24, color = "black"))

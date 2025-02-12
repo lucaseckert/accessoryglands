@@ -1,4 +1,5 @@
-get_ag_data <- function(full_data, species_name = "species", trait_names = c("ag", "care", "spawning"), phylo) {
+get_ag_data <- function(full_data, species_name = "species", trait_names = c("ag", "care", "spawning"), phylo,
+                        include_missing = TRUE) {
   full_data <- full_data[c(species_name, trait_names)]
   ## prepare binary trait data for corHMM missing convention
   full_data <- (full_data
@@ -9,6 +10,9 @@ get_ag_data <- function(full_data, species_name = "species", trait_names = c("ag
                                care = "?",
                                spawning = "?"))
   )
+  if (!include_missing) {
+      full_data <- filter(full_data, !(ag=="?" | care == "?" | spawning == "?"))
+  }
   cc <- caper::comparative.data(phy = phylo,
                                 data = as.data.frame(full_data), ## f'n works REALLY BADLY with tibbles!
                                 names.col = "species")
