@@ -620,13 +620,10 @@ We performed a range of different analyses to test the sensitivity of our conclu
 ##
 tar_load(ag_compdata)
 tar_load(all_ci)
+tar_load(all_contr_ci)
 
 all_ci <- fix_all_ci(all_ci, levels = levs)
 
-## did I mess up the order in the plot somehow when adding the 'nomiss' run?
-all_ci |> filter(method %in% c("model_pcsc","mcmc_tb_nomiss","mcmc_tb"),
-                 term == "gain.pc")
-                 
 
 ## extend NA confidence interval to limit of graph
 gg_ci0 <- (ggplot(
@@ -663,6 +660,7 @@ gg_ci_nowald <- (gg_ci0 %+% dplyr::filter(all_ci, method != "model_pcsc")
 ```
 
 ```{r contrast-ci, fig.width=8, fig.height = 6, warning = FALSE, message = FALSE}
+## Now do the same thing, but substitute in the CONTRASTS
 method_levs <- c("mcmc_tb", "mcmc_0",
                  "mcmc_tb_nogainloss",
                  "mcmc_tb_nomiss",
@@ -672,14 +670,13 @@ method_levs <- c("mcmc_tb", "mcmc_0",
                  "model_pcsc_prior")
 
 all_contr_ci <- (fix_all_ci(all_contr_ci, levels = contr_levs)
+    ## don't want prior predictive sims, or net-change estimates, or intercept terms
     |> filter(!grepl("net", term),
               !grepl("intercept", term),
               method != "priorsamp",
               !is.na(term))
-    |> mutate(across(method, factor, levels =rev(method_levs)))
+    |> mutate(across(method, \(x) factor(x, levels =rev(method_levs))))
 )
-
-## levels(all_contr_ci$method)
 
 ## reverse order of levels, *and* guide, so that both are top-to-bottom
 
@@ -698,6 +695,12 @@ gg_ci1C  <- (gg_ci0 %+% all_contr_ci
 print(gg_ci1C)
 ```
 
+```{r sens_plot_miss, echo=FALSE, message = FALSE}
+## save plot for specific primary/nomiss comparison
+gg_nmiss <- gg_ci1C %+% filter(all_contr_ci, method %in% c("mcmc_tb", "mcmc_tb_nomiss"))
+ggsave(gg_nmiss, file = "sensitivity_nmiss.pdf")
+```
+
 Points at the edge of the graph (`sc_gain`, `pc_loss`, `pcxsc_loss`) indicate that the point estimates fell outside of the plotted range.
 
 Intercepts are excluded (as being less biologically interesting, and using a different scale from the contrasts: transition rates rather than transition rate ratios), as are the estimates of the rates of gain and loss of the non-focal traits (spawning mode and male care).
@@ -706,7 +709,7 @@ We can draw a variety of conclusions from these results.
 
 - `mcmc_tb` vs. `mcmc_0`: as illustrated above, the estimates from the full tree-block data set and the reduced ("fishphylo") data set are similar, although the tree-block estimates are slightly more precise.
 - `mcmc_tb` vs. `mcmc_tb_nogainloss`: leaving out the gain/loss priors doesn't make much difference; it slightly weakens the SC estimate and strengthens the PC estimate
-- `mcmc_tb` vs. `mcmc_tb_nomiss`: 
+- `mcmc_tb` vs. `mcmc_tb_nomiss`: interestingly, selecting only species with complete data has a moderately large effect on our results. In particular, the estimated sign of the effect of spawning mode on gain (`sc_gain`) flips from negative to positive (and indeed *clearly* positive), while the effect of paternal care on gain, while still positive, decreases and becomes unclear. Furthermore, estimates based on the no-missing-data subset suggest that group spawning also decreases the loss rate of accessory glands.
 - `mcmc_tb` vs. `full`: although the results from the full model are generally of the same sign as from the reduced (12-parameter) model, they are much less certain. None of the signs of the effects are statistically clear ($p_{\textrm{MCMC}} > 0.05$ for all estimates).
 - `mcmc_tb` vs. `model_pcsc`: the 12-parameter model is too poorly constrained to draw conclusions from the parameter estimates; this agrees with the likelihood ratio and IC tests above, which indicate that the additive model is preferred to the interaction model.
 - `model_pcsc` vs. `model_pcsc_add`: constraining the model slightly by removing the interaction terms helps a little bit - now we get a point estimate and confidence intervals for the `pc_gain` parameter that agrees reasonably well with the full Bayesian fits - but most of the other parameters of interest are still unidentifiable (large confidence intervals/failure of the Wald approximation). The estimates of the rates of gain and loss of the non-focal traits are well identified, but not of interest.
