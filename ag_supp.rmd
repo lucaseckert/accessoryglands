@@ -148,11 +148,11 @@ ff <- full_ag_data |> get_ag_data(trait_names = c("ag", "care", "pairs.groups", 
 
 ## Transition matrices
 
-As described in the main text, a continuous-time stochastic process for three binary traits has a total of 24 possible transitions where a single one of the three states changes. The figure below shows the full and reduced transition matrices. In the axis tick labels, `ag0_pc0_sc1` (for example) refers to the state without AGs (`ag0`), without male care (`pc0`), and with group spawning (`sc1`, loosely "sperm competition present"^[Hereafter we refer to pair spawning as "sperm competition absent" (`sc0`) and group spawning as "sperm competition present" (`sc1`), recognizing that this is an oversimplification.]). Parameter 1 quantifies the log-hazard of a switch to pair spawning in this state (i.e., to `ag0_pc0_sc0`). 
+As described in the main text, a continuous-time stochastic process for three binary traits has a total of 24 possible transitions where a single one of the three states changes. The figure below shows the full and reduced transition matrices. In the axis tick labels, `ag0_pc0_sc1` (for example) refers to the state without AGs (`ag0`), without male care (`pc0`), and with group spawning (`sc1`, loosely "sperm competition present"^[Elsewhere in this document we sometimes refer to pair spawning as "sperm competition absent" (`sc0`) and group spawning as "sperm competition present" (`sc1`), recognizing that this is an oversimplification.]). Parameter 1 quantifies the log-transition rate of a switch to pair spawning in this state (i.e., to `ag0_pc0_sc0`). 
 
-The assignment of numbers to rates is arbitrary, numbered in sequence in column-wise order. Knowing the assignment is only necessary when doing low-level computations based on the vector of parameters. The take-home information is which sets of transitions are constrained to be identical in the reduced model; these rates have the same number . In the reduced model (righthand plot), transitions that are assumed to have equal rates - because we assume that all transitions in spawning mode, and all transitions in male care, are independent of the other states - have the same ID number. Colours denote the estimated log-hazard for each parameter when the models are fitted by maximum likelihood. Below, we denote parameter 1 (in the reduced model, which occupies four different cells in the transition matrix) as `sc_loss`, because it quantifies the loss rate of sperm competition regardless of the states of the other traits; we refer to parameter 3 (for example) as `loss.ag_pc0_sc1`, the loss rate of AGs in the absence of male care and presence of sperm competition.
+The assignment of numbers to rates is arbitrary, numbered in sequence in column-wise order. Knowing the assignment is only necessary when doing low-level computations based on the vector of parameters. The take-home information is which sets of transitions are constrained to be identical in the reduced model; these rates have the same number . In the reduced model (righthand plot), transitions that are assumed to have equal rates - because we assume that all transitions in spawning mode, and all transitions in male care, are independent of the other states - have the same ID number. Colours denote the estimated log-transition rate for each parameter when the models are fitted by maximum likelihood. Below, we denote parameter 1 (in the reduced model, which occupies four different cells in the transition matrix) as `sc_loss`, because it quantifies the loss rate of sperm competition regardless of the states of the other traits; we refer to parameter 3 (for example) as `loss.ag_pc0_sc1`, the loss rate of AGs in the absence of male care and presence of sperm competition.
 
-```{r image, message=FALSE, fig.width = 12, fig.height = 5, fig.cap = "Transition matrix for full and reduced (independent evolution of spawning mode and male care) models. Colours of grid squares represent the estimated evolutionary rates (log-hazards) for each transition. Note that the rates for 24-parameter model are extremely uncertain; see sensitivity analysis (last section)."}
+```{r image, message=FALSE, fig.width = 12, fig.height = 5, fig.cap = "Transition matrix for full and reduced (independent evolution of spawning mode and male care) models. Colours of grid squares represent the estimated evolutionary rates (log-transition rates) for each transition. Note that the rates for 24-parameter model are extremely uncertain; see sensitivity analysis (last section)."}
 pc <- gray(0.9)
 cowplot::plot_grid(plot(ag_model_full, pnum_col = pc,
                         main = "full (24-parameter)"),
@@ -240,14 +240,14 @@ $$
 
 # Priors
 
-Here we illustrate our general strategy for constructing priors: pick sensible lower and upper "bounds" (not really bounds, but values we would consider extreme) and use a Normal prior on the log-hazard scale (equivalent to a log-Normal prior on the hazard scale) with a mean halfway between the lower and upper bounds and a standard deviation $\sigma = (\log(\textrm{upper})-\log(\textrm{lower}))/(2 \cdot \textrm{range})$
+Here we illustrate our general strategy for constructing priors: pick sensible lower and upper "bounds" (not really bounds, but values we would consider extreme) and use a Normal prior on the log-transition rate scale (equivalent to a log-Normal prior on the transition rate scale) with a mean halfway between the lower and upper bounds and a standard deviation $\sigma = (\log(\textrm{upper})-\log(\textrm{lower}))/(2 \cdot \textrm{range})$
 In our model we use a range of 3 (i.e. the lower and upper bounds are at $\pm 3 \sigma$), to denote that the lower and upper bounds we specify are extreme (99.7% ranges). The figure below uses range = 2 (which would correspond to 95.4% ranges) so the tails are more clearly visible.
 
 ```{r prior-spec, fig.width = 10, fig.height = 5, fig.cap = "Schematic of prior definition in terms of lower and upper tails of a Gaussian distribution. Left, linear scale; right, log scale"}
 fun <- function(logsc = TRUE, range = 2, xp = 1.15) {
     DFUN <- if (!logsc) dlnorm else dnorm
     trans <- if (!logsc) exp else identity
-    xlab <- if (!logsc) "Hazard" else "Log-hazard"
+    xlab <- if (!logsc) "Transition Rate" else "Log-transition rate"
     ticklabs <- c("lower", "upper")
     if (logsc) ticklabs <- sprintf("log(%s)", ticklabs)
     rr <- xp*range
@@ -354,7 +354,7 @@ we can confirm that the priors on the contrasts (ratio of AG gain/loss rates dep
           xmin = exp(lwr),
           xmax = exp(upr), y = term)
     + geom_pointrange()
-    + labs(y = "", x = "hazard or hazard ratio")
+    + labs(y = "", x = "transition rate or transition rate ratio")
     + scale_x_log10()
     + geom_vline(xintercept = 1, lty = 2)
 )
@@ -599,11 +599,18 @@ As stated in the main text, we can see that AICc gives similar conclusions to th
 
 # Sensitivity analyses
 
+```{r get_data_sizes, echo = FALSE}
+tar_load(ag_compdata_tb_nomiss)
+tar_load(ag_compdata_tb)
+n_full <- nrow(ag_compdata_tb$data)
+n_nomiss <- nrow(ag_compdata_tb_nomiss$data)
+```
 We performed a range of different analyses to test the sensitivity of our conclusions to technical choices, and to explore the difference between frequentist (maximum likelihood estimate = MLE), constrained frequentist (maximum *a posteriori* = MAP), and full Bayesian (MCMC) fitting methods.
 
 - `mcmc_tb`: Bayesian MCMC using neutral priors on the transition rates and biologically informed priors on the gain/loss rates; this is the primary model presented in the main text
 - `mcmc_0`: as `mcmc_tb`, but using only the completely resolved phylogeny (i.e., only including species for which genetic data is available)
 - `mcmc_tb_nogainloss`: as `mcmc_tb`, but using only the priors on the transition rates, omitting the priors on the gain/loss rates
+- `mcmc_tb_nomiss`: as `mcmc_tb`, but using only species with complete data for all three traits (this includes less than half of the full data set, `r n_nomiss` vs. `r n_full` species)
 - `full`: a model estimating all 24 transition rates, i.e. allowing for the rates of evolution of male care and sperm competition to depend on each other and on AG
 - `model_pcsc`: MLE fit of the 12-parameter model
 - `model_pcsc_add`: MLE fit of the additive (10-parameter) model
@@ -615,6 +622,11 @@ tar_load(ag_compdata)
 tar_load(all_ci)
 
 all_ci <- fix_all_ci(all_ci, levels = levs)
+
+## did I mess up the order in the plot somehow when adding the 'nomiss' run?
+all_ci |> filter(method %in% c("model_pcsc","mcmc_tb_nomiss","mcmc_tb"),
+                 term == "gain.pc")
+                 
 
 ## extend NA confidence interval to limit of graph
 gg_ci0 <- (ggplot(
@@ -653,10 +665,12 @@ gg_ci_nowald <- (gg_ci0 %+% dplyr::filter(all_ci, method != "model_pcsc")
 ```{r contrast-ci, fig.width=8, fig.height = 6, warning = FALSE, message = FALSE}
 method_levs <- c("mcmc_tb", "mcmc_0",
                  "mcmc_tb_nogainloss",
+                 "mcmc_tb_nomiss",
                  "full",
                  "model_pcsc",
                  "model_pcsc_add",
                  "model_pcsc_prior")
+
 all_contr_ci <- (fix_all_ci(all_contr_ci, levels = contr_levs)
     |> filter(!grepl("net", term),
               !grepl("intercept", term),
@@ -664,6 +678,9 @@ all_contr_ci <- (fix_all_ci(all_contr_ci, levels = contr_levs)
               !is.na(term))
     |> mutate(across(method, factor, levels =rev(method_levs)))
 )
+
+## levels(all_contr_ci$method)
+
 ## reverse order of levels, *and* guide, so that both are top-to-bottom
 
 gg_ci1C  <- (gg_ci0 %+% all_contr_ci
@@ -672,22 +689,24 @@ gg_ci1C  <- (gg_ci0 %+% all_contr_ci
                     labels = function(x) sprintf("%g", x),
                     oob = scales::squish,
                     expand = expansion(0,0))
-    + labs(y="hazard ratio", x = "")
+    + labs(y="rate ratio", x = "")
     + geom_hline(yintercept =1, lty=2)
     + aes(shape = method)
-    + scale_shape_manual(values = c(scales::shape_pal(solid=TRUE)(6),9,10))
+    + scale_shape_manual(values = c(scales::shape_pal(solid=TRUE)(6),9,10,11))
 )
+
 print(gg_ci1C)
 ```
 
 Points at the edge of the graph (`sc_gain`, `pc_loss`, `pcxsc_loss`) indicate that the point estimates fell outside of the plotted range.
 
-Intercepts are excluded (as being less biologically interesting, and using a different scale from the contrasts: hazards rather than hazard ratios), as are the estimates of the rates of gain and loss of the non-focal traits (spawning mode and male care).
+Intercepts are excluded (as being less biologically interesting, and using a different scale from the contrasts: transition rates rather than transition rate ratios), as are the estimates of the rates of gain and loss of the non-focal traits (spawning mode and male care).
 
 We can draw a variety of conclusions from these results.
 
 - `mcmc_tb` vs. `mcmc_0`: as illustrated above, the estimates from the full tree-block data set and the reduced ("fishphylo") data set are similar, although the tree-block estimates are slightly more precise.
 - `mcmc_tb` vs. `mcmc_tb_nogainloss`: leaving out the gain/loss priors doesn't make much difference; it slightly weakens the SC estimate and strengthens the PC estimate
+- `mcmc_tb` vs. `mcmc_tb_nomiss`: 
 - `mcmc_tb` vs. `full`: although the results from the full model are generally of the same sign as from the reduced (12-parameter) model, they are much less certain. None of the signs of the effects are statistically clear ($p_{\textrm{MCMC}} > 0.05$ for all estimates).
 - `mcmc_tb` vs. `model_pcsc`: the 12-parameter model is too poorly constrained to draw conclusions from the parameter estimates; this agrees with the likelihood ratio and IC tests above, which indicate that the additive model is preferred to the interaction model.
 - `model_pcsc` vs. `model_pcsc_add`: constraining the model slightly by removing the interaction terms helps a little bit - now we get a point estimate and confidence intervals for the `pc_gain` parameter that agrees reasonably well with the full Bayesian fits - but most of the other parameters of interest are still unidentifiable (large confidence intervals/failure of the Wald approximation). The estimates of the rates of gain and loss of the non-focal traits are well identified, but not of interest.
