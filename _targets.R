@@ -92,7 +92,28 @@ data_input_targets <- tar_plan(
     tar_target(
         ag_compdata_tb_nomiss,
         get_ag_data(full_ag_data, phylo = treeblock[[1]], include_missing = FALSE)
+    ),
+    
+    tar_target(
+        ag_compdata_tb_subsamp,
+        {
+            set.seed(101)
+            ## same subsample size as "nomiss"
+            replicate(5, get_ag_data(full_ag_data, phylo = treeblock[[1]], subsamp = 0.43), simplify = FALSE)
+        }
+    ),
+
+    tar_target(
+        ag_compdata_tb_subsamp2,
+        {
+            set.seed(101)
+            ## increasing sample sizes
+            lapply(seq(0.1, 0.9, by = 0.2),
+                   function(s) get_ag_data(full_ag_data, phylo = treeblock[[1]], subsamp = s))
+        }
     )
+
+
 )  ## end data_input_targets
 
 ## rules for setting up parameter constraints
@@ -181,6 +202,12 @@ list(data_input_targets,
           upper = 100 * ape::Ntip(ag_compdata$phy)) ## 100 transitions per species
     ),
 
+    ## total number of tips in full phylog (for scaling)
+    tar_target(
+        tot_ntip,
+        ape::Ntip(ag_compdata$phy)
+    ),
+    
     ## fit corHMM models for all sets of constraints ('fishphylo' phylogeny only)
     tar_map(
         values = tibble(
@@ -236,6 +263,29 @@ list(data_input_targets,
                 )
         }),
 
+    tar_target(
+        ## FIXME: DRY (via tar_map) and/or don't bother with 'fishphylo' fit?
+        ag_model_tb_subsamp_list, {
+            lapply(ag_compdata_tb_subsamp,
+                   function(dd) {
+                       ## need to explicitly list default args that depend on upstream stuff ...
+                       aug_corHMM(data = dd, ratemat = ag_statemat_pcsc, root.p = root.p,
+                                  rate.mat = ag_statemat_pcsc, upr = 100 * tot_ntip)
+                   }
+                   )
+        }),
+
+        tar_target(
+        ## FIXME: DRY (via tar_map) and/or don't bother with 'fishphylo' fit?
+            ag_model_tb_subsamp2_list, {
+            lapply(ag_compdata_tb_subsamp2,
+                   function(dd) {
+                       ## need to explicitly list default args that depend on upstream stuff ...
+                       aug_corHMM(data = dd, ratemat = ag_statemat_pcsc, root.p = root.p,
+                                  rate.mat = ag_statemat_pcsc, upr = 100 * tot_ntip)
+                   }
+                   )
+        }),
 
     ## fit corHMM model with priors (MAP estimation)
     tar_target(ag_model_pcsc_prior,
@@ -365,6 +415,17 @@ list(data_input_targets,
         )
     ),
 
+    tar_target(
+        ag_mcmc_tb_contr_list,
+        lapply(ag_mcmc_tb_subsamp_list, function(mcmc) {
+            ((as.mcmc(mcmc) %*% contrast_mat_0) 
+                %>% as_tibble()
+                %>% pivot_longer(everything(), names_to = "contrast")
+                %>% separate(contrast, into=c("contrast", "rate"))
+            )
+        })
+    ),
+
     ## stochastic character mapping
     tar_target(
         states_df, {
@@ -399,12 +460,21 @@ list(data_input_targets,
         all_contr_ci,
         (purrr::map_dfr(mod_list, my_tidy, .id = "method",
                         contrast_mat = contrast_mat_inv)
+            ## add contrasts from models with different numbers of parameters
+            ## (different contrast matrices)
             %>% bind_rows(full_contr_ci)
             %>% bind_rows((tidy(ag_model_pcsc_add, conf.int = TRUE)
                 %>% mutate(method = "model_pcsc_add")
                 %>% rename(lwr = "conf.low", upr = "conf.high")))
             ## FIXME: gsub("model", "corhmm" OR "mle", method) ...
         )
+    ),
+
+    tar_target(
+        subsample_contr_ci,
+        purrr::map_dfr(ag_mcmc_tb_subsamp_list, my_tidy, .id = "subsamp",
+                       contrast_mat = contrast_mat_inv)
+
     ),
 
     ## run 12-parameter model (SLOW)
@@ -489,8 +559,10 @@ list(data_input_targets,
                            p_args=list(nllfun = make_nllfun(ag_model_tb, treeblock = treeblock),
                                        ## sum(edge length) scaled to 1
                                        lb = log(1),
-                                       ub = log(10 * ape::Ntip(ag_compdata_tb$phy))
-                                       ),
+                                       ub = log(10 * ape::Ntip(ag_compdata_tb$phy)),
+                                       gainloss_pairs = gainloss_priors$pairs,
+                                       lb_gainloss = gainloss_priors$lb,
+                                       ub_gainloss = gainloss_priors$ub),
                            n_cores = 8,
                            n_chains = 8,
                            n_burnin =  4000,
@@ -499,6 +571,46 @@ list(data_input_targets,
                            seed = 101),
                cue = run_slow()
                ),
+    tar_target(ag_mcmc_tb_subsamp_list,
+               lapply(ag_model_tb_subsamp_list,
+                      function(x) { corhmm_mcmc(x,
+                                              p_args=list(nllfun = make_nllfun(x, treeblock = treeblock),
+                                                          ## sum(edge length) scaled to 1
+                                                          lb = log(1),
+                                                          ub = log(10 * ape::Ntip(ag_compdata_tb$phy)),
+                                                          gainloss_pairs = gainloss_priors$pairs,
+                                                          lb_gainloss = gainloss_priors$lb,
+                                                          ub_gainloss = gainloss_priors$ub),
+                                              n_cores = 8,
+                                              n_chains = 8,
+                                              n_burnin =  4000,
+                                              n_iter =  84000,
+                                              n_thin = 10,
+                                              seed = 101)
+                      }),
+               cue = run_slow()
+               ),
+
+    tar_target(ag_mcmc_tb_subsamp2_list,
+               lapply(ag_model_tb_subsamp2_list,
+                      function(x) { corhmm_mcmc(x,
+                                                p_args=list(nllfun = make_nllfun(x, treeblock = treeblock),
+                                                            ## sum(edge length) scaled to 1
+                                                            lb = log(1),
+                                                            ub = log(10 * ape::Ntip(ag_compdata_tb$phy)),
+                                                            gainloss_pairs = gainloss_priors$pairs,
+                                                            lb_gainloss = gainloss_priors$lb,
+                                                            ub_gainloss = gainloss_priors$ub),
+                                                n_cores = 8,
+                                                n_chains = 8,
+                                                n_burnin =  4000,
+                                                n_iter =  84000,
+                                                n_thin = 10,
+                                                seed = 101)
+                      }),
+               cue = run_slow()
+               ),
+
     tar_target(ag_priorsamp,
                corhmm_mcmc(ag_model_pcsc,
                            p_args=list(nllfun = function(x) 1,
