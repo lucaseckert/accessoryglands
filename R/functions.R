@@ -13,7 +13,7 @@ get_ag_data <- function(full_data, species_name = "species", trait_names = c("ag
   if (!include_missing) {
       full_data <- filter(full_data, !(ag=="?" | care == "?" | spawning == "?"))
   }
-  if (subsample <- 1) {
+  if (subsample < 1) {
       n_full <- nrow(full_data)
       nsamp <- round(n_full*subsample)
       full_data <- dplyr::slice(full_data, sample(n_full, size = nsamp, replace = FALSE))

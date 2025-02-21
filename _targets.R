@@ -416,8 +416,19 @@ list(data_input_targets,
     ),
 
     tar_target(
-        ag_mcmc_tb_contr_list,
+        ag_mcmc_tb_contr_subsamp,
         lapply(ag_mcmc_tb_subsamp_list, function(mcmc) {
+            ((as.mcmc(mcmc) %*% contrast_mat_0) 
+                %>% as_tibble()
+                %>% pivot_longer(everything(), names_to = "contrast")
+                %>% separate(contrast, into=c("contrast", "rate"))
+            )
+        })
+    ),
+
+    tar_target(
+        ag_mcmc_tb_contr_subsamp2,
+        lapply(ag_mcmc_tb_subsamp2_list, function(mcmc) {
             ((as.mcmc(mcmc) %*% contrast_mat_0) 
                 %>% as_tibble()
                 %>% pivot_longer(everything(), names_to = "contrast")
@@ -473,6 +484,13 @@ list(data_input_targets,
     tar_target(
         subsample_contr_ci,
         purrr::map_dfr(ag_mcmc_tb_subsamp_list, my_tidy, .id = "subsamp",
+                       contrast_mat = contrast_mat_inv)
+
+    ),
+
+    tar_target(
+        subsample2_contr_ci,
+        purrr::map_dfr(ag_mcmc_tb_subsamp2_list, my_tidy, .id = "subsamp",
                        contrast_mat = contrast_mat_inv)
 
     ),
@@ -607,8 +625,8 @@ list(data_input_targets,
                                                 n_iter =  84000,
                                                 n_thin = 10,
                                                 seed = 101)
-                      }),
-               cue = run_slow()
+                      })
+             ## , cue = run_slow()
                ),
 
     tar_target(ag_priorsamp,
