@@ -202,7 +202,8 @@ list(data_input_targets,
                 corHMM(phy = ag_compdata_tb$phy,
                        data = ag_compdata_tb$data,
                        rate.cat = 1,
-                       rate.mat = ag_statemat_pcsc,
+                       rate.mat =
+                           ag_statemat_pcsc,
                        root.p = root.p,
                        lower = 0.1,                             ## 0.1 transitions per tree
                        upper = 100 * ape::Ntip(ag_compdata$phy) ## 100 transitions per species
@@ -512,6 +513,7 @@ list(data_input_targets,
     ## technical note (audience: technical users/computational folks)
     ## tar_render(ag_tech_html, "ag_tech.rmd") ## ,
     ## supplementary material (audience: general, stats enthusiasts)
-    tar_render(ag_supp_html, "ag_supp.rmd")
+    tar_render(ag_supp_html, "ag_supp.rmd", output_format = "html_document"),
+    tar_render(ag_supp_pdf, "ag_supp.rmd")
     ## tar_render(ag_supp_docx, "ag_supp.rmd", output_format = "word_document")
 )
