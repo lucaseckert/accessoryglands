@@ -3,9 +3,11 @@ library("tarchetypes")
 library("tidyverse")
 library("crew")
 
-tar_option_set(
-  controller = crew_controller_local(workers = 4)
-)
+## doesn't work with old (0.14.1) targets
+## tar_option_set(
+##   controller = crew_controller_local(workers = 4)
+## )
+
 source("R/utils.R")
 source("R/pkg_install.R")
 source("R/functions.R")
@@ -687,6 +689,7 @@ list(data_input_targets,
     ## technical note (audience: technical users/computational folks)
     ## tar_render(ag_tech_html, "ag_tech.rmd") ## ,
     ## supplementary material (audience: general, stats enthusiasts)
-    tar_render(ag_supp_html, "ag_supp.rmd")
+    tar_render(ag_supp_html, "ag_supp.rmd", output_format = "html_document"),
+    tar_render(ag_supp_pdf, "ag_supp.rmd")
     ## tar_render(ag_supp_docx, "ag_supp.rmd", output_format = "word_document")
 )
