@@ -184,7 +184,8 @@ ggplot(ac2, aes(x=estimate, y = sample,
     scale_colour_manual(values = OkIt, guide = guide_legend(reverse = TRUE),
                         name = "subsample proportion") +
     facet_wrap(~term, scale = "free_y") +
-    geom_vline(lty=2, xintercept = 0)
+    geom_vline(lty=2, xintercept = 0) +
+    geom_vline(lty=3, xintercept = log(c(0.1, 10)))
 
 ggsave("subsamples.pdf", width = 16, height = 8)
 
