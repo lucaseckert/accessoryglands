@@ -15,6 +15,8 @@ if (!require("remotes")) install.packages("remotes")
 detach("package:remotes")
 source("R/pkg_install.R")
 install_pkgs()
+remotes::install_version("targets", "0.14.2")
+remotes::install_version("tarchetypes", "0.7.3")
 ```
 
 ### running the workflow
@@ -69,6 +71,7 @@ targets::tar_visnetwork()
    - possibly: compute Wald and/or likelihood profile confidence intervals
    - specify priors and do MCMC computation
    - plot/interpret results
+- see "messiness" section at the end
 
 ## contents
 
@@ -144,7 +147,10 @@ bayestraits(data = primate.discrete1,
 ##
 
 
-
 ```
 git clone git@github.com:bbolker/btw.git
 ```
+
+## messiness
+
+Between November 2022 and March 2025 (this sounds like a long time, but not that much changed in the core project during that time: the project was largely inactive), we introduced a bug that messed up the sensitivity-analysis plots in the supplementary (but not anything else that we could detect). We did some Git branch rearrangement to salvage the old workflow. If you want to retrieve work done during that interval (particularly the experiments with BayesTraits), see the `BayesTraits_broken` branch on GitHub for commits during that time interval.
