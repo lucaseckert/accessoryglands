@@ -1,6 +1,7 @@
 source("R/utils.R")
 source("R/mcmc.R")
 source("R/functions.R")
+source("R/pkg_install.R")
 load_pkgs()
 zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
 theme_set(theme_bw())
@@ -85,8 +86,8 @@ if (file.exists("simmap.rda")) {
 gain.ci <- quantile(counts[,"ag0,ag1"], c(0.025,0.975))
 loss.ci <- quantile(counts[,"ag1,ag0"], c(0.025,0.975))
 
-## BMB: where are these used?
-
+## BMB: where are these used
+?
 #finding AG nodes
 
 which_sim <- 1 ## this is indexed based on *which sims were saved* (not original 1:100)
@@ -118,8 +119,25 @@ cols1 <- list(care=c("#c7e9c0","#006d2c"), spawning=c("#bdd7e7","#2171b5"))
 labs1 <- c("Male Care","Spawning Mode")
 str1 <- list(care=c("No Male Care","Male Care"), spawning=c("Pair Spawning", "Group Spawning"))
 
+do_png <- TRUE
 tar_load(treeblock)
-trait.plot(treeblock[[2]], data2, cols1, cex.lab = 0.2,lab = labs1, str = str1, cex.legend = 0.5)
+totpix <- 4800
+res <- 600
+tfun <- function() {
+    trait.plot(treeblock[[2]], data2, cols1, cex.lab = 0.2,
+               lab = labs1, str = str1, cex.legend = 0.5)
+}
+
+png("ridiculous_tree.png", width = totpix, height = totpix, res = res,
+    type = "cairo-png")
+tfun()
+dev.off()
+file.info("ridiculous_tree.png")
+
+svg("ridiculous_tree.svg", width = 8, height = 8)
+tfun()
+dev.off()
+file.info("ridiculous_tree.svg")
 
 #distribution of transitions
 transitions<-data.frame(counts[,-1])
