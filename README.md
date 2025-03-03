@@ -2,6 +2,20 @@
 
 Code and data for analyzing the evolution of reproductive accessory glands across fishes. Specifically, we test whether the evolution of accessory glands is driven by other reproductive traits, namely parental care and spawning mode. 
 
+## Caution: project version
+
+There are some glitches somewhere in the `targets` workflow, or the interaction of the `targets` workflow, that we are trying to understand. Some changes between Nov 2022 and March 2025 (which sounds like a long time, but the project was largely inactive during this time) break some of the sensitivity plots of the MLE estimates (e.g. `ag_pcsc_prior` results no longer approximately match the primary MCMC results.
+
+Checking out a 'salvage' version from Nov 30 2022 and rebuilding the supp appears to work. Re-making the `ag_model_*` objects breaks things, for some reason.
+
+We are still trying to diagnose this.
+
+* different versions of data (treeblock vs fishphylo_tree)?
+* something about `targets`/`tarchetypes` versions?
+* contrast matrix messed up somehow?
+
+In any case, if you want to rebuild the supplementary material, do *not* run `targets::tar_make()`.
+
 ## running the project
 
 ### getting started
