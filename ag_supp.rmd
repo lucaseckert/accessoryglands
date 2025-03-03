@@ -28,6 +28,8 @@ theme_set(theme_bw())
 library(targets)
 knitr::opts_chunk$set(echo = FALSE, dpi = 200, optipng = knitr::hook_optipng)
 options(bitmapType = "cairo")
+## skip yellow
+OkIt <- unname(palette.colors(n = 9, palette = "Okabe-Ito"))[-6]
 ```
 
 <!-- use PNG for heavy graphics to avoid blowing up file size.
@@ -126,9 +128,9 @@ ff <- full_ag_data |> get_ag_data(trait_names = c("ag", "care", "pairs.groups", 
 
 ## Transition matrices
 
-As described in the main text, a continuous-time stochastic process for three binary traits has a total of 24 possible transitions where a single one of the three states changes. The figure below shows the full and reduced transition matrices. In the axis tick labels, `ag0_pc0_sc1` (for example) refers to the state without AGs (`ag0`), without male care (`pc0`), and with group spawning (`sc1`, loosely "sperm competition present"^[Hereafter we refer to pair spawning as "sperm competition absent" (`sc0`) and group spawning as "sperm competition present" (`sc1`), recognizing that this is an oversimplification.]). Parameter 1 quantifies the log-hazard of a switch to pair spawning in this state (i.e., to `ag0_pc0_sc0`). 
+As described in the main text, a continuous-time stochastic process for three binary traits has a total of 24 possible transitions where a single one of the three states changes. The figure below shows the full and reduced transition matrices. In the axis tick labels, `ag0_pc0_sc1` (for example) refers to the state without AGs (`ag0`), without male care (`pc0`), and with group spawning (`sc1`, loosely "sperm competition present"^[Hereafter we refer to pair spawning as "sperm competition absent" (`sc0`) and group spawning as "sperm competition present" (`sc1`), recognizing that this is an oversimplification.]). Parameter 1 quantifies the log(transition rate) of a switch to pair spawning in this state (i.e., to `ag0_pc0_sc0`). 
 
-The assignment of numbers to rates is arbitrary, numbered in sequence in column-wise order. Knowing the assignment is only necessary when doing low-level computations based on the vector of parameters. The take-home information is which sets of transitions are constrained to be identical in the reduced model; these rates have the same number . In the reduced model (righthand plot), transitions that are assumed to have equal rates - because we assume that all transitions in spawning mode, and all transitions in male care, are independent of the other states - have the same ID number. Colours denote the estimated log-hazard for each parameter when the models are fitted by maximum likelihood. Below, we denote parameter 1 (in the reduced model, which occupies four different cells in the transition matrix) as `sc_loss`, because it quantifies the loss rate of sperm competition regardless of the states of the other traits; we refer to parameter 3 (for example) as `loss.ag_pc0_sc1`, the loss rate of AGs in the absence of male care and presence of sperm competition.
+The assignment of numbers to rates is arbitrary, numbered in sequence in column-wise order. Knowing the assignment is only necessary when doing low-level computations based on the vector of parameters. The take-home information is which sets of transitions are constrained to be identical in the reduced model; these rates have the same number . In the reduced model (righthand plot), transitions that are assumed to have equal rates - because we assume that all transitions in spawning mode, and all transitions in male care, are independent of the other states - have the same ID number. Colours denote the estimated log(transition rate) for each parameter when the models are fitted by maximum likelihood. Below, we denote parameter 1 (in the reduced model, which occupies four different cells in the transition matrix) as `sc_loss`, because it quantifies the loss rate of sperm competition regardless of the states of the other traits; we refer to parameter 3 (for example) as `loss.ag_pc0_sc1`, the loss rate of AGs in the absence of male care and presence of sperm competition.
 
 ```{r image, message=FALSE, fig.width = 12, fig.height = 5, fig.cap = "Transition matrix for full and reduced (independent evolution of spawning mode and male care) models. Colours of grid squares represent the estimated evolutionary rates (log-hazards) for each transition. Note that the rates for 24-parameter model are extremely uncertain; see sensitivity analysis (last section)."}
 pc <- gray(0.9)
@@ -218,14 +220,14 @@ $$
 
 # Priors
 
-Here we illustrate our general strategy for constructing priors: pick sensible lower and upper "bounds" (not really bounds, but values we would consider extreme) and use a Normal prior on the log-hazard scale (equivalent to a log-Normal prior on the hazard scale) with a mean halfway between the lower and upper bounds and a standard deviation $\sigma = (\log(\textrm{upper})-\log(\textrm{lower}))/(2 \cdot \textrm{range})$
+Here we illustrate our general strategy for constructing priors: pick sensible lower and upper "bounds" (not really bounds, but values we would consider extreme) and use a Normal prior on the log(transition rate) scale (equivalent to a log-Normal prior on the transition rate scale) with a mean halfway between the lower and upper bounds and a standard deviation $\sigma = (\log(\textrm{upper})-\log(\textrm{lower}))/(2 \cdot \textrm{range})$
 In our model we use a range of 3 (i.e. the lower and upper bounds are at $\pm 3 \sigma$), to denote that the lower and upper bounds we specify are extreme (99.7% ranges). The figure below uses range = 2 (which would correspond to 95.4% ranges) so the tails are more clearly visible.
 
 ```{r prior-spec, fig.width = 10, fig.height = 5, fig.cap = "Schematic of prior definition in terms of lower and upper tails of a Gaussian distribution. Left, linear scale; right, log scale"}
 fun <- function(logsc = TRUE, range = 2, xp = 1.15) {
     DFUN <- if (!logsc) dlnorm else dnorm
     trans <- if (!logsc) exp else identity
-    xlab <- if (!logsc) "Hazard" else "Log-hazard"
+    xlab <- if (!logsc) "Transition rate" else "log(Transition rate)"
     ticklabs <- c("lower", "upper")
     if (logsc) ticklabs <- sprintf("log(%s)", ticklabs)
     rr <- xp*range
@@ -332,7 +334,7 @@ we can confirm that the priors on the contrasts (ratio of AG gain/loss rates dep
           xmin = exp(lwr),
           xmax = exp(upr), y = term)
     + geom_pointrange()
-    + labs(y = "", x = "hazard or hazard ratio")
+    + labs(y = "", x = "transition rate or rate ratio")
     + scale_x_log10()
     + geom_vline(xintercept = 1, lty = 2)
 )
@@ -596,7 +598,9 @@ gg_ci0 <- (ggplot(
         colour = method)
 )
     + geom_linerange(position = position_dodge(width = 0.5), key_glyph = "path") 
-    +   geom_point(position = position_dodge(width = 0.5))
+    + geom_point(position = position_dodge(width = 0.5))
+    ## + scale_colour_manual(values = OkIt)
+    ## OkIt <- unname(palette.colors(n = 9, palette = "Okabe-Ito"))[-1]
     + colorspace::scale_colour_discrete_qualitative()
     + coord_flip()
     ## +     theme(legend.position="bottom")
@@ -621,6 +625,11 @@ gg_ci1  <- (gg_ci0
 gg_ci_nowald <- (gg_ci0 %+% dplyr::filter(all_ci, method != "model_pcsc")
     +  scale_y_log10()
 )
+
+subsamp_fits <- readRDS("subsamp_fits.rds")
+subsamp_coefs <- purrr::map_dfr(subsamp_fits, ~ .[["coefs"]], .id = "method") |>
+    filter(method == "nomiss") |>
+    mutate(method = "model_pcsc_prior_nomiss")
 ```
 
 ```{r contrast-ci, fig.width=8, fig.height = 6, warning = FALSE, message = FALSE}
@@ -629,8 +638,12 @@ method_levs <- c("mcmc_tb", "mcmc_0",
                  "full",
                  "model_pcsc",
                  "model_pcsc_add",
-                 "model_pcsc_prior")
-all_contr_ci <- (fix_all_ci(all_contr_ci, levels = contr_levs)
+                 "model_pcsc_prior",
+                 "model_pcsc_prior_nomiss")
+
+all_contr_ci2 <- (all_contr_ci
+    |> bind_rows(subsamp_coefs)
+    |> fix_all_ci(x = _, levels = contr_levs)
     |> filter(!grepl("net", term),
               !grepl("intercept", term),
               method != "priorsamp",
@@ -639,13 +652,13 @@ all_contr_ci <- (fix_all_ci(all_contr_ci, levels = contr_levs)
 )
 ## reverse order of levels, *and* guide, so that both are top-to-bottom
 
-gg_ci1C  <- (gg_ci0 %+% all_contr_ci
+gg_ci1C  <- (gg_ci0 %+% all_contr_ci2
     + scale_y_log10(limits=c(1e-2, 1e3),
                     breaks = 10^seq(-2, 3),
                     labels = function(x) sprintf("%g", x),
                     oob = scales::squish,
                     expand = expansion(0,0))
-    + labs(y="hazard ratio", x = "")
+    + labs(y="transition rate ratio", x = "")
     + geom_hline(yintercept =1, lty=2)
     + aes(shape = method)
     + scale_shape_manual(values = c(scales::shape_pal(solid=TRUE)(6),9,10))
@@ -655,7 +668,7 @@ print(gg_ci1C)
 
 Points at the edge of the graph (`sc_gain`, `pc_loss`, `pcxsc_loss`) indicate that the point estimates fell outside of the plotted range.
 
-Intercepts are excluded (as being less biologically interesting, and using a different scale from the contrasts: hazards rather than hazard ratios), as are the estimates of the rates of gain and loss of the non-focal traits (spawning mode and male care).
+Intercepts are excluded (as being less biologically interesting, and using a different scale from the contrasts: transition rates rather than transition rate ratios), as are the estimates of the rates of gain and loss of the non-focal traits (spawning mode and male care).
 
 We can draw a variety of conclusions from these results.
 
@@ -664,7 +677,8 @@ We can draw a variety of conclusions from these results.
 - `mcmc_tb` vs. `full`: although the results from the full model are generally of the same sign as from the reduced (12-parameter) model, they are much less certain. None of the signs of the effects are statistically clear ($p_{\textrm{MCMC}} > 0.05$ for all estimates).
 - `mcmc_tb` vs. `model_pcsc`: the 12-parameter model is too poorly constrained to draw conclusions from the parameter estimates; this agrees with the likelihood ratio and IC tests above, which indicate that the additive model is preferred to the interaction model.
 - `model_pcsc` vs. `model_pcsc_add`: constraining the model slightly by removing the interaction terms helps a little bit - now we get a point estimate and confidence intervals for the `pc_gain` parameter that agrees reasonably well with the full Bayesian fits - but most of the other parameters of interest are still unidentifiable (large confidence intervals/failure of the Wald approximation). The estimates of the rates of gain and loss of the non-focal traits are well identified, but not of interest.
-- `mcmc_tb` vs. `model_pcsc_prior`: when we add the prior information to the MLE fit, we get point estimates, and CIs, that are very close to those from the primary (`mcmc_tb`) model.
+- `mcmc_tb` vs. `model_pcsc_prior`: when we add the prior information to the MLE fit (resulting in a "maximum *a posteriori*", or MAP, fit rather than an MLE), we get point estimates, and CIs, that are very close to those from the primary (`mcmc_tb`) model.
+- `mcmc_tb` vs. `model_pcsc_prior_nomiss`: dropping all of the species with any missing trait information severely reduces the size of the data set, to approximately 1/3-1/2 of its original size. For computational convenience, we ran this subset (and a variety of other subsampling experiments) as MAP estimation (taking about 10 minutes per run on 1 core vs. 12 hours on 8 cores). We thus also had to exclude species with insufficient phylogenetic information (i.e. not using the "treeblock" method), reducing the sample size to 234 species (39% of the original data set, vs. 261/43% if we had run the full analysis). Unsurprisingly, this gave us qualitatively similar answers but lost the statistical clarity of the effect of male parental care on gain of accessory glands (new transition rate contrast ratio 2.03, credible interval [0.392 - 10.5]).
 
 # Technical details of Bayesian computations
 
@@ -779,6 +793,12 @@ monitor(aa2)
 ```{r bayes_pairs_tb_nogainloss, fig.width=10, fig.height=10, cache=TRUE}
 tar_load(mc_pairsplots_tb_nogainloss)
 knitr::include_graphics('pix/mcmc_pairs_tb_nogainloss.png')
+```
+
+## Session information
+
+```{r session-info}
+sessionInfo()
 ```
 
 # References
