@@ -342,7 +342,7 @@ list(data_input_targets,
     tar_target(
         states_df, {
           sm <- with(ag_model_pcsc,
-                     makeSimmap(phy, data, solution, rate.cat, nSim = 100, nCores = 5))
+                     makeSimmap(phy, data, solution, rate.cat, nSim = 100, nCores = 1))
           purrr::map_dfr(sm, ~ get_state_occ_prop(.[["maps"]])) %>% setNames(state_names(ag_compdata$data[,-1]))
         }),
     tar_target(

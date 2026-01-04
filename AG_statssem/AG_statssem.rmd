@@ -128,11 +128,11 @@ img {
 
 ## examples
 
-![](../pix/fish_examples.png)
+![](pix/fish_examples.png)
 
 ## data (607 species total)
 
-![](../pix/fish_ag_phylo.png)
+![](pix/fish_ag_phylo.png)
 
 ## associated traits
 
@@ -144,8 +144,8 @@ img {
 
 <center>
 
-<!-- ![](../pix/phylo_plot-1.png) -->
-<img src = "../pix/phyloplot.png" height="500">
+<!-- ![](pix/phylo_plot-1.png) -->
+<img src = "pix/phylo_plot-1.png" height="500">
 
 </center>
 
@@ -153,11 +153,11 @@ img {
 
 ## modeling correlated evolution
 
-* model the influence of a trait on the *rate of change* of another trait [@pagelDetecting1997]
+* model the influence of a trait on the *rate of change* of another trait [@pagelDetecting1994]
    * is the rate of gain/loss of AGs (in)dependent of whether a species (lineage) has group vs pair spawning, or male parental care?
 * likelihood ratio tests for (in)equality of rates
 
-![](../pix/pagel_hyp.png)
+![](pix/pagel_hyp.png)
 
 ## setting up the model
 
@@ -172,7 +172,7 @@ $$
 
 <center>
 
-![](../pix/flowfig.png)
+![](pix/flowfig.png)
 
 </center>
 
@@ -206,7 +206,7 @@ From @harmonPhylogenetic2019 (CC-BY-4.0)
 
 <center>
 
-<img src = "../pix/prune1.png" height="400">
+<img src = "pix/prune1.png" height="400">
 
 </center>
 
@@ -216,7 +216,7 @@ From @harmonPhylogenetic2019 (CC-BY-4.0)
 
 <center>
 
-<img src = "../pix/prune2.png" height="400">
+<img src = "pix/prune2.png" height="400">
 
 </center>
 
@@ -232,7 +232,7 @@ From @harmonPhylogenetic2019 (CC-BY-4.0)
 
 <center>
 
-<img src="../pix/lrt_comp.png" height="400">
+<img src="pix/lrt_comp.png" height="400">
 
 </center>
 
@@ -285,13 +285,13 @@ e.g. $\{q_{12}, q_{13}\} = \phi_1; \{q_{13}, q_{24}\}=\phi_2; \ldots$
 
 <center>
 
-![](../pix/bayestraits_fig6.png)
+![](pix/bayestraits_fig6.png)
 
 </center>
 
 ## possible approaches
 
-![](../pix/statstab.png)
+![](pix/statstab.png)
 
 <!--
 ------------------------------------------------------------------------------------------------------
@@ -317,13 +317,13 @@ Continuous/quantitative      MLE etc. + confidence intervals        posterior me
 
 <center>
 
-![](../pix/flowfig.png)
+![](pix/flowfig.png)
 
 </center>
 
 ## contrast matrix
 
-![](../pix/contrast_mat.png)
+![](pix/contrast_mat.png)
 
 # back to statistics
 
@@ -344,23 +344,23 @@ Continuous/quantitative      MLE etc. + confidence intervals        posterior me
    * e.g. with total branch length scaled to 1, hazards from 1 to 10 $\times$ (# species)
 * assume log-Normal prior, with lower/upper bounds representing $\mu \pm 3 \sigma$
 * priors on gain/loss ratio
-* check **prior predictive samples** [@mcelreathStatistical2015; @gelmanBayesian2020]
+* check **prior predictive samples** [@mcelreathStatistical2020; @gelmanBayesian2020]
 
 ## MCMC diagnostics/params
 
 * 8 chains, 84000 iterations, burn-in of 4000, thin by 10 (640,000 samples)
 * 12-24 hours on 8 cores
-* (improved) R-hat statistics all $\leq 1.01$, effective sample sizes all $>1000$ [@vehtariRankNormalization2021]
+* (improved) R-hat statistics all $\leq 1.01$, effective sample sizes all $>1000$ [@vehtariRankNormalization2019]
 * trace plots
 * pairs plots
 
 ## pairs plots example
 
-![](../pix/mcmc_pairs_tb.png)
+![](pix/mcmc_pairs_tb.png)
 
 ## results
 
-![](../pix/fig2.png)
+![](pix/fig2.png)
 
 ## sensitivity analyses
 
