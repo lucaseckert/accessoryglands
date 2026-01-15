@@ -1,0 +1,64 @@
+---
+title: "Bayes traits writeup/comparison"
+date: '`r format(Sys.Date(), "%d %b %Y")`'
+---
+
+## tl;dr
+
+I think we can say that BayesTraits (hereafter 'BT') gives results *sufficiently* similar to ours, and briefly describe some differences/issues. Unfortunately, we do get mismatches in the bottom-line conclusions that are a little bit larger than I'd like or can explain ...
+
+## Procedure
+
+We ran a factorial series of experiments with BT. In particular:
+
+* with and without using the 'reversible jump MCMC' algorithm that some people use with BT to quantify the probability of different *discrete* evolutionary hypotheses;
+* with and without data (i.e., we generated both prior and posterior distributions), in particular to compare our priors with BT's;
+* with our priors (lognormal) or with BT's default priors (i.e. no explicit prior settings.
+
+Our default settings for BT were to run four MCMC chains, each with a burnin of 10,000 steps followed by 50,000 MCMC samples. These chains used different random-number seeds but all used the same starting parameters (it's better to use widely dispersed sets of starting parameters but we couldn't figure out how to set starting parameters with BT). Our priors were either the same log-Normal priors as used in our runs (not including the gain/loss priors, and scaled to account for different scaling of branch lengths in BT).
+
+After our first round of RJ runs we realized that much longer runs were necessary to get adequate mixing. We did two more runs, with and without data (i.e. priors and posteriors), but only with 'our' priors, for four chains x 10 million iterations (typical analyses using BT with RJ have used a single chain run for 100 million iterations). The figures below only show these RJ runs.
+
+We impose the same constraints as in our original analyses (tree rooting assumption; simultaneous change of more than one trait prohibited (sets 32 rates to zero); use of the tree block; constraint that rates of gain and loss of non-focal traits (male parental care and group spawning) are independent of other trait states (i.e.,  reduces 16 rates to 4 distinct values), for a total of 12 estimated rate parameters.
+
+In our original analyses, we estimated contrasts from rates by taking ratios of differences of means on the log scale, or ratios of geometric means on the non-log scale: for example, if the log rates are $\phi$, then the effect of parental care on the gain of accessory glands is 
+
+$$
+\left(\phi_{\text{gain},c=1,s=0} + \phi_{\text{gain},c=1,s=1}\right)/2 - \left(\phi_{\text{gain},c=0,s=0} + \phi_{\text{gain},c=0,s=1}\right)/2
+$$
+
+When we use RJ, we can't make this calculation, because the rates are zero sometimes, which makes $\phi = -\infty$ and messes everything up. Below, we only compare *contrasts* for the non-RJ runs.
+
+## Figure 1: diagnostics for all BT runs
+
+These diagnostics don't have to do with how much data we have or what the uncertainty in the data is, but just in whether the computational procedures are working properly.
+
+* ESS (effective sample size); rules of thumb are that these should be >500, so all rates and runs are OK. The ESS for RJ runs (red) are almost all higher than for the non-RJ runs (black) because the chains were so much longer. 
+* MCSE (Monte Carlo standard error); this is a measure of the uncertainty in the *mean* estimate due to computational uncertainty. It's relatively high for the prior distribution with the default priors; this probably doesn't matter.
+* "Rhat" ($\hat R$), or the "Gelman-Rubin statistic" or the "potential scale reduction factor"; these values should be close to 1. $\hat R \lt 1.01$ is a typical cutoff, these are a little bit high but probably OK for most parameters, likely good enough at least for comparative purposes. (The values for our original runs were considerably lower.)
+* "Rhat_upr": these are upper bounds on the $\hat R$ statistic, not much larger than the estimates themselves.
+
+## Figure 2: trace plots
+
+The trace plots for the RJ runs look wonky because in this mode rates can jump back and forth between being fixed to zero and exploring non-zero space - in the prior (rightmost column) this happens for all rates, when the data are used (third column) some rates bounce back and forth, some stay away from zero, and one (`gain.ag_pc0_sc1`) is almost always zero. (This figure, and other plots of the rates, show the value of $x + 10^{-4}$ on the log scale.)
+
+## Figures 3 and 4: prior and posterior distributions
+
+These compare the prior (blue) and posterior (green) distributions of rates under the range of different models fitted. **Top panels** ("ours") are from the previous analyses (note that these rates are scaled differently from the BT rates). **Middle panels** are the BT runs without RJ, using our priors ("priors") or BT default priors ("default"). **Bottom panels** are from the BT/RJ runs: note bimodal (or trimodal) distributions with a mode at 'zero' (= $10^{-4}$ on this plot) and away from zero. Rates of gains and losses are shown on two different figures for legibility.
+
+## Figure 5: trace plots for contrasts
+
+This shows traces for all the "regular" (non-RJ) runs. They all look well-behaved.
+
+## Figure 6: posterior distributions
+
+This shows the prior and posterior distributions of contrasts. The scaling differences between 'our' analyses (top panel) and the BT analyses (bottom panel) has gone away because they cancel out when we calculate contrasts. These results all look *reasonably* similar, but it will be easier to see the differences if we concentrate only on the 50% and 95% credible (quantile) intervals ...
+
+
+## Figure 7: CIs
+
+The priors (left panel) are confirmed to be (almost) identical. The posterior distributions, however, are unsettlingly different. Our "headline" result (male parental care is associated with a higher probability of gaining AGs holds up, more or less (p=0.02 for us vs p=0.06 for BT). Our result that group spawning is weakly (p=0.06) associated with a *lower* probability of gaining AGs isn't there for BT results. BT thinks that the loss of AG is weakly associated with the parental care/spawning interaction (p=0.07). This is not a result we saw in any of our senstivity analyses (leaving out gain/loss priors, fitting with the consensus tree, ML estimation, etc.) I haven't sat down to try to interpret it yet ... In general, the BT results are not *inconsistent* with ours, but they're not as close as I would have expected given that the priors were very similar and all of the other machinery was as close to the same as we could get ...
+ 
+
+
+
