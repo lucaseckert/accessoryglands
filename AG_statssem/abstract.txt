@@ -1,0 +1,17 @@
+
+Biologists often want to understand why certain traits of organisms
+evolved. One way of translating this question into a statistical
+context is to set up a continuous-time, discrete-state Markov process
+along the branches of a phylogenetic tree and estimate how the
+evolutionary rates (log-hazards of changes in particular states) vary
+depending on the current values of other traits. Using an example from
+fish biology I will explain how to estimate the log-likelihood of a
+set of tip states given a transition matrix; based on this computation
+we can use standard Bayesian (Markov chain Monte Carlo) techniques to estimate linear contrasts that
+describe the effects of one biological trait on the evolutionary rate
+of another trait. I will also (1) rant briefly about some
+philosophical issues, in particular why single, scalar metrics
+describing model performance (in this case, p-values, but applicable
+to other metrics from statistics and machine learning) are less useful than interval measures of uncertainty
+(2) discuss ongoing technical improvements using automatic
+differentiation to enable Hamilton Monte Carlo sampling.
