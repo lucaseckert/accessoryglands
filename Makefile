@@ -10,12 +10,12 @@ push: ag_bayesdiag.html ag_supp.html
 #	scp $^ ms.mcmaster.ca:~/public_html/AG/
 
 ## FIXME: should be in targets file!
-figures: flowfig.R R/plotmat.R figures.R
+figures: mk_flowfig.R R/plotmat.R figures.R
 	R CMD BATCH --vanilla figures.R
-	R CMD BATCH --vanilla flowfig.R
+	R CMD BATCH --vanilla mk_flowfig.R
 
 flowfig: flowfig.R R/plotmat.R figures.R
-	R CMD BATCH --vanilla flowfig.R
+	R CMD BATCH --vanilla mk_flowfig.R
 
 ag_supp.pdf: ag_supp.rmd
 	Rscript -e "rmarkdown::render('ag_supp.rmd', output_format = 'pdf_document')"

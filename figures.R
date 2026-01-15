@@ -86,8 +86,7 @@ if (file.exists("simmap.rda")) {
 gain.ci <- quantile(counts[,"ag0,ag1"], c(0.025,0.975))
 loss.ci <- quantile(counts[,"ag1,ag0"], c(0.025,0.975))
 
-## BMB: where are these used
-?
+## BMB: where are these used?
 #finding AG nodes
 
 which_sim <- 1 ## this is indexed based on *which sims were saved* (not original 1:100)

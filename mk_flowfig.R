@@ -6,6 +6,7 @@ tar_load(ag_model_pcsc)
 
 library(diagram)
 source("R/plotmat.R") ## hacked version for nudging arrows
+source("R/utils.R")
 
 ## devs <- c("pdf", "svg", "png", "tikz")
 devs <- "tikz"  ## all we really need
