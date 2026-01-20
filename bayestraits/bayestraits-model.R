@@ -102,11 +102,12 @@ all_bt_results <- purrr::map_dfr(all_bt_model_results[no_rj], read_contrasts, .i
 all_bt_chains <- purrr::map_dfr(all_bt_model_results, read_chains, .id = "model_run")
 ## diagnostics for each model
 
+
 all_bt_diag <- (purrr::map_dfr(all_bt_model_results,
-                           function(x) { read_chains_list(x) |> diagnostic_posterior() },
-                           .id = "model_run")
-    |> rename(rate = "Parameter")
-    |> fix_names()
+                            function(x) { read_chains_list(x) |> diagnostic_posterior() },
+                            .id = "model_run")
+  |> rename(rate = "Parameter")
+  |> fix_names()
 )
 
 ### load previous results
@@ -119,7 +120,6 @@ tar_load(ag_priorsamp)
 tar_load(ag_mcmc_tb)
 tar_load(contr_long_ag_mcmc_tb)
 tar_load(contr_long_ag_priorsamp)
-
 
 pivot_ours <- function(mcmc, nm = "ours") {
     (as.mcmc(mcmc) 

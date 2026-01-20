@@ -974,3 +974,25 @@ get_contrasts <- function(results, maxlen = 6000) {
                loss_interaction =   cfun_nonlog(q51,q84,q73,q62))
 }
 
+## shims for bayestestR
+abind <- function(x) {
+  nchains <- length(x)
+  a <- array(dim = c(nrow(x[[1]]), nchains, ncol(x[[1]])))
+  for (i in seq(nchains)) {
+    a[,i,] <- x[[i]]
+  }
+  if (!is.null(parnames <- dimnames(x[[1]])[[2]])) {
+    dimnames(a)[[3]] <- parnames
+  }
+  return(a)
+}
+
+diagnostic_posterior.default <- function(posterior, ...) {
+  if (is.list(posterior)) posterior <- abind(posterior)
+  if (!(inherits(posterior, "array") && length(dim(posterior)) == 3)) {
+    stop("expecting a 3D array")
+  }
+  ret <- monitor(posterior) |> tibble::rownames_to_column(var = "Parameter")
+  class(ret) <- "data.frame" ## get rid of simsummary() class
+  as_tibble(ret)
+}
