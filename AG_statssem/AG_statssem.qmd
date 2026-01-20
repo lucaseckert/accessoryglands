@@ -4,8 +4,101 @@ format:
   revealjs: 
     slide-number: true
     preview-links: auto
-bibliography: ../corHMM.bib
+bibliography: corHMM.bib
+csl: reflist2.csl
 ---
+
+```{r setup, include = FALSE}
+source("../R/utils.R")
+source("../R/mcmc.R")
+source("../R/functions.R")
+source("../R/pkg_install.R")
+load_pkgs(skip = "tikzDevice")
+zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
+theme_set(theme_bw())
+library(targets)
+knitr::opts_chunk$set(echo = FALSE, dpi = 200, optipng = knitr::hook_optipng)
+options(bitmapType = "cairo")
+```
+
+```{r load, include=FALSE}
+## https://github.com/ropensci/targets/issues/230
+withr::with_dir("..",tar_load(ag_model_pcsc))
+withr::with_dir("..",tar_load(ag_model_full))
+withr::with_dir("..",tar_load(ag_mcmc0))
+withr::with_dir("..",tar_load(all_ci))
+withr::with_dir("..",tar_load(all_contr_ci))
+withr::with_dir("..",tar_load(ag_compdata))
+withr::with_dir("..",tar_load("ag_model_pcsc"))
+withr::with_dir("..",tar_load("ag_model_pc"))
+withr::with_dir("..",tar_load("ag_model_sc"))
+withr::with_dir("..",tar_load("ag_model_indep"))
+withr::with_dir("..",tar_load("ag_model_pcsc_add"))
+mnames <- c("pcsc", "pcsc_add", "pc", "sc", "indep")
+```
+
+```{r utils}
+withr::with_dir("..",tar_load(ag_compdata))
+corhmm_bounds <- log(c(lwr=0.1, upper = 100*ape::Ntip(ag_compdata$phy)))
+corhmm_prior <- log(c(lwr=1, upper = 10*ape::Ntip(ag_compdata$phy)))
+corhmm_mid <- mean(corhmm_bounds)
+## order of parameters
+levs <- c(outer(FUN = paste, sep = ".",
+      c("loss", "gain"),
+      c("sc", "pc",
+        paste0("ag_", c(outer(paste0("pc", 0:1), paste0("sc", 0:1), paste, sep = "_"))))
+      ))
+contr_levs <- c(outer(FUN = paste, sep = "_",
+                      c("intercept", "sc", "pc", "pcxsc"),
+                      c("loss", "gain")))
+
+fix_all_ci <- function(x, levels = NULL) {
+    x <- (x
+        ## replace NA values with Inf/-Inf so bars extend full range
+        %>% replace_na(list(upr = Inf, lwr = -Inf))
+        ## utility var for below-bounds estimates
+        %>% mutate(lwr_bound = (estimate <= corhmm_bounds[["lwr"]]))
+    )
+    if (!is.null(levels)) {
+        ## reorder levels as above
+        x <- (x
+            %>%  mutate(across(term, factor, levels = levels))
+        )
+    }
+    return(x)
+}
+```
+
+<!-- 
+apa.csl is a slightly hacked version of APA 
+  (modified for "et al" after 2 authors in text)
+-->
+<!-- .refs is style for reference page (small text) -->
+<style>
+.refs {
+   font-size: 14px;
+}
+h2 { 
+ color: #3399ff;		
+}
+h3 { 
+ color: #3399ff;		
+}
+.title-slide {
+   background-color: #55bbff;
+}
+<!-- https://stackoverflow.com/questions/50378349/force-column-break-in-rmarkdown-ioslides-columns-2-layout -->
+.forceBreak { -webkit-column-break-after: always; break-after: column; }
+</style>
+<!--    content: url(https://i.creativecommons.org/l/by-sa/4.0/88x31.png)
+>
+<!-- Limit image width and height -->
+<style type="text/css">
+img {     
+  max-height: 560px;     
+  max-width: 800px; 
+}
+</style>
 
 \newcommand{\P}{\mathbf P}
 \newcommand{\Q}{\mathbf Q}
@@ -35,11 +128,11 @@ bibliography: ../corHMM.bib
 
 ## examples
 
-![](../pix/fish_examples.png)
+![](pix/fish_examples.png)
 
 ## data (607 species total)
 
-![](../pix/fish_ag_phylo.png)
+![](pix/fish_ag_phylo.png)
 
 ## associated traits
 
@@ -47,9 +140,15 @@ bibliography: ../corHMM.bib
 (proxy for sperm competition)
 * presence of **male parental care**
 
-## all data {.center}
+## data on all traits
 
-![](../pix/phylo_plot-1.png)
+<center>
+
+<!-- ![](pix/phylo_plot-1.png) -->
+<!-- <img src = "pix/phylo_plot-1.png" height="500"> -->
+<img src = "pix/bigphylo.png" height="600">
+
+</center>
 
 # From evolution to statistics
 
@@ -59,10 +158,7 @@ bibliography: ../corHMM.bib
    * is the rate of gain/loss of AGs (in)dependent of whether a species (lineage) has group vs pair spawning, or male parental care?
 * likelihood ratio tests for (in)equality of rates
 
-![](../pix/pagel_hyp.png)
-
----
-
+![](pix/pagel_hyp.png)
 
 ## setting up the model
 
@@ -75,7 +171,12 @@ $$
 
 ## flow diagram
 
-![](../pix/flowfig.png)
+<center>
+
+```{r flowfig2-1, out.width = "65%"}
+knitr::include_graphics("pix/flowfig2.png")
+```
+</center>
 
 ## computing the likelihoods
 
@@ -86,9 +187,9 @@ $$
 
 ## pruning algorithm [@felsensteinMaximum1973]
 
-* conditional independence of graph nodes given value at an intervening node
-* recursive computation starting from tips (dynamic programming)
-* at tips, probability is 1 for observed trait value, 0 for others  
+* conditional independence of graph nodes
+* recursive computation starting from tips
+* at tips, prob=1.0 for observed trait value, 0 for others  
 (or evenly distributed across unknown traits)
 
 $$
@@ -101,17 +202,26 @@ $$
 \end{split}
 $$
 
-## pruning algorithm (ex)
+## pruning algorithm example
 
 From @harmonPhylogenetic2019 (CC-BY-4.0)
 
-![](../pix/prune1.png)
+<center>
 
-## pruning algorithm (ex)
+<img src = "pix/prune1.png" height="400">
+
+</center>
+
+## pruning algorithm example
 
 From @harmonPhylogenetic2019 (CC-BY-4.0)
 
-![](../pix/prune2.png)
+<center>
+
+<img src = "pix/prune2.png" height="400">
+
+</center>
+
 
 ## pruning algorithm (complete)
 
@@ -130,7 +240,9 @@ From @harmonPhylogenetic2019 (CC-BY-4.0)
 ## can we do better inference?
 
 * pairwise comparisons are unsatisfying
-* could rank by AIC/BIC/etc. ...
+* e.g. "the interaction term and the combined effect of sperm competition and the pc × sc interaction are non-significant, all other effects are significant"
+
+## rank by AIC/BIC/etc. ...
 
 ```{r ictab}
 ag_models <- paste0("ag_model_",
@@ -173,13 +285,13 @@ e.g. $\{q_{12}, q_{13}\} = \phi_1; \{q_{13}, q_{24}\}=\phi_2; \ldots$
 
 <center>
 
-![](../pix/bayestraits_fig6.png)
+![](pix/bayestraits_fig6.png)
 
 </center>
 
 ## possible approaches
 
-![](../pix/statstab.png)
+![](pix/statstab.png)
 
 <!--
 ------------------------------------------------------------------------------------------------------
@@ -211,24 +323,16 @@ Continuous/quantitative      MLE etc. + confidence intervals        posterior me
 
 <center>
 
-![](../pix/flowfig.png)
+```{r flowfig2-2, out.width = "65%"}
+knitr::include_graphics("pix/flowfig2.png")
+```
+</center>
 
 ## contrast matrix
 
-$$
-\left[
-\begin{array}{rrrrrrrr}
-1/4 & 1/4 & 1/4 & 1/4 & . & . & . & . \\
--1/2 & -1/2 & 1/2 & 1/2 & . & . & . & . \\
-1/2 & -1/2 & -1/2 & 1/2 & . & . & . & . \\
--1/2 & 1/2 & -1/2 & 1/2 & . & . & . & . \\
-. & . & . & . & 1/4 & 1/4 & 1/4 & 1/4 \\
-. & . & . & . & -1/2 & 1/2 & -1/2 & 1/2 \\
-. & . & . & . & -1/2 & -1/2 & 1/2 & 1/2 \\
-. & . & . & . & 1/2 & -1/2 & -1/2 & 1/2 \\
-\end{array}
-\right]
-$$
+![](pix/contrast_mat.png)
+
+# back to statistics
 
 ## Bayesian estimation (MCMC)
 
@@ -259,9 +363,11 @@ $$
 
 ## pairs plots example
 
-![](../pix/mcmc_pairs_tb.png)
+![](pix/mcmc_pairs_tb.png)
 
 ## results
+
+![](pix/fig2.png)
 
 ## sensitivity analyses
 

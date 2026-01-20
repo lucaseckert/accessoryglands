@@ -145,7 +145,8 @@ img {
 <center>
 
 <!-- ![](pix/phylo_plot-1.png) -->
-<img src = "pix/phylo_plot-1.png" height="500">
+<!-- <img src = "pix/phylo_plot-1.png" height="500"> -->
+<img src = "pix/bigphylo.png" height="550">
 
 </center>
 
