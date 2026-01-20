@@ -50,21 +50,27 @@ fix_names <- function(x) {
 }
 
 #### CONTRAST FUNCTIONS ####
-cfun_nonlog <- function(q12, q34, q56, q78, time1, time3, time5, time7) {
-    gmean(q12, q34, time1, time3)
+## computing contrasts - from rates to geometric mean ratios
+## rescued from 4b6dce5 on old_bayestest branch (!!)
+gmean <- function(x, y) sqrt(x*y)  ## equivalent to exp((log(x) + log(y))/2)
+cfun_nonlog <- function(q1, q2, q3, q4) {
+    gmean(q1,q2)/gmean(q3,q4)
+    ## or exp(
+    ##        (log(q1) + log(q2))/2 -
+    ##        (log(q3) + log(q4))/2
+    ##    )
 }
 
-## function for getting weighted contrasts from rates
+## function for getting contrasts from rates
 get_contrasts <- function(results) {
-  results$Log$results %>% 
-    mutate(gain_care_effect =   cfun_nonlog(q37,q48,q15,q26,time3,time4,time1,time2),
-           gain_spawn_effect =  cfun_nonlog(q26,q48,q15,q37,time2,time4,time1,time3),
-           gain_interaction =   cfun_nonlog(q15,q48,q37,q26,time1,time4,time3,time2),
-           loss_care_effect =   cfun_nonlog(q73,q84,q51,q62,time7,time8,time5,time6),
-           loss_spawn_effect =  cfun_nonlog(q62,q84,q51,q73,time6,time8,time5,time7),
-           loss_interaction =   cfun_nonlog(q51,q84,q73,q62,time5,time8,time7,time6))
+  results$Log$results %>%
+  mutate(gain_care_effect =   cfun_nonlog(q37,q48,q15,q26),
+         gain_spawn_effect =  cfun_nonlog(q26,q48,q15,q37),
+         gain_interaction =   cfun_nonlog(q15,q48,q37,q26),
+         loss_care_effect =   cfun_nonlog(q73,q84,q51,q62),
+         loss_spawn_effect =  cfun_nonlog(q62,q84,q51,q73),
+         loss_interaction =   cfun_nonlog(q51,q84,q73,q62))
 }
-
 
 ## read in three different formats (raw rates; rates as list of chains; contrasts)
 bdir <- "bayestraits"
