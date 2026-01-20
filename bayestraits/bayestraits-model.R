@@ -50,12 +50,27 @@ fix_names <- function(x) {
 }
 
 #### CONTRAST FUNCTIONS ####
+cfun_nonlog <- function(q12, q34, q56, q78, time1, time3, time5, time7) {
+    gmean(q12, q34, time1, time3)
+}
+
+## function for getting weighted contrasts from rates
+get_contrasts <- function(results) {
+  results$Log$results %>% 
+    mutate(gain_care_effect =   cfun_nonlog(q37,q48,q15,q26,time3,time4,time1,time2),
+           gain_spawn_effect =  cfun_nonlog(q26,q48,q15,q37,time2,time4,time1,time3),
+           gain_interaction =   cfun_nonlog(q15,q48,q37,q26,time1,time4,time3,time2),
+           loss_care_effect =   cfun_nonlog(q73,q84,q51,q62,time7,time8,time5,time6),
+           loss_spawn_effect =  cfun_nonlog(q62,q84,q51,q73,time6,time8,time5,time7),
+           loss_interaction =   cfun_nonlog(q51,q84,q73,q62,time5,time8,time7,time6))
+}
 
 
 ## read in three different formats (raw rates; rates as list of chains; contrasts)
-read_chains <- function(fn)      { readRDS(file.path("bayestraits", fn)) |> get_chains() }
-read_chains_list <- function(fn) { readRDS(file.path("bayestraits", fn)) |> get_chains("mcmc.list") }
-read_contrasts <- function(fn)   { readRDS(file.path("bayestraits", fn)) |> get_contrasts() }
+bdir <- "bayestraits"
+read_chains <- function(fn)      { readRDS(file.path(bdir, fn)) |> get_chains() }
+read_chains_list <- function(fn) { readRDS(file.path(bdir, fn)) |> get_chains("mcmc.list") }
+read_contrasts <- function(fn)   { readRDS(file.path(bdir, fn)) |> get_contrasts() }
 
 if (!interactive()) pdf("bayestraits-pix.pdf", width = 16, height = 10)
 
@@ -65,7 +80,7 @@ if (!interactive()) pdf("bayestraits-pix.pdf", width = 16, height = 10)
 
 prior_fac <- 1/1212  ## derived from scaling ratio of our vs BayesTraits trees (see bayestraits-run.R)
 
-all_bt_model_results <- list.files(path="bayestraits",
+all_bt_model_results <- list.files(path=bdir,
                                 pattern = "bt_model_(no)?data_(reg|rj)_(default|prior)")
 names(all_bt_model_results) <- gsub("(bt_model_|\\.rds)", "", all_bt_model_results)
 ## should have a 2 x 2 x 2 result ({data, nodata} * {reg, rj} * {default, priors}) + 2
