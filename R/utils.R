@@ -920,3 +920,57 @@ if (require("tikzDevice")) {
 ##     system(sprintf("sed '%d i %s' %s", line = , str, file))
 ## }
 
+
+get_chains <- function(results, ret_val = c("data.frame", "mcmc", "mcmc.list"), xcols = c("chain", "Iteration"),
+                       maxlen = 6000) {
+    ret_val <- match.arg(ret_val)
+    rate_cols <- grep("^q[0-9]+", colnames(results$Log$results), value = TRUE)
+    chains <- results$Log$results[,c(xcols, rate_cols)]  ## q** values only
+    if ((nc <- nrow(chains)) > maxlen) {
+        message(sprintf("keeping %d of %d rows", maxlen, nc))
+        keep <- round(seq(1, nc, length.out = maxlen))
+        chains <- chains[keep,]
+    }
+    cols_disallowed <- which(apply(chains==0, 2, all)) ## forbidden/boring
+    dupes <- c("q24","q57","q68", ## care gain
+               "q42","q75","q86", ## care loss
+               "q34","q56","q78", ## spawn gain
+               "q43","q65","q87" ## spawn loss
+               )
+    cols_dupes <- match(dupes, colnames(chains))
+    res <- chains[, -c(cols_dupes, cols_disallowed)]
+    res <- switch(ret_val,
+                  mcmc = as.mcmc(res[!names(res) %in% xcols]),
+                  mcmc.list = as.mcmc.list(lapply(split(res[!names(res) %in% xcols], res$chain), mcmc)),
+                  res)
+    return(res)
+}
+
+## computing contrasts - from rates to geometric mean ratios
+gmean <- function(x, y) sqrt(x*y)  ## equivalent to exp((log(x) + log(y))/2)
+cfun_nonlog <- function(q1, q2, q3, q4) {
+    gmean(q1,q2)/gmean(q3,q4)
+    ## or exp(
+    ##        (log(q1) + log(q2))/2 -
+    ##        (log(q3) + log(q4))/2
+    ##    ) 
+}
+
+## function for getting contrasts from rates
+get_contrasts <- function(results, maxlen = 6000) {
+    chains <- results$Log$results
+    ## DRY, this is also in get_chains()
+    if ((nc <- nrow(chains)) > maxlen) {
+        message(sprintf("keeping %d of %d rows", maxlen, nc))
+        keep <- round(seq(1, nc, length.out = maxlen))
+        chains <- chains[keep,]
+    }
+    chains |> 
+        mutate(gain_care_effect =   cfun_nonlog(q37,q48,q15,q26),
+               gain_spawn_effect =  cfun_nonlog(q26,q48,q15,q37),
+               gain_interaction =   cfun_nonlog(q15,q48,q37,q26),
+               loss_care_effect =   cfun_nonlog(q73,q84,q51,q62),
+               loss_spawn_effect =  cfun_nonlog(q62,q84,q51,q73),
+               loss_interaction =   cfun_nonlog(q51,q84,q73,q62))
+}
+
