@@ -19,6 +19,7 @@ theme_set(theme_bw())
 library(targets)
 knitr::opts_chunk$set(echo = FALSE, dpi = 200, optipng = knitr::hook_optipng)
 options(bitmapType = "cairo")
+library(tidyverse)
 ```
 
 ```{r load, include=FALSE}
@@ -283,15 +284,32 @@ e.g. $\{q_{12}, q_{13}\} = \phi_1; \{q_{13}, q_{24}\}=\phi_2; \ldots$
 
 ## BayesTraits posteriors
 
-<center>
-
-![](pix/bayestraits_fig6.png)
-
-</center>
+```{r bayestraits-post, fig.width = 6}
+rjdat <- readRDS("../bayestraits/bayestraits_rj.rds") |>
+  filter(method == "rj", data == "data", grepl("loss.ag", rate))
+min_val <- 1e-3
+gg_rate_violins <- ggplot(rjdat, aes(x = min_val + value, y = rate)) +
+  geom_violin(fill = "gray", adjust = 0.4) +
+  scale_x_log10() +
+  labs(x="rate (+ min value)",
+       y = "") +
+  geom_vline(xintercept = 1.0, lty = 2)
+print(gg_rate_violins)
+```
 
 ## possible approaches
 
 ![](pix/statstab.png)
+
+```{r statstab, echo = FALSE}
+## n.b. this a TAB-SEPARATED text
+statstab <- read.delim(header=TRUE, row.names = 1, text =
+"	Frequentist	Bayesian
+Discrete/qualitative (hypothesis testing)	NHST; AIC etc. (stats textbooks; @burnhamModel2004)	Bayes factors; B. indices of significance [@makowskiIndices2019]
+Continuous/quantitative (estimation w/ uncertainty)	MLE etc. + confidence intervals [@cummingIntroduction2017]	posterior means/medians + credible intervals
+")
+pander::pander(statstab, split.tables = Inf, justify = "left")
+```
 
 <!--
 ------------------------------------------------------------------------------------------------------

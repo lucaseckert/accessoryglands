@@ -220,6 +220,7 @@ gg_rate_violins <- ggplot(chains_long_2, aes(x = min_val + value, y = interactio
     labs(x="rate (+ min value)",
          y = "") +
     geom_vline(xintercept = 1.0, lty = 2)
+saveRDS(chains_long_2, file = "bayestraits/bayestraits_rj.rds")
 
 chains_long_3 <- (
     chains_long_2
