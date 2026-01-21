@@ -348,7 +348,49 @@ knitr::include_graphics("pix/flowfig2.png")
 
 ## contrast matrix
 
-![](pix/contrast_mat.png)
+Convert estimates of rates into estimates of *differences between rates* (contrasts). E.g. for parameters quantifying rates of gain of accessory glands:
+
+```{r contrast-1, echo = FALSE}
+cc <- read.csv("../contr.csv")
+if (FALSE) {
+    image(Matrix(as.matrix(cc[,-1])))
+    cc2 <- tidyr::pivot_longer(cc, -parname, names_to = "parname2") |>
+        filter(grepl("gain", parname) & grepl("gain", parname2) &
+               !grepl("net", parname2) &
+               grepl("_", parname))
+    ggplot(cc2, aes(parname, parname2, fill = factor(value))) +
+        geom_raster() +
+        scale_fill_manual(values = c("red", "lightblue", "blue")) +
+        scale_x_discrete(expand = c(0,0)) +
+        scale_y_discrete(expand = c(0,0))
+}
+```
+
+```{r contrast-2, echo = FALSE}
+cc3 <- as.matrix(cc[,-1])
+rownames(cc3) <- cc[,1]
+cc4 <- t(cc3[grepl("gain.*_", rownames(cc3)), grepl("_gain", colnames(cc3))])
+cc5 <- MASS::fractions(cc4)
+class(cc5) <- c("matrix", "array")
+cc5[] <- attr(cc5, "fracs")
+attr(cc5, "fracs") <- NULL
+fix_nm <- function(x, target, replacement, w = c("r", "s")) {
+    if ("r" %in% w) rownames(x) <- gsub(target, replacement, rownames(x))
+    if ("c" %in% w) colnames(x) <- gsub(target, replacement, colnames(x))
+    x
+}
+cc5 <- (fix_nm(cc5, "_gain", "", "r")
+    |> fix_nm("gain\\.ag_","", "c")
+    |> fix_nm("pc", "care", c("r", "c"))
+    |> fix_nm("sc", "spawn", c("r", "c"))
+    |> fix_nm("0", "(no)", "c")
+    |> fix_nm("1", "(yes)", "c")
+    |> fix_nm("_", "\n", "c")
+    |> fix_nm("x", "×\n", "r")
+)
+
+pander::pander(cc5, align = "r", split.tables = Inf)
+```
 
 # back to statistics
 
@@ -395,6 +437,8 @@ knitr::include_graphics("pix/flowfig2.png")
 * MLE fit
 * MLE fit, additive model
 * MAP fit with priors
+
+## sensitivity analyses (results)
 
 ```{r ci_plot0, warning = FALSE, message = FALSE}
 ##

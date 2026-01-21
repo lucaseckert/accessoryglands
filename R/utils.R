@@ -972,42 +972,43 @@ get_contrasts <- function(results, maxlen = 6000) {
                loss_interaction =   cfun_nonlog(q51,q84,q73,q62))
 }
 
-## shims for bayestestR
-abind <- function(x) {
-  nchains <- length(x)
-  a <- array(dim = c(nrow(x[[1]]), nchains, ncol(x[[1]])))
-  for (i in seq(nchains)) {
-    a[,i,] <- as.matrix(x[[i]])
-  }
-  if (!is.null(parnames <- dimnames(x[[1]])[[2]])) {
-    dimnames(a)[[3]] <- parnames
-  }
-  return(a)
-}
+## should be covered by BMB fork of bayestestR now
+## ## shims for bayestestR
+## abind <- function(x) {
+##   nchains <- length(x)
+##   a <- array(dim = c(nrow(x[[1]]), nchains, ncol(x[[1]])))
+##   for (i in seq(nchains)) {
+##     a[,i,] <- as.matrix(x[[i]])
+##   }
+##   if (!is.null(parnames <- dimnames(x[[1]])[[2]])) {
+##     dimnames(a)[[3]] <- parnames
+##   }
+##   return(a)
+## }
 
-#' @examples
-#' mkdata <- function(nrow = 1000, ncol = 2, parnm = LETTERS[1:ncol]) {
-#'    replicate(ncol, rnorm(nrow) |> as.data.frame() |> setNames(parnm)
-#' }
-#' dd <- replicate(5, mkdata(), simplify = FALSE)
-#' x <- diagnostic_posterior(dd)
-diagnostic_posterior.default <- function(posterior, ...) {
-  if (is.list(posterior)) {
-    for (i in seq.along(posterior)) {
-      p <- posterior[[i]]
-      if (!(
-        (inherits(p, "data.frame") || inherits(p, "matrix")) &&
-        (dim(p) == 2) &&
-        (ncol(p) == ncol(posterior[[1]])))
-        ) stop("'posterior' must be a 3D array or a list of data frames with equal numbers of columns")
-    }
-    posterior <- abind(posterior)
-  }
-  if (!(inherits(posterior, "array") && length(dim(posterior)) == 3)) {
-    stop("expecting a 3D array")
-  }
-  ret <- rstan::monitor(posterior)
-  class(ret) <- "data.frame" ## get rid of simsummary() class
-  ret <- ret |> tibble::rownames_to_column(var = "Parameter")
-  as_tibble(ret)
-}
+## #' @examples
+## #' mkdata <- function(nrow = 1000, ncol = 2, parnm = LETTERS[1:ncol]) {
+## #'    replicate(ncol, rnorm(nrow) |> as.data.frame() |> setNames(parnm)
+## #' }
+## #' dd <- replicate(5, mkdata(), simplify = FALSE)
+## #' x <- diagnostic_posterior(dd)
+## diagnostic_posterior.default <- function(posterior, ...) {
+##   if (is.list(posterior)) {
+##     for (i in seq.along(posterior)) {
+##       p <- posterior[[i]]
+##       if (!(
+##         (inherits(p, "data.frame") || inherits(p, "matrix")) &&
+##         (dim(p) == 2) &&
+##         (ncol(p) == ncol(posterior[[1]])))
+##         ) stop("'posterior' must be a 3D array or a list of data frames with equal numbers of columns")
+##     }
+##     posterior <- abind(posterior)
+##   }
+##   if (!(inherits(posterior, "array") && length(dim(posterior)) == 3)) {
+##     stop("expecting a 3D array")
+##   }
+##   ret <- rstan::monitor(posterior)
+##   class(ret) <- "data.frame" ## get rid of simsummary() class
+##   ret <- ret |> tibble::rownames_to_column(var = "Parameter")
+##   as_tibble(ret)
+## }
