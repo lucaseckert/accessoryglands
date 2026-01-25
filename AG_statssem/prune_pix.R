@@ -121,7 +121,7 @@ pruning <- function(q, tree, x, model=NULL, steps = NULL, ...){
   Q[] <- c(0,q)[model+1]
   diag(Q) <- -rowSums(Q)
   L <- rbind(to.matrix(x[pw$tip.label],levels(x)),
-      matrix(0,tree$Nnode,k,dimnames=
+      matrix(NA_real_,tree$Nnode,k,dimnames=
                               list(1:tree$Nnode+Ntip(tree))))
   nn <- unique(pw$edge[,1]) 
   for (i in 1:length(nn)) {
@@ -144,6 +144,9 @@ library(ape)
 # A small 6-tip tree with varied branch lengths
 tr  <-  read.tree(text = "((A:1,B:1):0.5,(C:1.5,(D:0.5,E:0.5):2.0):1.0,F:2.5):0.5;")
 
+## example from Harmon
+tr_harmon <- read.tree(text = "((((A:1,B:1):0.5,C:1.5):1.0,(D:0.5,E:0.5):2.0):0.5,F:2.5);")
+tips_harmon <- c(0, 1, 0, 2, 2, 1)
 
 set.seed(101)
 invisible(capture.output(
@@ -163,7 +166,11 @@ P  <-  matrix(NA_real_, nrow = ntot, ncol = K)
 tip_states  <-  sample(0:(K-1), N, replace = TRUE)
 for (i in 1:N) P[i, ]  <-  as.numeric(0:(K - 1) == tip_states[i])
 
-pruning(q=rep(1,6), tree = tr, x = setNames(factor(tip_states), tr$tip.label))
+# Tip states: harmon
+
+pruning(q=rep(1,6), tree = tr_harmon, x = setNames(factor(tips_harmon), tr_harmon$tip.label), steps = 3 )
+
+pruning(q=rep(1,6), tree = tr, x = setNames(factor(tips_states), tr$tip.label))
 pruning(q=rep(1,6), tree = tr, x = setNames(factor(tip_states), tr$tip.label), steps = 1)
 pruning(q=rep(1,6), tree = tr, x = setNames(factor(tip_states), tr$tip.label), steps = 2)
 pruning(q=rep(1,6), tree = tr, x = setNames(factor(tip_states), tr$tip.label), steps = 3)
@@ -171,8 +178,8 @@ pruning(q=rep(1,6), tree = tr, x = setNames(factor(tip_states), tr$tip.label), s
   
 par(mar = c(2,2,2,2), xpd = NA)
 for (i in 0:5) {
-  P <- pruning(q=rep(1,6), tree = tr, x = setNames(factor(tip_states), tr$tip.label), steps = i)
-  P[rowSums(P)==0,] <- NA
+  P <- pruning(q=rep(1,6), tree = tr_harmon, x = setNames(factor(tips_harmon),
+                                                          tr_harmon$tip.label), steps = i)
   res  <-  plot_pruning_boxes_vertical(
     tr, P,
     digits = 3,
@@ -194,3 +201,6 @@ P[N + 4, ]  <-  c(0.5, NA, NA)
 
 # Plot
 title(main = "Pruning algorithm: probabilities filled where available", adj = 0)
+
+## example from Harmon's book
+
