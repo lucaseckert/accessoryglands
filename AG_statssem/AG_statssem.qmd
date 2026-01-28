@@ -13,9 +13,10 @@ source("../R/utils.R")
 source("../R/mcmc.R")
 source("../R/functions.R")
 source("../R/pkg_install.R")
+source("../R/prune_pix.R")
 load_pkgs(skip = "tikzDevice")
 zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
-theme_set(theme_bw())
+theme_set(theme_bw(base_size=16))
 library(targets)
 knitr::opts_chunk$set(echo = FALSE, dpi = 200, optipng = knitr::hook_optipng)
 options(bitmapType = "cairo")
@@ -53,7 +54,7 @@ contr_levs <- c(outer(FUN = paste, sep = "_",
                       c("intercept", "sc", "pc", "pcxsc"),
                       c("loss", "gain")))
 
-fix_all_ci <- function(x, levels = NULL) {
+fix_all_ci <- function(x, levels = NULL, labels = levels) {
     x <- (x
         ## replace NA values with Inf/-Inf so bars extend full range
         %>% replace_na(list(upr = Inf, lwr = -Inf))
@@ -63,7 +64,7 @@ fix_all_ci <- function(x, levels = NULL) {
     if (!is.null(levels)) {
         ## reorder levels as above
         x <- (x
-            %>%  mutate(across(term, factor, levels = levels))
+            %>%  mutate(across(term, factor, levels = levels, labels = labels))
         )
     }
     return(x)
@@ -159,7 +160,7 @@ img {
    * is the rate of gain/loss of AGs (in)dependent of whether a species (lineage) has group vs pair spawning, or male parental care?
 * likelihood ratio tests for (in)equality of rates
 
-![](pix/pagel_hyp.png)
+<img src = "pix/pagel_hyp.png" height = "250">
 
 ## setting up the model
 
@@ -203,38 +204,83 @@ $$
 \end{split}
 $$
 
-## pruning algorithm example
+## pruning algorithm [@harmonPhylogenetic2019] (0)
 
-From @harmonPhylogenetic2019 (CC-BY-4.0)
+```{r prune0, echo = FALSE}
+## example from Harmon
+## https://lukejharmon.github.io/pcm/pdf/phylogeneticComparativeMethods.pdf
+## pp 127ff
+tr_harmon <- read.tree(text = "((((A:1,B:1):0.5,C:1.5):1.0,(D:0.5,E:0.5):2.0):0.5,F:2.5);")
+tips_harmon <- c(0, 1, 0, 2, 2, 1)
+plot_prune <- function(i) {
+  par(mar = c(2,2,2,2), xpd = NA)
+  hn <- NULL ## node(s) to highlight
+  P <- pruning(q=rep(1,6), tree = tr_harmon,
+               x = setNames(factor(tips_harmon),
+                            tr_harmon$tip.label), steps = i)
 
-<center>
+  if (i > 0) hn <- max(tr_harmon$edge) + 1 - i
 
-<img src = "pix/prune1.png" height="400">
+  res  <-  plot_pruning_boxes_vertical(
+    tr_harmon, P,
+    digits = 3,
+    box_gap_x = 0,
+    box_width_x = 0.3,
+    highlight.nodes = hn
+  )
+  nnode <- length(tips_harmon)
+  labs <- sprintf("%s = %s", tr_harmon$tip.label, tips_harmon)
+  for (i in 1:nnode) {
+    text(res$coords$x[i], res$coords$y[i]+0.3,
+         bquote(bold(.(labs[i]))))
+  }
+  invisible(res)
+}
+plot_prune(0)
+```
 
-</center>
+## pruning algorithm [@harmonPhylogenetic2019] (1)
 
-## pruning algorithm example
+```{r prune1, echo = FALSE}
+plot_prune(1)
+```
 
-From @harmonPhylogenetic2019 (CC-BY-4.0)
+## pruning algorithm [@harmonPhylogenetic2019] (2)
 
-<center>
+```{r prune2, echo = FALSE}
+plot_prune(2)
+```
 
-<img src = "pix/prune2.png" height="400">
+## pruning algorithm [@harmonPhylogenetic2019] (3)
 
-</center>
+```{r prune3, echo = FALSE}
+plot_prune(3)
+```
 
+## pruning algorithm [@harmonPhylogenetic2019] (4)
+
+```{r prune4, echo = FALSE}
+plot_prune(4)
+```
+
+## pruning algorithm [@harmonPhylogenetic2019] (5)
+
+```{r prune5, echo = FALSE}
+plot_prune(5)
+```
 
 ## pruning algorithm (complete)
 
 * once we get to the **root**, compute $\sum \textrm{Prior(i)} \cdot \pr(i)$
-* now apply your favourite optimization algorithm ...
+* now apply your favourite optimization (or sampling) algorithm ...
 
+## Likelihood ratio tests
 
-## LRTs
+* via `corHMM` package [@corHMM; @beaulieu_hidden_2014]
 
-* code from `corHMM` package [@corHMM; @beaulieu_hidden_2014]
-
-![](../pix/lrt_comp.png)
+<center>
+<img src = "../pix/lrt_comp.png" height="500">
+</center>
 
 # pause for statistical philosophy
 
@@ -298,8 +344,6 @@ print(gg_rate_violins)
 ```
 
 ## possible approaches
-
-![](pix/statstab.png)
 
 ```{r statstab, echo = FALSE}
 ## n.b. this a TAB-SEPARATED text
@@ -481,23 +525,32 @@ gg_ci_nowald <- (gg_ci0 %+% dplyr::filter(all_ci, method != "model_pcsc")
 )
 ```
 
-```{r contrast-ci, fig.width=8, fig.height = 6, warning = FALSE, message = FALSE}
+```{r contrast-ci, fig.width=12, fig.height = 6, warning = FALSE, message = FALSE}
 method_levs <- c("mcmc_tb", "mcmc_0",
                  "mcmc_tb_nogainloss",
                  "full",
                  "model_pcsc",
                  "model_pcsc_add",
                  "model_pcsc_prior")
-all_contr_ci <- (fix_all_ci(all_contr_ci, levels = contr_levs)
+method_labels <- c("MCMC + treeblock",
+                   "MCMC (consensus tree)",
+                   "MCMC (no gain/loss priors)",
+                   "MCMC (24-parameter model)",
+                   "MLE",
+                   "MLE (no interactions)",
+                   "MLE (regularized)")
+                   
+all_contr_ci <- (fix_all_ci(all_contr_ci,
+                            levels = contr_levs)
     |> filter(!grepl("net", term),
               !grepl("intercept", term),
               method != "priorsamp",
               !is.na(term))
-    |> mutate(across(method, factor, levels =rev(method_levs)))
+  |> mutate(across(method, factor, levels =rev(method_levs),
+                   labels = rev(method_labels)))
 )
 ## reverse order of levels, *and* guide, so that both are top-to-bottom
-
-gg_ci1C  <- (gg_ci0 %+% all_contr_ci
+gg_ci1C  <- (gg_ci0 + all_contr_ci
     + scale_y_log10(limits=c(1e-2, 1e3),
                     breaks = 10^seq(-2, 3),
                     labels = function(x) sprintf("%g", x),
@@ -524,6 +577,15 @@ print(gg_ci1C)
 * re-implement with HMC sampling in Template Model Builder (C++/autodiff engine) [@TMB2016]
 * consider contrasts weighted by occupancy?
 * extensions to hidden Markov models/covarion model [@beaulieu_hidden_2014]
+
+## Source
+
+https://github.com/eckert/accessoryglands
+
+```{r qrcode, out.width = "90%"}
+library("qrcode")
+plot(qr_code("https://www.math.mcmaster.ca/bolker/misc/AG_statssem.html"))
+```
 
 ## references {.refs}
 

@@ -7,6 +7,9 @@ AG_statssem.html: AG_statssem.qmd ../corHMM.bib
 AG_csesem.html: AG_csesem.rmd corHMM.bib
 	Rscript -e 'rmarkdown::render("AG_csesem.rmd")'
 
+upload:
+	scp AG_statssem.html ms.mcmaster.ca:~/public_html/misc
+
 
 
 

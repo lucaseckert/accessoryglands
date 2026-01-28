@@ -28,6 +28,7 @@ plot_pruning_boxes_vertical <- function(
   box_gap_x     = 0.006,
   border        = "black",
   fill          = "white",
+  highlight.nodes = NULL,
   cex           = 0.8,
   plot_args     = list(direction = "upwards",
                        type = "cladogram",
@@ -65,15 +66,19 @@ plot_pruning_boxes_vertical <- function(
 
   # Helper: draw K horizontally arranged cells centered at y_mid,
   # starting at x_left, all at the same y.
-  draw_row <- function(x_left, y_mid, probs) {
+  draw_row <- function(x_left, y_mid, probs,
+                       col = "black", bold = FALSE) {
     for (j in seq_len(K)) {
       xl <- x_left + (j - 1) * (bw + gap)
       rect(xl, y_mid - bh/2, xl + bw, y_mid + bh/2,
            col = fill, border = border)
       if (!is.na(probs[j])) {
+        f <- unname(formatC(probs[j], format = "f", digits = digits))
+        val <- if (!bold) f else bquote(bold(.(f)))
         text(xl + bw/2, y_mid,
-             formatC(probs[j], format = "f", digits = digits),
-             cex = cex)
+             val,
+             cex = cex,
+             col = col)
       }
     }
   }
@@ -94,20 +99,28 @@ plot_pruning_boxes_vertical <- function(
     row_span <- K * bw + (K - 1) * gap
     x_left   <- x_center - row_span / 2
     y_below  <- yy[i] - node_offset_y * yspan
-    draw_row(x_left, y_below, P[i, ])
+    if (i %in% highlight.nodes) {
+      draw_row(x_left, y_below, P[i, ], bold = TRUE, col = "red")
+    } else {
+      draw_row(x_left, y_below, P[i, ])
+    }
   }
 
   invisible(list(coords = data.frame(node = 1:n_total, x = xx, y = yy),
                  box = list(cell_width_x = bw, height_y = bh, gap_x = gap, K = K)))
 }
 
+## extract just pruning algorithm part (probably redundant with
+## code above but ...)
 ## https://blog.phytools.org/2023/03/simple-demonstration-of-felsensteins.html
 ##' @param q rates
 ##' @param tree
 ##' @param x tip states
 ##' @param model matrix of transition-rate indices
-##' optional pi: root priors
-pruning <- function(q, tree, x, model=NULL, steps = NULL, ...){
+##' @param steps stop after (x) pruning steps and return matrix of probabilities
+##' @param pi: root priors
+pruning <- function(q, tree, x, model=NULL, steps = NULL,
+                    pi = rep(1/k, k), ...){
   require("phytools", quietly = TRUE) ## for to.matrix
   pw <- reorder(tree,"postorder")
   k <- length(levels(x))
@@ -115,8 +128,6 @@ pruning <- function(q, tree, x, model=NULL, steps = NULL, ...){
     model <- matrix(1,k,k)
     diag(model) <- 0
   }
-  if(hasArg(pi)) pi <- list(...)$pi
-  else pi <- rep(1/k,k)
   Q <- matrix(0,k,k)
   Q[] <- c(0,q)[model+1]
   diag(Q) <- -rowSums(Q)
@@ -141,66 +152,4 @@ pruning <- function(q, tree, x, model=NULL, steps = NULL, ...){
 
 library(ape)
 
-# A small 6-tip tree with varied branch lengths
-tr  <-  read.tree(text = "((A:1,B:1):0.5,(C:1.5,(D:0.5,E:0.5):2.0):1.0,F:2.5):0.5;")
-
-## example from Harmon
-tr_harmon <- read.tree(text = "((((A:1,B:1):0.5,C:1.5):1.0,(D:0.5,E:0.5):2.0):0.5,F:2.5);")
-tips_harmon <- c(0, 1, 0, 2, 2, 1)
-
-set.seed(101)
-invisible(capture.output(
-  tr  <-  rtree(6) |> phytools::force.ultrametric() |>
-    reorder("postorder")
-))
-tr$edge.length <- round(tr$edge.length/min(tr$edge.length))
-N   <-  Ntip(tr)
-Ni  <-  tr$Nnode
-K   <-  3
-ntot  <-  N + Ni
-
-# Start with all NA, then fill tips with one-hot encoding of observed states
-P  <-  matrix(NA_real_, nrow = ntot, ncol = K)
-
-# Tip states: random
-tip_states  <-  sample(0:(K-1), N, replace = TRUE)
-for (i in 1:N) P[i, ]  <-  as.numeric(0:(K - 1) == tip_states[i])
-
-# Tip states: harmon
-
-pruning(q=rep(1,6), tree = tr_harmon, x = setNames(factor(tips_harmon), tr_harmon$tip.label), steps = 3 )
-
-pruning(q=rep(1,6), tree = tr, x = setNames(factor(tips_states), tr$tip.label))
-pruning(q=rep(1,6), tree = tr, x = setNames(factor(tip_states), tr$tip.label), steps = 1)
-pruning(q=rep(1,6), tree = tr, x = setNames(factor(tip_states), tr$tip.label), steps = 2)
-pruning(q=rep(1,6), tree = tr, x = setNames(factor(tip_states), tr$tip.label), steps = 3)
-pruning(q=rep(1,6), tree = tr, x = setNames(factor(tip_states), tr$tip.label), steps = 4)
-  
-par(mar = c(2,2,2,2), xpd = NA)
-for (i in 0:5) {
-  P <- pruning(q=rep(1,6), tree = tr_harmon, x = setNames(factor(tips_harmon),
-                                                          tr_harmon$tip.label), steps = i)
-  res  <-  plot_pruning_boxes_vertical(
-    tr, P,
-    digits = 3,
-    box_gap_x = 0,
-    box_width_x = 0.3
-  )
-  
-}
-
-nodelabels()
-## run the pruning algorithm!
-
-# Partially fill some internal nodes (to mimic "has reached/not yet")
-# NOTE: internal nodes are numbered N+1 to N+Ni
-P[N + 1, ]  <-  c(0.5, NA, NA)
-P[N + 2, ]  <-  c(NA, 1.0, NA)
-P[N + 3, ]  <-  c(NA, NA, NA)   # still blank
-P[N + 4, ]  <-  c(0.5, NA, NA)
-
-# Plot
-title(main = "Pruning algorithm: probabilities filled where available", adj = 0)
-
-## example from Harmon's book
 
