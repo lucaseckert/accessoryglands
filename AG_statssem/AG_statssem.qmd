@@ -109,7 +109,7 @@ img {
 ## Acknowledgments
 
 * NSERC ($$$)
-* Lucas Eckert, Sigal Balshine, Jess Miller, John Fitzpatrick
+* Lucas Eckert, Sigal Balshine, Jess Miller, John Fitzpatrick, Haoyu (Alan) Ji
 
 # The evolutionary problem
 
@@ -151,6 +151,37 @@ img {
 <img src = "pix/bigphylo.png" height="600">
 
 </center>
+
+## lots of missing data ...
+
+```{r missdat, echo = FALSE}
+library(magrittr)
+withr::with_dir("..",tar_load(ag_compdata))
+withr::with_dir("..",tar_load(ag_compdata_tb))
+barplot_trans <- (. 
+  %>% dplyr::mutate(dplyr::across(c(pc, sc), ~ factor(., levels = c(0:1, "?"))))
+  %>% dplyr::mutate(dplyr::across(ag, ~factor(., levels = 1:0))) ## reverse order to get ag=1 on top of bars
+)
+
+bar_data <- (purrr::map_dfr(list(fishphylo = ag_compdata$data,
+                    treeblock = ag_compdata_tb$data),
+               barplot_trans,
+               .id = "phylo")
+  |> dplyr::rename(`spawning mode`="sc")
+)
+
+tabs <- with(bar_data, table(pc == "?", `spawning mode` == "?", phylo))
+tt2 <- tabs[,,2]
+dimnames(tt2) <- list(c("care known", "care unknown"),
+                      c("spawning known", "spawning unknown"))
+```
+
+* `r sum(tabs[,,1])` species in consensus tree (complete genetic data); `r sum(tabs[,,2])` in "tree block" (imputations)
+
+```{r missdata-2}
+pander::pander(tt2)
+```
+
 
 # From evolution to statistics
 
@@ -571,12 +602,21 @@ print(gg_ci1C)
 * gain/loss priors unimportant
 * full 24-parameter model is problematic ...
 
+## computational improvements
+
+* single ML optimization: 6 minutes (computation), 2 minutes (elapsed)
+    * 1000 edges, 500 tips, 12 rate parameters
+* MCMC (adaptive Metropolis-Hastings)
+    * 8 chains × 84,000 iterations, burn-in = 4,000, thin = 10 → 64K samples
+    * 12-24 hours on 8 cores
+* re-implement with [RTMB](https://cran.r-project.org/web/packages/RTMB/vignettes/RTMB-introduction.html) [@TMB2016]
+    * single ML optimization: **3.3 seconds**
+	
 ## to-do list
 
-* compute Bayes factors (bridge sampling)
-* re-implement with HMC sampling in Template Model Builder (C++/autodiff engine) [@TMB2016]
-* consider contrasts weighted by occupancy?
-* extensions to hidden Markov models/covarion model [@beaulieu_hidden_2014]
+* RTMB + Hamiltonian Monte Carlo
+* compute Bayes factors (bridge sampling) ?
+* extensions to hidden Markov models/covarion model [@beaulieu_hidden_2014] ?
 
 ## Source
 
