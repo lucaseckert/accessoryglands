@@ -14,7 +14,7 @@ CRAN_pkgs <- c(CRAN_core_pkgs, CRAN_pix_pkgs)
 ## packages to install from GitHub (username, reponame)
 GH_core_pkgs <- list(c("bbolker","corHMM")        ## hacked/BMB version
                    , c("bbolker","btw")           ## BayesTree interface (hacked/BMB version)
-                   , c("bbolker", "bayestestR") ## BMB branch: https://github.com/easystats/bayestestR/pull/750
+                   , c("easystats", "bayestestR") ## need devel version
                 )
 
 GH_pix_pkgs <- list(c("YuLab-SMU","ggtree"))
