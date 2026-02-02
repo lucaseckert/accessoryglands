@@ -254,6 +254,7 @@ par_names <- function(model) {
 
 #' give parameters and states more meaningful names
 #' @param model corHMM model
+#' @param add_hessian compute Hessian and add it as an attribute?
 augment_model <- function(model, add_hessian = TRUE) {
     sn <- state_names(model$data[, -1])
     dimnames(model$solution) <- dimnames(model$index.mat) <- list(sn, sn)
@@ -263,6 +264,7 @@ augment_model <- function(model, add_hessian = TRUE) {
         f <- make_nllfun(model)
         p <- model$args.list$p
         H <- numDeriv::hessian(f, p)
+        ## if we had RTMB functions we could use numDeriv::jacobian(gr, p)
         attr(model, "hessian") <- H
     }
     return(model)
