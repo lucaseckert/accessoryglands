@@ -259,6 +259,7 @@ augment_model <- function(model, add_hessian = TRUE) {
     dimnames(model$solution) <- dimnames(model$index.mat) <- list(sn, sn)
     names(model$args.list$p) <- par_names(model)
     if (add_hessian) {
+        ## update model with return.devfun?
         f <- make_nllfun(model)
         p <- model$args.list$p
         H <- numDeriv::hessian(f, p)
