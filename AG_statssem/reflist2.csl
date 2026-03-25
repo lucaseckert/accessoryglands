@@ -111,7 +111,7 @@
    </macro>
    <macro name="contributors">
       <names variable="author">
-         <name and="text" initialize-with="" name-as-sort-order="first" sort-separator=", " delimiter=", " delimiter-precedes-last="always"/>
+         <name form="short" and="text" name-as-sort-order="first" sort-separator=", " delimiter=", " delimiter-precedes-last="always"/>
          <label form="short" prefix=", " suffix="." text-case="lowercase" strip-periods="true"/>
          <substitute>
             <text macro="editor"/>
@@ -385,7 +385,7 @@
          </else>
       </choose>
    </macro>
-   <citation et-al-min="1" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" givenname-disambiguation-rule="primary-name">
+   <citation et-al-min="1" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" givenname-disambiguation-rule="primary-name">
       <layout prefix="(" suffix=")" delimiter="; ">
          <group delimiter=", ">
             <group delimiter=" ">

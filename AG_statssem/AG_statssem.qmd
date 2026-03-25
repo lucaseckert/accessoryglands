@@ -39,7 +39,7 @@ withr::with_dir("..",tar_load("ag_model_pcsc_add"))
 mnames <- c("pcsc", "pcsc_add", "pc", "sc", "indep")
 ```
 
-```{r utils}
+```{r utils, include = FALSE}
 withr::with_dir("..",tar_load(ag_compdata))
 corhmm_bounds <- log(c(lwr=0.1, upper = 100*ape::Ntip(ag_compdata$phy)))
 corhmm_prior <- log(c(lwr=1, upper = 10*ape::Ntip(ag_compdata$phy)))
@@ -64,7 +64,7 @@ fix_all_ci <- function(x, levels = NULL, labels = levels) {
     if (!is.null(levels)) {
         ## reorder levels as above
         x <- (x
-            %>%  mutate(across(term, factor, levels = levels, labels = labels))
+            %>%  mutate(across(term, ~factor(., levels = levels, labels = labels)))
         )
     }
     return(x)
@@ -122,7 +122,6 @@ img {
 
 ## accessory glands
 
-
 * "organs involved in reproduction but not directly in the production or release of gametes"
 * typically in males, associated with seminal fluid
 * often associated with **sperm competition**
@@ -176,7 +175,7 @@ dimnames(tt2) <- list(c("care known", "care unknown"),
                       c("spawning known", "spawning unknown"))
 ```
 
-* `r sum(tabs[,,1])` species in consensus tree (complete genetic data); `r sum(tabs[,,2])` in "tree block" (imputations)
+* `r sum(tabs[,,1])` species in consensus tree (complete genetic data); `r sum(tabs[,,2])` in "tree block" (imputations, @@raboskyinverse2018)
 
 ```{r missdata-2}
 pander::pander(tt2)
@@ -303,11 +302,11 @@ plot_prune(5)
 ## pruning algorithm (complete)
 
 * once we get to the **root**, compute $\sum \textrm{Prior(i)} \cdot \pr(i)$
-* now apply your favourite optimization (or sampling) algorithm ...
+* now apply your favourite optimization [frequentist] or sampling [Bayesian] algorithm ...
 
 ## Likelihood ratio tests
 
-* via `corHMM` package [@corHMM; @beaulieu_hidden_2014]
+* via `corHMM` package [@beaulieu_hidden_2014; @corHMM]
 
 <center>
 <img src = "../pix/lrt_comp.png" height="500">
@@ -328,11 +327,11 @@ ag_models <- paste0("ag_model_",
 fake_nobs <- 30 ## ?? something weird about targets evaluation:
 dtab <- tibble(
     model = mnames,
-    desc = c("AG dep on PC, SC & interaction",
-             "AG dep on PC, SC additively",
-             "AG dep only on PC",
-             "AG dep only on SC",
-             "AG evol indep of PC, SC"))
+    desc = c("AG ~ PC * SC  (interaction)",
+             "AG ~ PC + SC (additive)",
+             "AG ~ PC",
+             "AG ~ SC",
+             "AG ~ 1 (constant)"))
 atab <- (mget(ag_models)
     |> setNames(mnames)
     |> map_dfr(glance, nobs = fake_nobs, .id = "model")
@@ -381,7 +380,7 @@ print(gg_rate_violins)
 statstab <- read.delim(header=TRUE, row.names = 1, text =
 "	Frequentist	Bayesian
 Discrete/qualitative (hypothesis testing)	NHST; AIC etc. (stats textbooks; @burnhamModel2004)	Bayes factors; B. indices of significance [@makowskiIndices2019]
-Continuous/quantitative (estimation w/ uncertainty)	MLE etc. + confidence intervals [@cummingIntroduction2017]	posterior means/medians + credible intervals
+Continuous/quantitative (estimation w/ uncertainty)	MLEs + CIs ('New Statistics', @cummingIntroduction2017)	posterior means + credible intervals
 ")
 pander::pander(statstab, split.tables = Inf, justify = "left")
 ```
@@ -402,15 +401,19 @@ Continuous/quantitative      MLE etc. + confidence intervals        posterior me
 -----------------------------------------------------------------------------------------------------
 -->
 
+<!--
 ## parallel with data science problems
 
 * inference based on discrete hypotheses $\approx$ comparing model goodness-of-fit summaries  
 (residual sum of squares, $R^2$, AIC, AUC, etc.)
-* we can also get predictions/point estimates of rates (not very interesting
+* we can also get predictions/point estimates of rates (not very interesting)
 
-## an approach to a quantitative solution
+-->
 
-* **how much** do traits affect rates?
+## ask a different question
+
+* instead of "reject $H_0$ that rates are independent of states"
+* $\to$ **how much** do traits affect rates?
 
 ## set up contrasts
 
@@ -515,10 +518,16 @@ pander::pander(cc5, align = "r", split.tables = Inf)
 
 ## sensitivity analyses (results)
 
-```{r ci_plot0, warning = FALSE, message = FALSE}
+```{r canned-sensitivity}
+knitr::include_graphics("sensitivity.png")
+```
+<!-- sensitivity outputs messed up ... ???? compare with
+ 'good' supplement version -->
+ 
+```{r ci_plot0, warning = FALSE, message = FALSE, eval = FALSE}
 ##
-withr::with_dir("..",tar_load(ag_compdata))
-withr::with_dir("..",tar_load(all_ci))
+withr::with_dir("..", targets::tar_load(ag_compdata))
+withr::with_dir("..", targets::tar_load(all_ci))
 
 all_ci <- fix_all_ci(all_ci, levels = levs)
 
@@ -556,7 +565,7 @@ gg_ci_nowald <- (gg_ci0 %+% dplyr::filter(all_ci, method != "model_pcsc")
 )
 ```
 
-```{r contrast-ci, fig.width=12, fig.height = 6, warning = FALSE, message = FALSE}
+```{r contrast-ci, fig.width=12, fig.height = 6, warning = FALSE, message = FALSE, eval = FALSE}
 method_levs <- c("mcmc_tb", "mcmc_0",
                  "mcmc_tb_nogainloss",
                  "full",
@@ -592,13 +601,25 @@ gg_ci1C  <- (gg_ci0 + all_contr_ci
     + aes(shape = method)
     + scale_shape_manual(values = c(scales::shape_pal(solid=TRUE)(6),9,10))
 )
-print(gg_ci1C)
+print(gg_ci1C + annotate("rect",
+                         ymin = 0.02,
+                         ymax = 50,
+                         xmin = 4.5,
+                         xmax = 5.5,
+                         fill = NA, colour = "darkred",
+                         linewidth = 1.5)
+      )
+```
+
+## sensitivity (zoom)
+```{r canned-sensitivity-crop}
+knitr::include_graphics("sensitivity-crop.png")
 ```
 
 ## take-home messages from sensitivity analysis
 
-* regularization matters (MAP $\approx$ full Bayes)
-* sampling over tree blocks (imputation) helps a little bit
+* regularization helps (full Bayes $\approx$ MAP)
+* sampling over tree blocks (imputation) helps
 * gain/loss priors unimportant
 * full 24-parameter model is problematic ...
 
@@ -612,6 +633,61 @@ print(gg_ci1C)
 * re-implement with [RTMB](https://cran.r-project.org/web/packages/RTMB/vignettes/RTMB-introduction.html) [@TMB2016]
     * single ML optimization: **3.3 seconds**
 	
+## original MLE vs autodiff (RTMB)
+
+```{r comp-compare, message = FALSE}
+dd <- readRDS("trait3_subtree.rds")
+if (!is.data.frame(dd)) dd <- as.data.frame(t(dd))
+dd$ldiff <- dd$RTMB_loglik - dd$orig_loglik
+tt <- t.test(dd$ldiff)
+qq <- quantile(dd$ldiff, c(0.25, 0.75))
+
+ddtb <- dd |>
+  transmute(
+    seed, ntaxa, ntrait, model,
+    ldiff,
+    opt_RTMB = RTMB_opt.time,
+    opt_orig = orig_opt.time,
+    tot_RTMB = RTMB_tot.time,
+    tot_orig = orig_tot.time
+  ) |>
+  pivot_longer(
+    cols = c(opt_RTMB, opt_orig, tot_RTMB, tot_orig),
+    names_to      = c("type", "method"),
+    names_pattern = "(opt|tot)_(RTMB|orig)",
+    values_to     = "value"
+  ) |>
+  mutate(
+    type   = factor(type,   levels = c("opt", "tot")),
+    method = factor(method, levels = c("orig", "RTMB")),
+
+    good = case_when(
+      is.na(ldiff) ~ NA_character_,
+      abs(ldiff) < 1e-6 ~ "OK",  
+      ldiff < 0 ~ "RTMB",  
+      ldiff > 0 ~ "orig"
+    ),
+    good = factor(good, levels = c("OK", "orig", "RTMB"))
+  )
+
+ggplot(filter(ddtb, type == "tot"),
+       aes(x = ntaxa, y = value, colour = method)) +
+  geom_point(alpha = 0.5) +
+  scale_x_log10() +
+  scale_y_log10() +
+  ## facet_wrap(~ type, scales = "free_y") +
+  geom_smooth(
+    method = "lm",  
+    se = FALSE,
+    linewidth = 0.8
+  ) +
+  labs(
+    x = "Number of taxa",
+    y = "time (seconds)",
+    colour   = "method"
+  ) +
+    scale_colour_discrete_qualitative()
+```  
 ## to-do list
 
 * RTMB + Hamiltonian Monte Carlo
@@ -626,6 +702,12 @@ https://github.com/eckert/accessoryglands
 library("qrcode")
 plot(qr_code("https://www.math.mcmaster.ca/bolker/misc/AG_statssem.html"))
 ```
+
+## tree block construction
+
+From @raboskyinverse2018:
+
+>  For each of the unsampled species of ray-finned fish, we assigned the most restrictive taxonomic rank (for example, genus, family, order) that was recovered as monophyletic in our maximum likelihood phylogeny. To determine divergence times for unsampled species in the phylogeny, we sampled from a distribution of waiting times conditioned on rank-specific estimates of the speciation rate and sampling fraction using a custom Python script implementing functions from TreePar and SimTree39,40,41, and added unsampled species based on the assigned taxonomic rank and inferred waiting time. This procedure was repeated 100 times to generate a distribution of fully sampled ray-finned fish phylogenies (Supplementary Information). This procedure is similar to stochastic polytomy resolution as implemented in PASTIS42, but permits construction of extremely large phylogenies using all molecular data in a single analysis, rather than a two-stage process that begins with a reduced backbone dataset followed by separate tree searches for each crown lineage.
 
 ## references {.refs}
 
