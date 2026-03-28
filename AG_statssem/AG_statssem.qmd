@@ -4,6 +4,7 @@ format:
   revealjs: 
     slide-number: true
     preview-links: auto
+    embed-resources: true
 bibliography: corHMM.bib
 csl: reflist2.csl
 ---
@@ -197,7 +198,7 @@ pander::pander(tt2)
 * continuous-time, discrete-state Markov process
 * rates defined as pairwise **hazards** (states $i$ and $j$)
 $$
-h_{ij}  = \lim_{\Delta t \to 0} P(i \to j\:\textrm{between}\:t\:\textrm{and}\:t+\Delta t)
+h_{ij}  = \lim_{\Delta t \to 0} P(i \to j\:\textrm{between}\:t\:\textrm{and}\:t+\Delta t)/\Delta t
 $$
 * 8 states (3 binary traits, 2 × 2 × 2)
 
